@@ -2,36 +2,6 @@
 
 <html lang="fr">
 <head>
-    <body>
-    <div id="game-container">
-        </div>
-<style>
-    body, html {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: -100%;
-        background-color: #000000; /* Fond noir total */
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Cette zone contient ton jeu */
-    #game-container {
-        flex: 1; /* Prend tout l'espace disponible en haut */
-        width: 100%;
-        height: 85vh; /* Le jeu ne prend que 85% de la hauteur de l'écran */
-        overflow-y: auto;
-    }
-
-    /* Cette zone est l'espace noir "mort" en bas */
-    .spacer-bottom {
-        height: 80px; /* Taille de la zone de sécurité en bas */
-        width: 100%;
-        background-color: #000000;
-        pointer-events: none; /* Désactive les clics sur cette zone */
-    }
 </style>
     <div class="spacer-bottom"></div>
 </body>
