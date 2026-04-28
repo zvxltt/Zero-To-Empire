@@ -1,31 +1,56 @@
 <!DOCTYPE html>
 
 <html lang="fr">
-<head><meta charset="UTF-8">
+<head>
+    <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ZeroToEmpire">
+    
     <title>Zero To Empire</title>
 
     <style>
-        /* Ce code force le jeu à ignorer les bordures du téléphone */
-        body, html {
+        /* Supprime les marges et bloque l'écran */
+        html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Empêche le rebond bizarre au scroll */
-            position: fixed; /* Bloque l'écran pour éviter que la barre d'adresse remonte */
-            background-color: #000; /* Fond noir pour se fondre avec l'encoche de l'iPhone */
+            overflow: hidden; /* Empêche le jeu de bouger de haut en bas */
+            position: fixed; /* Fixe la vue pour supprimer les barres de navigation */
+            background-color: #0d1117; /* Ta couleur sombre de fond */
+            font-family: sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Supprime le carré gris quand on clique */
+            -webkit-touch-callout: none; /* Empêche le menu copier/coller */
+            user-select: none; /* Empêche de sélectionner le texte du jeu */
         }
 
-        /* Si tu as un menu en bas, on lui ajoute une marge de sécurité pour l'iPhone */
-        .ton-menu-du-bas {
+        /* Protection pour les iPhones avec encoche (Barre du bas et encoche du haut) */
+        body {
+            padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* Ajustement automatique de ton contenu */
+        #game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
+<body>
+    ```
 <body>
     <div id="game-container"></div>
 
