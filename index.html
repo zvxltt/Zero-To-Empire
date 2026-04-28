@@ -2,6 +2,36 @@
 
 <html lang="fr">
 <head>
+  <style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #0d1117; /* La couleur sombre de ton jeu */
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    /* Le container principal du jeu */
+    #game-container {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        /* ICI : On ajoute l'espace vide en bas pour éviter la barre Safari */
+        padding-bottom: 120px; 
+        box-sizing: border-box;
+    }
+
+    /* Optionnel : si tu veux que ton image/pièce soit bien centrée */
+    .main-game-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>From Zero to Empire</title>
