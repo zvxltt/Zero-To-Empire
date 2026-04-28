@@ -2,18 +2,8 @@
 
 <html lang="fr">
 <head>
-</style>
-    <div class="spacer-bottom"></div>
-</body>
-    </style>
-</head>
-<body>
-    ```
-<body>
-    <div id="game-container"></div>
-
-    <script src="script.js"></script>
-</body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>From Zero to Empire</title>
 <style>
 /* Load Google Fonts when online */
@@ -677,12 +667,34 @@ const SVG_ICONS = {
   '⚠️': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
 };
 
+// Twemoji codepoint map (emoji → PNG filename on CDN)
+const TWEMOJI_MAP = {
+  '☀️':'2600','⚙️':'2699','⚡':'26a1','⛓️':'26d3','⛵':'26f5','⛷️':'26f7',
+  '✂️':'2702','✈️':'2708','⭐':'2b50','🌊':'1f30a','🌍':'1f30d','🌐':'1f310',
+  '🌑':'1f311','🌞':'1f31e','🌴':'1f334','🌸':'1f338','🍔':'1f354','🍷':'1f377',
+  '🍽️':'1f37d','🎭':'1f3ad','🎰':'1f3b0','🏁':'1f3c1','🏅':'1f3c5','🏆':'1f3c6',
+  '🏎️':'1f3ce','🏗️':'1f3d7','🏙️':'1f3d9','🏦':'1f3e6','🏨':'1f3e8','🏭':'1f3ed',
+  '🐂':'1f402','🐴':'1f434','👑':'1f451','👔':'1f454','👗':'1f457','👤':'1f464',
+  '👥':'1f465','💊':'1f48a','💎':'1f48e','💡':'1f4a1','💨':'1f4a8','💻':'1f4bb',
+  '💼':'1f4bc','📡':'1f4e1','📦':'1f4e6','📰':'1f4f0','📱':'1f4f1','🔧':'1f527',
+  '🔬':'1f52c','🔮':'1f52e','🔴':'1f534','🔶':'1f536','🔷':'1f537','🖥️':'1f5a5',
+  '🗺️':'1f5fa','🗽':'1f5fd','🚀':'1f680','🚗':'1f697','🚚':'1f69a','🛒':'1f6d2',
+  '🛡️':'1f6e1','🤖':'1f916','🥂':'1f942','🥖':'1f956','🦁':'1f981','🧠':'1f9e0',
+  '🧬':'1f9ec','🪂':'1fa82','⚽':'26bd','🌟':'1f31f','🔥':'1f525','🐯':'1f42f',
+  '🐺':'1f43a','🦊':'1f98a','🐉':'1f409',
+};
+const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/';
+
 function getIcon(emoji, size='18px') {
   const svg = SVG_ICONS[emoji];
   if (svg) return `<span class="svg-icon" style="width:${size};height:${size};display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${svg}</span>`;
-  // Emoji fallback with guaranteed rendering
+  const cp = TWEMOJI_MAP[emoji];
+  if (cp) {
+    return `<img src="${TWEMOJI_BASE}${cp}.png" width="${parseInt(size)||18}" height="${parseInt(size)||18}" style="display:inline-block;vertical-align:middle;image-rendering:auto;flex-shrink:0" alt="${emoji}" onerror="this.replaceWith(document.createTextNode('${emoji}'))">`;
+  }
+  // Emoji text fallback
   const px = parseInt(size) || 18;
-  return `<span style="font-size:${Math.round(px*0.9)}px;line-height:1;font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji','Twemoji Mozilla',sans-serif;display:inline-flex;align-items:center;justify-content:center">${emoji}</span>`;
+  return `<span style="font-size:${Math.round(px*0.9)}px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;display:inline-flex;align-items:center;justify-content:center">${emoji}</span>`;
 }
 
 // ══════════════════════════════════════════════
@@ -2428,11 +2440,6 @@ function cnpSell() {
     </div>
   </div>
 </div>
-<script>
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
-  }
-</script>
-  
+
 </body>
 </html>
