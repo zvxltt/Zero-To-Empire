@@ -146,9 +146,10 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 #football-progress-text{font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:7px;}
 #club-panel{display:flex;flex-direction:column;gap:9px;}
 
-/* Club tabs */
-.club-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:2px;}
-.club-tab{flex:1;padding:8px 6px;background:var(--bg2);border:none;color:var(--text3);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:var(--font-head);transition:all .2s;}
+/* Club tabs — scrollable on mobile */
+.club-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow-x:auto;overflow-y:hidden;margin-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.club-tabs::-webkit-scrollbar{display:none;}
+.club-tab{flex:1 0 auto;padding:8px 6px;background:var(--bg2);border:none;color:var(--text3);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:var(--font-head);transition:all .2s;white-space:nowrap;}
 .club-tab.active{background:var(--bg3);color:var(--mint);}
 .club-subpanel{display:none;}
 .club-subpanel.active{display:flex;flex-direction:column;gap:9px;}
@@ -235,8 +236,8 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 .crypto-change.up{color:var(--success);}
 .crypto-change.down{color:var(--danger);}
 .chart-canvas{width:100%;height:50px;background:var(--bg2);border-radius:5px;margin-bottom:10px;overflow:hidden;}
-.crypto-actions{display:flex;gap:6px;align-items:center;}
-.crypto-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text1);font-family:var(--font-mono);font-size:11px;outline:none;}
+.crypto-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.crypto-input{flex:1;min-width:80px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text1);font-family:var(--font-mono);font-size:11px;outline:none;}
 .crypto-input:focus{border-color:var(--gold-dim);}
 .crypto-invest-btn{padding:6px 10px;border-radius:6px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head);transition:all .15s;white-space:nowrap;}
 .crypto-invest-btn:active{transform:scale(0.96);}
@@ -397,7 +398,7 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
         <div class="stat-card"><div class="label">Fortune totale</div><div class="value gold" id="stat-fortune">0 €</div></div>
         <div class="stat-card"><div class="label">Revenus / sec</div><div class="value mint" id="stat-pps">0 €/s</div></div>
         <div class="stat-card"><div class="label">Par clic</div><div class="value" id="stat-cpc">1 €</div></div>
-        <div class="stat-card"><div class="label">Fortune max</div><div class="value gold" id="stat-max">0 €</div></div>
+        <div class="stat-card"><div class="label">Mult. prestige</div><div class="value gold" id="stat-max">×1.00</div></div>
       </div>
       <div id="click-zone">
         <div id="click-outer">
@@ -420,14 +421,6 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
           <div id="upgrades-list-home"></div>
         </div>
       </div>
-
-  <div id="prestige-bar">
-    <div>
-      <div class="pb-label">Multiplicateur prestige</div>
-      <div class="pb-desc" id="pb-desc">Aucun prestige encore</div>
-    </div>
-    <div class="pb-val" id="pb-val">×1.00</div>
-  </div>
 
   </div><!-- /#dashboard -->
   </div><!-- /#tab-dashboard -->
@@ -725,7 +718,33 @@ const TWEMOJI_MAP = {
 };
 const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/';
 
+// ── Badges clubs : SVG inline dans le style du jeu (gold/mint, no CDN) ──
+const BADGE_SVG = {
+  '⚽': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 7l1.5 4h4L14 14l1.5 4L12 16l-3.5 2L10 14l-3.5-3h4z" fill="rgba(212,175,55,0.15)" stroke="#D4AF37" stroke-width="1.2"/></svg>`,
+  '🦅': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M12 4C12 4 5 7 3 13c2.5-1 5-1 6 1"/><path d="M12 4C12 4 19 7 21 13c-2.5-1-5-1-6 1"/><path d="M9 14c0 4 1.5 6 3 7 1.5-1 3-3 3-7"/><line x1="12" y1="4" x2="12" y2="21"/><path d="M10 21h4"/><circle cx="12" cy="4" r="1.2" fill="#D4AF37"/></svg>`,
+  '🐯': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><circle cx="12" cy="13" r="7"/><path d="M9 11.5c0-1 1-2 3-2s3 1 3 2"/><path d="M10 16.5c.5.8 1.5 1 2 1s1.5-.2 2-1"/><line x1="6" y1="7" x2="4" y2="3"/><line x1="18" y1="7" x2="20" y2="3"/><line x1="8.5" y1="6" x2="7.5" y2="3.5"/><line x1="15.5" y1="6" x2="16.5" y2="3.5"/></svg>`,
+  '🦁': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><circle cx="12" cy="12" r="6"/><path d="M9 10.5c0-1 1-2 3-2s3 1 3 2"/><path d="M10 15c.5.8 1.5 1 2 1s1.5-.2 2-1"/><path d="M6 8C4 7 2 8.5 2 11M18 8c2-1 4 .5 4 3"/><path d="M8.5 7C7.5 5 7.5 3 9.5 2M15.5 7c1-2 1-4-1-5"/></svg>`,
+  '🐺': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M3 5.5l3.5 2.5 2-5 2.5 7h3l2.5-7 2 5L22 5.5l-2.5 6c0 4.5-3 8-7.5 8S4 16 4 11.5z"/><path d="M9.5 15c.8 1 2 1.5 2.5 1.5s1.7-.5 2.5-1.5"/><circle cx="9" cy="10" r="1" fill="#D4AF37"/><circle cx="15" cy="10" r="1" fill="#D4AF37"/></svg>`,
+  '🦊': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M3 3.5l4.5 5-1 3.5h11l-1-3.5L21 3.5l-5.5 1.5L12 2l-3.5 3z"/><path d="M6.5 12v5c0 3 2 5 5.5 5s5.5-2 5.5-5v-5"/><path d="M10 17c.5.8 1.3 1 2 1s1.5-.2 2-1"/></svg>`,
+  '🐉': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M4 12c0-4 3-7 7-7h2c3 0 5 2 5 5 0 2.5-1.5 4.5-4 4.5H8c-2 0-3-1.5-3-3.5"/><path d="M8 14.5l-2 6M16 14.5l2 6"/><path d="M9 5c0-2 2-3.5 3-3.5s3 1.5 3 3.5"/><circle cx="8.5" cy="10" r="1" fill="#D4AF37"/><circle cx="15.5" cy="10" r="1" fill="#D4AF37"/></svg>`,
+  '⭐': `<svg viewBox="0 0 24 24" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`,
+  '🔥': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M12 2c0 0-1.5 4-1.5 7.5 0 2.5 1.5 4 1.5 4s-3.5-1-3.5-6C6 10 4 13 4 16a8 8 0 0 0 16 0c0-6-5-10-8-14z" fill="rgba(212,175,55,0.12)"/><path d="M12 13.5c0 0-.5 1.5-.5 2.5a.5.5 0 0 0 1 0c0-1-.5-2.5-.5-2.5z" fill="#D4AF37" stroke="none"/></svg>`,
+  '🛡️': `<svg viewBox="0 0 24 24" fill="rgba(212,175,55,0.1)" stroke="#D4AF37" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7z"/><path d="M9 12l2 2 4-4" stroke="#D4AF37" stroke-width="1.5" fill="none"/></svg>`,
+  '👑': `<svg viewBox="0 0 24 24" fill="rgba(212,175,55,0.15)" stroke="#D4AF37" stroke-width="1.5"><path d="M2 20h20M3 8l4 8h10l4-8-5 4.5-4-8.5-4 8.5z"/><circle cx="3" cy="8" r="1.5" fill="#D4AF37"/><circle cx="21" cy="8" r="1.5" fill="#D4AF37"/><circle cx="12" cy="3.5" r="1.5" fill="#D4AF37"/></svg>`,
+  '🌟': `<svg viewBox="0 0 24 24" fill="rgba(212,175,55,0.2)" stroke="#D4AF37" stroke-width="1.4"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>`,
+  '🚀': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M5 17c-1.5 1.5-2 5-2 5s3.5-.5 5-2" fill="rgba(212,175,55,0.1)"/><path d="M12 2C12 2 6 6 6 12c0 3 2 6 4.5 7.5l1.5 1 1.5-1C16 18 18 15 18 12c0-6-6-10-6-10z" fill="rgba(212,175,55,0.1)"/><circle cx="12" cy="10" r="2.5"/><path d="M9 19l1-3M15 19l-1-3"/></svg>`,
+  '💎': `<svg viewBox="0 0 24 24" fill="rgba(212,175,55,0.15)" stroke="#D4AF37" stroke-width="1.5"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 3l4 6-4 12-4-12 4-6z" stroke="rgba(212,175,55,0.5)" stroke-width="0.8"/></svg>`,
+  '🏆': `<svg viewBox="0 0 24 24" fill="rgba(212,175,55,0.12)" stroke="#D4AF37" stroke-width="1.5"><path d="M6 9H3V5h3M18 9h3V5h-3M6 9v4a6 6 0 0 0 12 0V9H6z"/><path d="M12 19v3M8 22h8"/><path d="M9 13l1.5 1.5L15 10" stroke="#D4AF37" stroke-width="1.2" fill="none"/></svg>`,
+  // Équipes adverses
+  '🏙️': `<svg viewBox="0 0 24 24" fill="rgba(107,124,147,0.15)" stroke="#6B7C93" stroke-width="1.5"><rect x="2" y="7" width="6" height="15"/><rect x="10" y="3" width="8" height="19"/><rect x="20" y="10" width="2" height="12"/><line x1="0" y1="22" x2="24" y2="22"/><rect x="4" y="10" width="1.5" height="2" fill="#6B7C93" opacity=".5"/><rect x="13" y="6" width="1.5" height="2" fill="#6B7C93" opacity=".5"/><rect x="16" y="6" width="1.5" height="2" fill="#6B7C93" opacity=".5"/></svg>`,
+  '☀️': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><circle cx="12" cy="12" r="4" fill="rgba(212,175,55,0.2)"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>`,
+  '🔴': `<svg viewBox="0 0 24 24" stroke="#e05c5c" stroke-width="1.5"><circle cx="12" cy="12" r="9" fill="rgba(224,92,92,0.2)"/><path d="M9 9l6 6M15 9l-6 6" stroke="#e05c5c" stroke-width="1.5"/></svg>`,
+};
+
 function getIcon(emoji, size='18px') {
+  // Badges clubs : SVG inline dédié (priorité maximale, aucune dépendance CDN)
+  const badgeSvg = BADGE_SVG[emoji];
+  if (badgeSvg) return `<span class="svg-icon" style="width:${size};height:${size};display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${badgeSvg}</span>`;
   const svg = SVG_ICONS[emoji];
   if (svg) return `<span class="svg-icon" style="width:${size};height:${size};display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${svg}</span>`;
   const cp = TWEMOJI_MAP[emoji];
@@ -1042,7 +1061,7 @@ function fmt(n) {
   if (isNaN(n)||n===undefined) return '0 €';
   if (n >= 1e18) return (n/1e18).toFixed(2) + ' Qd €';
   if (n >= 1e15) return (n/1e15).toFixed(2) + ' Tr €';
-  if (n >= 1e12) return (n/1e12).toFixed(2) + ' Bn €';
+  if (n >= 1e12) return (n/1e12).toFixed(2) + ' Tr €';
   if (n >= 1e9)  return (n/1e9).toFixed(2)  + ' Md €';
   if (n >= 1e6)  return (n/1e6).toFixed(2)  + ' M€';
   if (n >= 1e3)  return (n/1e3).toFixed(1)  + ' k€';
@@ -1115,25 +1134,73 @@ function getMoralLabel(m) {
   return { txt: 'Mauvais', col: 'var(--danger)' };
 }
 
-function boostMoral() {
+const MORAL_BOOSTS = [
+  {id:'bonus',    name:'Prime de victoire',    desc:'Distribue des primes aux joueurs',   cost:50000,   moralGain:10, icon:'💰'},
+  {id:'spa',      name:'Stage & récupération', desc:'Centre de bien-être et kinés',        cost:150000,  moralGain:18, icon:'🌸'},
+  {id:'sortie',   name:'Cohésion d\'équipe',   desc:'Sortie teambuilding au restaurant',   cost:80000,   moralGain:12, icon:'🍽️'},
+  {id:'concert',  name:'Soirée VIP',           desc:'Soirée privée pour tout l\'effectif', cost:300000,  moralGain:22, icon:'🥂'},
+  {id:'vacances', name:'Vacances de mi-saison',desc:'Séjour de 4 jours pour les joueurs',  cost:600000,  moralGain:30, icon:'✈️'},
+  {id:'star',     name:'Recrutement coach star',desc:'Entraîneur motivateur de renom',     cost:2000000, moralGain:40, icon:'🏆'},
+];
+
+function openMoralShop() {
   const c = G.club;
-  const cost = Math.floor(50000 * (1 + (c.players.length * 0.5)));
-  if (G.money < cost) { showToast(`— Coût motivation : ${fmt(cost)}`); return; }
-  G.money -= cost;
-  c.moral = Math.min(100, (c.moral || 50) + 20);
-  showToast(`★ Moral boosté ! +20 moral → ${c.moral}/100`);
+  const existing = document.getElementById('moral-shop-modal');
+  if (existing) { existing.remove(); return; }
+  const modal = document.createElement('div');
+  modal.id = 'moral-shop-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:600;display:flex;align-items:flex-end;justify-content:center;padding:0';
+  modal.innerHTML = `
+    <div style="background:var(--bg1);border:1px solid var(--border);border-top:1px solid rgba(212,175,55,0.3);border-radius:16px 16px 0 0;padding:16px 14px 30px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase">★ Booster le Moral</div>
+        <button onclick="document.getElementById('moral-shop-modal').remove()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;padding:3px 9px;border-radius:6px">✕</button>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:10px">Moral actuel : <span style="color:${getMoralLabel(c.moral||50).col}">${c.moral||50}/100 — ${getMoralLabel(c.moral||50).txt}</span></div>
+      ${MORAL_BOOSTS.map(b=>`
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px">
+          <div style="font-size:20px;width:36px;height:36px;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${getIcon(b.icon,'18px')}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700">${b.name}</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text2);margin-top:2px">${b.desc}</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--success);margin-top:2px">+${b.moralGain} moral</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">${fmt(b.cost)}</div>
+            <button onclick="buyMoralBoost('${b.id}')" style="margin-top:4px;display:block;padding:4px 9px;border-radius:5px;border:1px solid ${G.money>=b.cost?'var(--mint)':'var(--bg4)'};background:transparent;color:${G.money>=b.cost?'var(--mint)':'var(--text3)'};font-size:9px;font-weight:700;cursor:pointer;font-family:var(--font-head)">${G.money>=b.cost?'Acheter':'Insuffisant'}</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+function buyMoralBoost(id) {
+  const b = MORAL_BOOSTS.find(x=>x.id===id);
+  if (!b) return;
+  if (G.money < b.cost) { showToast(`— Coût : ${fmt(b.cost)}`); return; }
+  G.money -= b.cost;
+  const c = G.club;
+  c.moral = Math.min(100, (c.moral||50) + b.moralGain);
+  document.getElementById('moral-shop-modal')?.remove();
+  showToast(`★ ${b.name} ! +${b.moralGain} moral → ${c.moral}/100`);
   renderClubAll(); updateUI();
 }
+
+function boostMoral() { openMoralShop(); }
 
 function upgradeSponsor() {
   const c = G.club;
   const lvl = c.sponsorLevel || 0;
   const sponsorTiers = [
-    { name: 'Sponsor local',      cost: 500000,    income: 2000  },
-    { name: 'Sponsor régional',   cost: 5000000,   income: 15000 },
-    { name: 'Sponsor national',   cost: 50000000,  income: 100000},
-    { name: 'Sponsor international', cost: 500000000, income: 800000},
-    { name: 'Sponsor mondial',    cost: 5000000000, income: 6000000},
+    { name: 'Sponsor local',           cost: 500000,      income: 2000    },
+    { name: 'Sponsor régional',        cost: 5000000,     income: 15000   },
+    { name: 'Sponsor national',        cost: 50000000,    income: 100000  },
+    { name: 'Sponsor international',   cost: 500000000,   income: 800000  },
+    { name: 'Sponsor mondial',         cost: 5000000000,  income: 6000000 },
+    { name: 'Partenaire premium',      cost: 25000000000, income: 35000000},
+    { name: 'Mégasponsor tech',        cost: 100000000000,income: 180000000},
+    { name: 'Sponsor légendaire',      cost: 5e11,        income: 1000000000},
   ];
   if (lvl >= sponsorTiers.length) { showToast('Niveau sponsor maximum !'); return; }
   const tier = sponsorTiers[lvl];
@@ -1157,7 +1224,9 @@ function getClickValue() {
 function getClubOverall() {
   const c = G.club;
   if (!c.players.length) return 0;
-  const avg = c.players.reduce((s,p)=>s+p.rat,0) / c.players.length;
+  const sorted = c.players.slice().sort((a,b)=>b.rat-a.rat);
+  const top5 = sorted.slice(0, Math.min(5, sorted.length));
+  const avg = top5.reduce((s,p)=>s+p.rat,0) / top5.length;
   return Math.min(99, (avg + (c.overallBonus||0)).toFixed(1)*1);
 }
 
@@ -1495,11 +1564,11 @@ function openClubModal() {
   document.getElementById('modal-club-name').value = G.club.name||'';
   document.getElementById('modal-club-nat').value = G.club.nat||'';
   const bs = document.getElementById('badge-selector');
-  bs.innerHTML = BADGE_OPTIONS.map(b=>`<div class="badge-opt${G.club.badge===b?' selected':''}" onclick="selectBadge('${b}')">${getIcon(b,'26px')}</div>`).join('');
+  bs.innerHTML = BADGE_OPTIONS.map(b=>`<div class="badge-opt${G.club.badge===b?' selected':''}" data-badge="${b}" onclick="selectBadge('${b}')">${getIcon(b,'26px')}</div>`).join('');
 }
 function selectBadge(b) {
   G.club.badge = b;
-  document.querySelectorAll('.badge-opt').forEach(el=>el.classList.toggle('selected',el.textContent===b));
+  document.querySelectorAll('.badge-opt').forEach(el=>el.classList.toggle('selected',el.dataset.badge===b));
 }
 function saveClubCustom() {
   const name = document.getElementById('modal-club-name').value.trim();
@@ -1820,11 +1889,11 @@ function renderClubOverview() {
       <div class="fin-card neutral full"><div class="f-label">Bonus moral (${c.moral||50}/100)</div><div class="f-amount" style="color:${getMoralLabel(c.moral||50).col}">${getMoralLabel(c.moral||50).txt} — ×${(1+((c.moral||50)/100)*0.5).toFixed(2)}</div></div>
     </div>
     ${c.sponsorLevel>0?`<div class="finance-grid" style="margin-top:6px">
-      <div class="fin-card income full"><div class="f-label">Sponsor actif — ${['','Local','Régional','National','International','Mondial'][c.sponsorLevel]||''}</div><div class="f-amount">+${fmt(c.sponsorIncome||0)}/s</div></div>
+      <div class="fin-card income full"><div class="f-label">Sponsor actif — ${['','Local','Régional','National','International','Mondial','Premium','Méga-Tech','Légendaire'][c.sponsorLevel]||''}</div><div class="f-amount">+${fmt(c.sponsorIncome||0)}/s</div></div>
     </div>`:''}
     <div style="display:flex;gap:6px;margin-top:6px">
       <button onclick="boostMoral()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(107,124,147,0.3);background:transparent;color:var(--mint);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">★ Booster moral</button>
-      <button onclick="upgradeSponsor()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(212,175,55,0.3);background:transparent;color:var(--gold);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">★ Sponsor (${fmt(([500000,5000000,50000000,500000000,5000000000][c.sponsorLevel||0])||500000)})</button>
+      <button onclick="upgradeSponsor()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(212,175,55,0.3);background:transparent;color:var(--gold);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">★ Sponsor (${fmt(([500000,5000000,50000000,500000000,5000000000,25000000000,100000000000,5e11][c.sponsorLevel||0])||500000)})</button>
     </div>
     <div class="section-title">Améliorations du club</div>
     <div class="upgrade-list">
@@ -2020,7 +2089,7 @@ function renderCryptoList() {
       <canvas class="chart-canvas" id="chart-${c.id}" width="300" height="50"></canvas>
       <div class="crypto-actions">
         <input class="crypto-input" id="ci-${c.id}" type="number" placeholder="Montant €" min="0" readonly style="cursor:pointer" onclick="openCryptoNumpad('${c.id}')">
-        <button class="crypto-invest-btn" onclick="openCryptoNumpad('${c.id}')">💰 Investir</button>
+        <button class="crypto-invest-btn" onclick="openCryptoNumpad('${c.id}')">Investir</button>
         ${h&&h.qty>0?`<button class="crypto-sell-btn" onclick="sellCrypto('${c.id}')">Vendre</button>`:''}
       </div>
       ${h&&h.qty>0?`<div class="crypto-holding ${pnl>=0?'profit':'loss'}">
@@ -2059,55 +2128,227 @@ function updateCryptoPortfolio() {
 // BTN STAGES (enhanced visuals)
 // ══════════════════════════════════════════════
 const BTN_STAGES = {
+  /* ─── STADE 1 : PIÈCE ─── dark gold coin avec reflet et relief */
   1: {
     label:'Stade 1 — Pièce de monnaie',
-    svg:`<circle cx="32" cy="32" r="27" fill="url(#coinGrad)" stroke="#D4AF37" stroke-width="2"/>
-         <circle cx="32" cy="32" r="20" fill="rgba(212,175,55,0.1)" stroke="#e8c96d" stroke-width="0.8"/>
-         <circle cx="24" cy="26" r="4" fill="rgba(255,240,150,0.3)"/>
-         <text x="32" y="41" text-anchor="middle" font-size="26" font-family="serif" fill="#e8c96d" font-weight="bold">€</text>
-         <defs><radialGradient id="coinGrad" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe57a"/><stop offset="50%" stop-color="#D4AF37"/><stop offset="100%" stop-color="#5a3e10"/></radialGradient></defs>`
+    svg:`<defs>
+      <radialGradient id="s1cg" cx="36%" cy="30%" r="65%">
+        <stop offset="0%"   stop-color="#fff5b0"/>
+        <stop offset="30%"  stop-color="#D4AF37"/>
+        <stop offset="65%"  stop-color="#7a5010"/>
+        <stop offset="100%" stop-color="#2e1a00"/>
+      </radialGradient>
+      <radialGradient id="s1hl" cx="30%" cy="25%" r="50%">
+        <stop offset="0%"  stop-color="rgba(255,255,200,0.45)"/>
+        <stop offset="100%" stop-color="rgba(255,255,200,0)"/>
+      </radialGradient>
+      <filter id="s1sh" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.7"/>
+      </filter>
+    </defs>
+    <!-- corps pièce -->
+    <circle cx="32" cy="32" r="26" fill="url(#s1cg)" filter="url(#s1sh)"/>
+    <!-- bord strié simulé -->
+    <circle cx="32" cy="32" r="26" fill="none" stroke="#e8c050" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="32" cy="32" r="23" fill="none" stroke="rgba(255,235,100,0.2)" stroke-width="0.7"/>
+    <!-- reflet spéculaire -->
+    <circle cx="32" cy="32" r="26" fill="url(#s1hl)"/>
+    <!-- gravure intérieure -->
+    <circle cx="32" cy="32" r="19" fill="none" stroke="rgba(255,220,80,0.18)" stroke-width="1.2"/>
+    <!-- symbole €  -->
+    <text x="32" y="40" text-anchor="middle" font-size="24" font-family="Georgia,serif" fill="#ffe070" font-weight="bold" opacity="0.95">€</text>
+    <!-- petite étincelle haut-gauche -->
+    <circle cx="21" cy="21" r="2.5" fill="rgba(255,250,180,0.4)"/>`
   },
+
+  /* ─── STADE 2 : LIASSE ─── trois billets empilés, style gravure */
   2: {
     label:'Stade 2 — Liasse de billets',
-    svg:`<rect x="6" y="28" width="52" height="26" rx="3" fill="#1a4a2a" stroke="#6B7C93" stroke-width="1"/>
-         <rect x="6" y="22" width="52" height="26" rx="3" fill="#1d5230" stroke="#6B7C93" stroke-width="1"/>
-         <rect x="6" y="16" width="52" height="26" rx="3" fill="#1a4a2a" stroke="#6B7C93" stroke-width="1.2"/>
-         <rect x="10" y="19" width="44" height="20" rx="2" fill="rgba(107,124,147,0.06)"/>
-         <line x1="10" y1="29" x2="54" y2="29" stroke="#6B7C93" stroke-width="0.6" opacity="0.5"/>
-         <circle cx="19" cy="29" r="5.5" fill="rgba(107,124,147,0.15)" stroke="#6B7C93" stroke-width="0.8"/>
-         <circle cx="45" cy="29" r="5.5" fill="rgba(107,124,147,0.15)" stroke="#6B7C93" stroke-width="0.8"/>
-         <text x="32" y="33" text-anchor="middle" font-size="9" font-family="monospace" fill="#6B7C93" font-weight="bold" letter-spacing="1">500 €</text>`
+    svg:`<defs>
+      <linearGradient id="s2bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#1c6035"/>
+        <stop offset="100%" stop-color="#0c3018"/>
+      </linearGradient>
+      <linearGradient id="s2top" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#256640"/>
+        <stop offset="100%" stop-color="#133820"/>
+      </linearGradient>
+      <filter id="s2sh">
+        <feDropShadow dx="1" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.65"/>
+      </filter>
+    </defs>
+    <!-- billet fond -->
+    <rect x="7"  y="32" width="50" height="22" rx="3" fill="#0f3a1e" stroke="#2a5e34" stroke-width="0.8" filter="url(#s2sh)"/>
+    <!-- billet milieu -->
+    <rect x="7"  y="25" width="50" height="22" rx="3" fill="url(#s2bg)" stroke="#3a7a48" stroke-width="0.9"/>
+    <!-- billet top -->
+    <rect x="7"  y="18" width="50" height="22" rx="3" fill="url(#s2top)" stroke="#5aaa6a" stroke-width="1"/>
+    <!-- inset décoratif -->
+    <rect x="11" y="21" width="42" height="16" rx="2" fill="rgba(255,255,255,0.03)" stroke="rgba(100,200,120,0.12)" stroke-width="0.5"/>
+    <!-- médaillon gauche -->
+    <circle cx="20" cy="29" r="5.5" fill="rgba(80,160,90,0.15)" stroke="#5aaa6a" stroke-width="0.6"/>
+    <circle cx="20" cy="29" r="3"   fill="rgba(80,160,90,0.12)"/>
+    <!-- médaillon droit -->
+    <circle cx="46" cy="29" r="5.5" fill="rgba(80,160,90,0.15)" stroke="#5aaa6a" stroke-width="0.6"/>
+    <circle cx="46" cy="29" r="3"   fill="rgba(80,160,90,0.12)"/>
+    <!-- trait horizontal -->
+    <line x1="11" y1="29" x2="53" y2="29" stroke="rgba(90,170,100,0.3)" stroke-width="0.6"/>
+    <!-- valeur -->
+    <text x="33" y="33" text-anchor="middle" font-size="7.5" font-family="monospace" fill="#90e0a0" font-weight="bold" letter-spacing="1.8">500 €</text>
+    <!-- coins coins de sécurité -->
+    <text x="11" y="23" font-size="4.5" font-family="monospace" fill="rgba(100,200,110,0.35)" letter-spacing="0.5">ZTE</text>
+    <text x="45" y="23" font-size="4.5" font-family="monospace" fill="rgba(100,200,110,0.35)" text-anchor="end">ZTE</text>`
   },
+
+  /* ─── STADE 3 : CARTE NOIRE ─── carte premium sombre avec puce dorée */
   3: {
-    label:'Stade 3 — Carte Premium',
-    svg:`<rect x="4" y="14" width="56" height="36" rx="6" fill="url(#cardGrad)" stroke="#D4AF37" stroke-width="1.5"/>
-         <rect x="4" y="26" width="56" height="9" fill="rgba(0,0,0,0.3)"/>
-         <rect x="8" y="37" width="16" height="10" rx="2" fill="url(#chipGrad)" stroke="#e8c96d" stroke-width="0.8"/>
-         <circle cx="44" cy="38" r="7" fill="rgba(224,92,92,0.25)" stroke="#e05c5c" stroke-width="0.8"/>
-         <circle cx="50" cy="38" r="7" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="0.8"/>
-         <text x="32" y="23" text-anchor="middle" font-size="7" font-family="monospace" fill="#e8c96d" letter-spacing="2.5">EMPIRE CARD</text>
-         <text x="8" y="48" font-size="6" font-family="monospace" fill="rgba(232,201,109,0.5)" letter-spacing="1.5">•••• •••• •••• 7777</text>
-         <defs>
-           <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1e2e40"/><stop offset="100%" stop-color="#0e1820"/></linearGradient>
-           <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#D4AF37"/><stop offset="100%" stop-color="#7a5e1e"/></linearGradient>
-         </defs>`
+    label:'Stade 3 — Carte Black',
+    svg:`<defs>
+      <linearGradient id="s3bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#1a2a3a"/>
+        <stop offset="50%"  stop-color="#0c151e"/>
+        <stop offset="100%" stop-color="#060d14"/>
+      </linearGradient>
+      <linearGradient id="s3chip" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#f0d060"/>
+        <stop offset="50%"  stop-color="#D4AF37"/>
+        <stop offset="100%" stop-color="#6a4008"/>
+      </linearGradient>
+      <linearGradient id="s3shine" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"  stop-color="rgba(255,255,255,0.06)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </linearGradient>
+      <filter id="s3glow">
+        <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- corps carte -->
+    <rect x="4" y="12" width="56" height="40" rx="5" fill="url(#s3bg)" stroke="#D4AF37" stroke-width="1.2" filter="url(#s3glow)"/>
+    <!-- reflet surface -->
+    <rect x="4" y="12" width="56" height="40" rx="5" fill="url(#s3shine)"/>
+    <!-- bande magnétique -->
+    <rect x="4" y="24" width="56" height="7" fill="rgba(0,0,0,0.55)"/>
+    <!-- puce EMV -->
+    <rect x="9" y="35" width="13" height="10" rx="2" fill="url(#s3chip)" stroke="#e8c050" stroke-width="0.6"/>
+    <line x1="9"  y1="38.3" x2="22" y2="38.3" stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>
+    <line x1="9"  y1="41"   x2="22" y2="41"   stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>
+    <line x1="15.5" y1="35" x2="15.5" y2="45" stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>
+    <!-- logo contactless -->
+    <path d="M30 37 Q33 37 33 40 Q33 43 30 43" fill="none" stroke="rgba(212,175,55,0.5)" stroke-width="1"/>
+    <path d="M28 35 Q35 35 35 40 Q35 45 28 45" fill="none" stroke="rgba(212,175,55,0.3)" stroke-width="0.8"/>
+    <!-- label -->
+    <text x="32" y="21" text-anchor="middle" font-size="5.5" font-family="monospace" fill="#D4AF37" letter-spacing="3.5" opacity="0.9">EMPIRE BLACK</text>
+    <!-- numéro carte -->
+    <text x="9"  y="50" font-size="5" font-family="monospace" fill="rgba(212,175,55,0.35)" letter-spacing="1.5">•••• •••• •••• 7777</text>
+    <!-- étoile haut droite -->
+    <text x="53" y="19" font-size="8" fill="rgba(212,175,55,0.4)" text-anchor="middle">★</text>`
   },
+
+  /* ─── STADE 4 : RÉSEAU CRYPTO ─── nœuds connectés, esthétique blockchain */
   4: {
-    label:'Stade 4 — Bitcoin / Crypto',
-    svg:`<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#hexGrad)" stroke="#e8c96d" stroke-width="1.5"/>
-         <polygon points="32,12 48,22 48,42 32,52 16,42 16,22" fill="rgba(212,175,55,0.08)" stroke="#D4AF37" stroke-width="0.6"/>
-         <text x="32" y="39" text-anchor="middle" font-size="24" fill="#e8c96d" font-weight="bold">₿</text>
-         <circle cx="44" cy="16" r="3" fill="rgba(232,201,109,0.4)"/>
-         <defs><radialGradient id="hexGrad" cx="40%" cy="30%"><stop offset="0%" stop-color="rgba(232,201,109,0.2)"/><stop offset="100%" stop-color="rgba(212,175,55,0.05)"/></radialGradient></defs>`
+    label:'Stade 4 — Réseau Crypto',
+    svg:`<defs>
+      <radialGradient id="s4ng" cx="50%" cy="50%" r="55%">
+        <stop offset="0%"   stop-color="rgba(212,175,55,0.14)"/>
+        <stop offset="100%" stop-color="rgba(212,175,55,0.01)"/>
+      </radialGradient>
+      <filter id="s4glow">
+        <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="s4nodeglow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- fond radial -->
+    <circle cx="32" cy="32" r="28" fill="url(#s4ng)"/>
+    <!-- cercle extérieur -->
+    <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(212,175,55,0.22)" stroke-width="1" stroke-dasharray="3,4"/>
+    <!-- arêtes réseau (liens entre nœuds) -->
+    <g stroke="rgba(212,175,55,0.25)" stroke-width="0.8">
+      <line x1="32" y1="10" x2="50" y2="22"/>
+      <line x1="32" y1="10" x2="14" y2="22"/>
+      <line x1="50" y1="22" x2="54" y2="42"/>
+      <line x1="14" y1="22" x2="10" y2="42"/>
+      <line x1="54" y1="42" x2="40" y2="54"/>
+      <line x1="10" y1="42" x2="24" y2="54"/>
+      <line x1="40" y1="54" x2="24" y2="54"/>
+      <line x1="32" y1="10" x2="32" y2="32"/>
+      <line x1="50" y1="22" x2="32" y2="32"/>
+      <line x1="14" y1="22" x2="32" y2="32"/>
+      <line x1="54" y1="42" x2="32" y2="32"/>
+      <line x1="10" y1="42" x2="32" y2="32"/>
+      <line x1="40" y1="54" x2="32" y2="32"/>
+      <line x1="24" y1="54" x2="32" y2="32"/>
+    </g>
+    <!-- nœuds périphériques -->
+    <g filter="url(#s4nodeglow)">
+      <circle cx="32" cy="10" r="2.8" fill="#D4AF37" opacity="0.9"/>
+      <circle cx="50" cy="22" r="2.2" fill="#D4AF37" opacity="0.7"/>
+      <circle cx="14" cy="22" r="2.2" fill="#D4AF37" opacity="0.7"/>
+      <circle cx="54" cy="42" r="2"   fill="#D4AF37" opacity="0.6"/>
+      <circle cx="10" cy="42" r="2"   fill="#D4AF37" opacity="0.6"/>
+      <circle cx="40" cy="54" r="2.2" fill="#D4AF37" opacity="0.7"/>
+      <circle cx="24" cy="54" r="2.2" fill="#D4AF37" opacity="0.7"/>
+    </g>
+    <!-- nœud central -->
+    <circle cx="32" cy="32" r="8" fill="rgba(212,175,55,0.12)" stroke="#D4AF37" stroke-width="1.2" filter="url(#s4glow)"/>
+    <circle cx="32" cy="32" r="5" fill="rgba(212,175,55,0.18)"/>
+    <text x="32" y="35.5" text-anchor="middle" font-size="8" font-family="monospace" fill="#e8c96d" font-weight="bold">₿</text>`
   },
+
+  /* ─── STADE 5 : EMPIRE ─── sceau héraldique, couronne, rayonnement */
   5: {
-    label:'Stade 5 — Corporation Mondiale',
-    svg:`<circle cx="32" cy="32" r="27" fill="rgba(212,175,55,0.05)" stroke="#D4AF37" stroke-width="1.5"/>
-         <circle cx="32" cy="32" r="20" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="0.8" stroke-dasharray="3,2"/>
-         <circle cx="32" cy="32" r="13" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width="0.6"/>
-         <text x="32" y="26" text-anchor="middle" font-size="8" fill="#e8c96d" font-weight="800" letter-spacing="3">EMPIRE</text>
-         <text x="32" y="37" text-anchor="middle" font-size="16" fill="#D4AF37">★</text>
-         <text x="32" y="47" text-anchor="middle" font-size="6" fill="rgba(212,175,55,0.6)" letter-spacing="2">CORP GLOBAL</text>`
+    label:'Stade 5 — Empire Mondial',
+    svg:`<defs>
+      <radialGradient id="s5bg" cx="50%" cy="45%" r="60%">
+        <stop offset="0%"   stop-color="rgba(212,175,55,0.18)"/>
+        <stop offset="60%"  stop-color="rgba(212,175,55,0.05)"/>
+        <stop offset="100%" stop-color="rgba(212,175,55,0)"/>
+      </radialGradient>
+      <filter id="s5glow">
+        <feGaussianBlur stdDeviation="3" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="s5crnglow">
+        <feGaussianBlur stdDeviation="2" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- fond rayonnant -->
+    <circle cx="32" cy="32" r="28" fill="url(#s5bg)"/>
+    <!-- rayons solaires (8) -->
+    <g stroke="rgba(212,175,55,0.18)" stroke-width="0.7">
+      <line x1="32" y1="4"  x2="32" y2="14"/>
+      <line x1="32" y1="50" x2="32" y2="60"/>
+      <line x1="4"  y1="32" x2="14" y2="32"/>
+      <line x1="50" y1="32" x2="60" y2="32"/>
+      <line x1="11.5" y1="11.5" x2="18.5" y2="18.5"/>
+      <line x1="52.5" y1="11.5" x2="45.5" y2="18.5"/>
+      <line x1="11.5" y1="52.5" x2="18.5" y2="45.5"/>
+      <line x1="52.5" y1="52.5" x2="45.5" y2="45.5"/>
+    </g>
+    <!-- cercles concentriques -->
+    <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(212,175,55,0.20)" stroke-width="0.8"/>
+    <circle cx="32" cy="32" r="22" fill="none" stroke="rgba(212,175,55,0.12)" stroke-width="0.6" stroke-dasharray="2,3"/>
+    <circle cx="32" cy="32" r="14" fill="none" stroke="rgba(212,175,55,0.10)" stroke-width="0.5"/>
+    <!-- couronne -->
+    <g filter="url(#s5crnglow)" fill="#D4AF37" opacity="0.92">
+      <!-- base couronne -->
+      <rect x="20" y="34" width="24" height="5" rx="1"/>
+      <!-- pointes couronne -->
+      <polygon points="20,34 22,25 25,32 28,22 32,30 36,22 39,32 42,25 44,34"/>
+      <!-- perles couronne -->
+      <circle cx="22" cy="25" r="1.5" fill="#ffe87a"/>
+      <circle cx="28" cy="22" r="1.5" fill="#ffe87a"/>
+      <circle cx="32" cy="30" r="1.2" fill="#ffe87a"/>
+      <circle cx="36" cy="22" r="1.5" fill="#ffe87a"/>
+      <circle cx="42" cy="25" r="1.5" fill="#ffe87a"/>
+    </g>
+    <!-- label bas -->
+    <text x="32" y="47" text-anchor="middle" font-size="5" font-family="monospace" fill="rgba(212,175,55,0.5)" letter-spacing="3" font-weight="700">EMPIRE</text>`
   }
 };
 
@@ -2155,15 +2396,15 @@ function updateUI() {
   document.getElementById('stat-fortune').textContent=fortStr;
   document.getElementById('stat-pps').textContent=fmt(pps)+'/s';
   document.getElementById('stat-cpc').textContent=fmt(getClickValue());
-  document.getElementById('stat-max').textContent=fmt(G.maxMoney);
-  document.getElementById('pb-val').textContent='×'+G.prestigeMult.toFixed(2);
-  document.getElementById('pb-desc').textContent=G.prestigeLevel>0?`Prestige niveau ${G.prestigeLevel}`:'Aucun prestige encore';
+  document.getElementById('stat-max').textContent='×'+G.prestigeMult.toFixed(2);
+  const pbVal=document.getElementById('pb-val'); if(pbVal) pbVal.textContent='×'+G.prestigeMult.toFixed(2);
+  const pbDesc=document.getElementById('pb-desc'); if(pbDesc) pbDesc.textContent=G.prestigeLevel>0?`Prestige niveau ${G.prestigeLevel}`:'Aucun prestige encore';
   document.getElementById('s-clicks').textContent=G.clicks.toLocaleString('fr-FR');
   document.getElementById('s-prest').textContent=G.prestigeLevel;
   document.getElementById('s-biz').textContent=Object.values(G.owned).reduce((a,b)=>a+b,0);
   document.getElementById('s-maxfort').textContent=fmt(G.maxMoney);
   document.getElementById('s-total').textContent=fmt(G.totalEarned);
-  document.getElementById('prestige-next-info').textContent=`Prochain prestige → ×${(1+(G.prestigeLevel+1)*0.25).toFixed(2)}`;
+  const pni=document.getElementById('prestige-next-info'); if(pni) pni.textContent=`Prochain prestige → ×${(1+(G.prestigeLevel+1)*0.25).toFixed(2)}`;
   const pb=document.getElementById('prestige-btn');
   pb.disabled=G.money<PRESTIGE_THRESHOLD;
   pb.textContent=G.money<PRESTIGE_THRESHOLD?`★ Prestige (nécessite ${fmt(PRESTIGE_THRESHOLD)})`:'★ Effectuer un Prestige';
@@ -2217,7 +2458,7 @@ function switchTab(name, btn) {
   }
   if (name==='football'&&G.clubUnlocked) renderClubAll();
   if (name==='bourse') { initCryptoPrices(); renderCryptoList(); updateCryptoPortfolio(); }
-  if (name==='settings') { renderKeySelector(); }
+  if (name==='settings') { switchSettingsTab('general', document.querySelector('#tab-settings .club-tab')); }
   updateUI();
 }
 
