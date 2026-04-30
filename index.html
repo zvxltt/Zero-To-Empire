@@ -2588,8 +2588,11 @@ function renderClubTransfers() {
     {tier:6, label:'Champions League', rankIdx:5,  color:'#e8cc5a'},
     {tier:7, label:'Coupe du Monde',   rankIdx:6,  color:'#f0a000'},
     {tier:8, label:'Légende',          rankIdx:7,  color:'#c87aff'},
-    {tier:9, label:'GOAT',             rankIdx:11, color:'#ff4466'},
-  ];
+    {tier:9, label:'Ballon d\'Or',     rankIdx:11, color:'#ff4466'},
+    {tier:10, label:'GOAT',            rankIdx:5,  color:'#f3da0b'},
+    {tier:11, label:'GOAT Suprême',    rankIdx:6,  color:'#ffdf68'},
+    {tier:12, label:'GOAT Ultime',     rankIdx:7,  color:'#f8a100'},
+   ];
 
   // Suggested tier = currentTierIdx+1 capped (tier field = rankIdx+1)
   const suggestedTier = Math.min(currentTierIdx + 1, 9);
