@@ -840,65 +840,220 @@ function getUpgLevel(id) {
 // ══════════════════════════════════════════════
 // PLAYERS POOL (50+)
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// PLAYERS POOL — tier corresponds to rank category
+// tier: 1=District, 2=Régional, 3=National, 4=Ligue2,
+//       5=Ligue1, 6=UCL, 7=CoupeDuMonde, 8=Légende,
+//       9=BallonDor, 10=Goat, 11=GoatSupreme, 12=GoatUltime
+// ratings: 1→30-45, 2→46-59, 3→60-69, 4→70-75,
+//          5→76-81, 6→82-87, 7→88-92, 8→93-96,
+//          9→93-96, 10→97-99, 11→97-99, 12→99
+// ══════════════════════════════════════════════
 const PLAYERS_POOL = [
-  // Élites (90+)
-  {name:'Kylian Mbappé',      pos:'AT', rat:97, salary:450000, value:220000000, nat:'🇫🇷'},
-  {name:'Erling Haaland',     pos:'AT', rat:96, salary:430000, value:200000000, nat:'🇳🇴'},
-  {name:'Vinícius Jr.',       pos:'AG', rat:95, salary:400000, value:190000000, nat:'🇧🇷'},
-  {name:'Rodri',              pos:'MC', rat:94, salary:370000, value:170000000, nat:'🇪🇸'},
-  {name:'Pedri',              pos:'MC', rat:92, salary:340000, value:150000000, nat:'🇪🇸'},
-  // Très bons (85-89)
-  {name:'Bukayo Saka',        pos:'AD', rat:89, salary:290000, value:110000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {name:'Jude Bellingham',    pos:'MC', rat:91, salary:310000, value:180000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {name:'Bernardo Silva',     pos:'MC', rat:88, salary:260000, value:85000000,  nat:'🇵🇹'},
-  {name:'Lautaro Martínez',   pos:'AT', rat:88, salary:250000, value:80000000,  nat:'🇦🇷'},
-  {name:'Florian Wirtz',      pos:'MC', rat:87, salary:230000, value:130000000, nat:'🇩🇪'},
-  {name:'Declan Rice',        pos:'MD', rat:86, salary:210000, value:70000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {name:'Phil Foden',         pos:'MC', rat:88, salary:270000, value:120000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  // Bons (80-84)
-  {name:'William Saliba',     pos:'DC', rat:85, salary:195000, value:55000000,  nat:'🇫🇷'},
-  {name:'Aurélien Tchouaméni',pos:'MD', rat:83, salary:170000, value:48000000,  nat:'🇫🇷'},
-  {name:'Gavi',               pos:'MD', rat:84, salary:180000, value:50000000,  nat:'🇪🇸'},
-  {name:'Marquinhos',         pos:'DC', rat:84, salary:175000, value:45000000,  nat:'🇧🇷'},
-  {name:'Victor Osimhen',     pos:'AT', rat:87, salary:240000, value:100000000, nat:'🇳🇬'},
-  {name:'Mike Maignan',       pos:'GB', rat:88, salary:220000, value:60000000,  nat:'🇫🇷'},
-  {name:'Virgil van Dijk',    pos:'DC', rat:86, salary:200000, value:40000000,  nat:'🇳🇱'},
-  {name:'Leroy Sané',         pos:'AG', rat:83, salary:160000, value:35000000,  nat:'🇩🇪'},
-  // Moyens (74-79)
-  {name:'Theo Hernández',     pos:'DG', rat:83, salary:155000, value:60000000,  nat:'🇫🇷'},
-  {name:'Yusuf Yazıcı',       pos:'MC', rat:78, salary:90000,  value:20000000,  nat:'🇹🇷'},
-  {name:'Ismaïla Sarr',       pos:'AG', rat:78, salary:85000,  value:18000000,  nat:'🇸🇳'},
-  {name:'Alexis Mac Allister', pos:'MC', rat:83, salary:165000, value:55000000,  nat:'🇦🇷'},
-  {name:'Lucas Hernández',    pos:'DC', rat:81, salary:140000, value:28000000,  nat:'🇫🇷'},
-  {name:'Takefusa Kubo',      pos:'AD', rat:80, salary:120000, value:50000000,  nat:'🇯🇵'},
-  {name:'Jonathan David',     pos:'AT', rat:84, salary:170000, value:65000000,  nat:'🇨🇦'},
-  {name:'Carlos Baleba',      pos:'MD', rat:76, salary:72000,  value:14000000,  nat:'🇨🇲'},
-  {name:'Idrissa Gueye',      pos:'MD', rat:76, salary:68000,  value:9000000,   nat:'🇸🇳'},
-  // Corrects (68-73)
-  {name:'Folarin Balogun',    pos:'AT', rat:75, salary:65000,  value:12000000,  nat:'🇺🇸'},
-  {name:'David Okereke',      pos:'AD', rat:73, salary:50000,  value:7000000,   nat:'🇳🇬'},
-  {name:'Kasper Dolberg',     pos:'AT', rat:73, salary:48000,  value:6500000,   nat:'🇩🇰'},
-  {name:'Filip Kostić',       pos:'DG', rat:76, salary:70000,  value:13000000,  nat:'🇷🇸'},
-  {name:'Lorenzo Pellegrini', pos:'MC', rat:79, salary:95000,  value:22000000,  nat:'🇮🇹'},
-  {name:'Patrik Schick',      pos:'AT', rat:78, salary:88000,  value:20000000,  nat:'🇨🇿'},
-  {name:'Bilal El Khannouss', pos:'MC', rat:74, salary:55000,  value:10000000,  nat:'🇲🇦'},
-  {name:'Rayan Cherki',       pos:'MC', rat:77, salary:75000,  value:40000000,  nat:'🇫🇷'},
-  // Développement (60-67)
-  {name:'Manu Koné',          pos:'MD', rat:77, salary:80000,  value:18000000,  nat:'🇫🇷'},
-  {name:'Lee Kang-in',        pos:'MC', rat:78, salary:82000,  value:30000000,  nat:'🇰🇷'},
-  {name:'Arjun Gaikwad',      pos:'DC', rat:64, salary:17000,  value:1200000,   nat:'🇮🇳'},
-  {name:'Cédric Hountondji',  pos:'DC', rat:66, salary:19000,  value:1500000,   nat:'🇧🇯'},
-  {name:'Mateus Fernandes',   pos:'MC', rat:72, salary:40000,  value:5000000,   nat:'🇵🇹'},
-  {name:'Mathys Tel',         pos:'AT', rat:74, salary:52000,  value:20000000,  nat:'🇫🇷'},
-  {name:'Warren Zaïre-Emery', pos:'MC', rat:78, salary:85000,  value:45000000,  nat:'🇫🇷'},
-  {name:'Sverre Nypan',       pos:'MC', rat:69, salary:25000,  value:4000000,   nat:'🇳🇴'},
-  {name:'Savio',              pos:'AD', rat:79, salary:90000,  value:40000000,  nat:'🇧🇷'},
-  {name:'Lamine Yamal',       pos:'AD', rat:87, salary:80000,  value:160000000, nat:'🇪🇸'},
-  {name:'Endrick',            pos:'AT', rat:76, salary:65000,  value:60000000,  nat:'🇧🇷'},
-  {name:'Alejandro Garnacho', pos:'AG', rat:81, salary:130000, value:55000000,  nat:'🇦🇷'},
-  {name:'Evan Ndicka',        pos:'DC', rat:78, salary:85000,  value:25000000,  nat:'🇫🇷'},
-  {name:'Ibrahim Sangaré',    pos:'MD', rat:78, salary:80000,  value:18000000,  nat:'🇨🇮'},
-  {name:'Loïc Badé',          pos:'DC', rat:77, salary:72000,  value:18000000,  nat:'🇫🇷'},
+  // ── TIER 1 : District (30–45) ──────────────
+  // Chelsea Legends
+  {name:'Petr Čech',          pos:'GB', rat:44, salary:1100,  value:9000,       nat:'🇨🇿', tier:1},
+  {name:'Branislav Ivanović', pos:'DD', rat:42, salary:950,   value:7000,       nat:'🇷🇸', tier:1},
+  {name:'John Terry',         pos:'DC', rat:45, salary:1200,  value:10000,      nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:1},
+  {name:'Ricardo Carvalho',   pos:'DC', rat:43, salary:1000,  value:8000,       nat:'🇵🇹', tier:1},
+  {name:'Azpilicueta',        pos:'DD', rat:41, salary:900,   value:6500,       nat:'🇪🇸', tier:1},
+  {name:'Frank Lampard',      pos:'MC', rat:45, salary:1200,  value:10000,      nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:1},
+  {name:'Claude Makélélé',    pos:'MD', rat:44, salary:1100,  value:9000,       nat:'🇫🇷', tier:1},
+  {name:'N\'Golo Kanté',      pos:'MD', rat:43, salary:1000,  value:8000,       nat:'🇫🇷', tier:1},
+  {name:'Eden Hazard',        pos:'AG', rat:44, salary:1100,  value:9500,       nat:'🇧🇪', tier:1},
+  {name:'Didier Drogba',      pos:'AT', rat:45, salary:1200,  value:10000,      nat:'🇨🇮', tier:1},
+  {name:'Gianfranco Zola',    pos:'MC', rat:40, salary:800,   value:6000,       nat:'🇮🇹', tier:1},
+  // Free fillers
+  {name:'Julien Moreau',      pos:'AT', rat:38, salary:700,   value:4500,       nat:'🇫🇷', tier:1},
+  {name:'Kevin Petit',        pos:'DC', rat:35, salary:550,   value:3500,       nat:'🇫🇷', tier:1},
+  {name:'Baptiste Roux',      pos:'MC', rat:40, salary:800,   value:5500,       nat:'🇫🇷', tier:1},
+  {name:'Lucas Blanc',        pos:'GB', rat:32, salary:450,   value:2800,       nat:'🇫🇷', tier:1},
+  {name:'Amine Benali',       pos:'AT', rat:41, salary:850,   value:6000,       nat:'🇲🇦', tier:1},
+  {name:'Moussa Diallo',      pos:'MD', rat:34, salary:500,   value:3000,       nat:'🇸🇳', tier:1},
+
+  // ── TIER 2 : Régional (46–59) ──────────────
+  // Atlético Madrid Legends
+  {name:'Jan Oblak',          pos:'GB', rat:58, salary:5500,  value:160000,     nat:'🇸🇮', tier:2},
+  {name:'Juanfran',           pos:'DD', rat:52, salary:3200,  value:80000,      nat:'🇪🇸', tier:2},
+  {name:'Diego Godín',        pos:'DC', rat:56, salary:4500,  value:130000,     nat:'🇺🇾', tier:2},
+  {name:'José Giménez',       pos:'DC', rat:54, salary:4000,  value:110000,     nat:'🇺🇾', tier:2},
+  {name:'Filipe Luís',        pos:'DG', rat:53, salary:3800,  value:100000,     nat:'🇧🇷', tier:2},
+  {name:'Gabi',               pos:'MD', rat:55, salary:4200,  value:120000,     nat:'🇪🇸', tier:2},
+  {name:'Koke',               pos:'MC', rat:57, salary:5000,  value:150000,     nat:'🇪🇸', tier:2},
+  {name:'Saúl Ñíguez',        pos:'MC', rat:54, salary:4000,  value:110000,     nat:'🇪🇸', tier:2},
+  {name:'Antoine Griezmann',  pos:'AT', rat:59, salary:5800,  value:180000,     nat:'🇫🇷', tier:2},
+  {name:'Fernando Torres',    pos:'AT', rat:56, salary:4500,  value:130000,     nat:'🇪🇸', tier:2},
+  {name:'Diego Forlán',       pos:'AT', rat:54, salary:4000,  value:110000,     nat:'🇺🇾', tier:2},
+  // Fillers
+  {name:'Thomas Leclercq',    pos:'AT', rat:50, salary:2800,  value:65000,      nat:'🇧🇪', tier:2},
+  {name:'Hamza Essalhi',      pos:'MD', rat:53, salary:3500,  value:90000,      nat:'🇲🇦', tier:2},
+  {name:'Jérémy Konan',       pos:'AG', rat:55, salary:4200,  value:120000,     nat:'🇨🇮', tier:2},
+
+  // ── TIER 3 : National (60–69) ──────────────
+  // PSG Legends
+  {name:'Bernard Lama',       pos:'GB', rat:62, salary:15000, value:4500000,    nat:'🇫🇷', tier:3},
+  {name:'Marquinhos',         pos:'DC', rat:68, salary:22000, value:12000000,   nat:'🇧🇷', tier:3},
+  {name:'Thiago Silva',       pos:'DC', rat:69, salary:24000, value:14000000,   nat:'🇧🇷', tier:3},
+  {name:'Maxwell',            pos:'DG', rat:63, salary:16000, value:5000000,    nat:'🇧🇷', tier:3},
+  {name:'Achraf Hakimi',      pos:'DD', rat:68, salary:22000, value:12000000,   nat:'🇲🇦', tier:3},
+  {name:'Marco Verratti',     pos:'MC', rat:68, salary:21000, value:11000000,   nat:'🇮🇹', tier:3},
+  {name:'Thiago Motta',       pos:'MD', rat:64, salary:17000, value:6000000,    nat:'🇧🇷', tier:3},
+  {name:'Blaise Matuidi',     pos:'MD', rat:65, salary:17500, value:7000000,    nat:'🇫🇷', tier:3},
+  {name:'Neymar Jr.',         pos:'AG', rat:69, salary:25000, value:15000000,   nat:'🇧🇷', tier:3},
+  {name:'Kylian Mbappé',      pos:'AT', rat:69, salary:25000, value:15000000,   nat:'🇫🇷', tier:3},
+  {name:'Edinson Cavani',     pos:'AT', rat:67, salary:20000, value:9000000,    nat:'🇺🇾', tier:3},
+  // Fillers
+  {name:'Rayan Cherki',       pos:'MC', rat:65, salary:17000, value:6500000,    nat:'🇫🇷', tier:3},
+  {name:'Carlos Baleba',      pos:'MD', rat:64, salary:16000, value:5800000,    nat:'🇨🇲', tier:3},
+  {name:'Patrik Schick',      pos:'AT', rat:65, salary:17000, value:6800000,    nat:'🇨🇿', tier:3},
+
+  // ── TIER 4 : Ligue 2 (70–75) ───────────────
+  // Arsenal Invincibles
+  {name:'David Seaman',       pos:'GB', rat:73, salary:42000, value:16000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4},
+  {name:'Lee Dixon',          pos:'DD', rat:71, salary:36000, value:12000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4},
+  {name:'Tony Adams',         pos:'DC', rat:74, salary:46000, value:19000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4},
+  {name:'Sol Campbell',       pos:'DC', rat:73, salary:43000, value:17000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4},
+  {name:'Ashley Cole',        pos:'DG', rat:74, salary:46000, value:19000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4},
+  {name:'Patrick Vieira',     pos:'MD', rat:75, salary:52000, value:22000000,   nat:'🇫🇷', tier:4},
+  {name:'Emmanuel Petit',     pos:'MD', rat:72, salary:40000, value:15000000,   nat:'🇫🇷', tier:4},
+  {name:'Robert Pirès',       pos:'AG', rat:74, salary:46000, value:19000000,   nat:'🇫🇷', tier:4},
+  {name:'Dennis Bergkamp',    pos:'AT', rat:75, salary:52000, value:22000000,   nat:'🇳🇱', tier:4},
+  {name:'Thierry Henry',      pos:'AT', rat:75, salary:52000, value:22000000,   nat:'🇫🇷', tier:4},
+  {name:'Ian Wright',         pos:'AT', rat:70, salary:34000, value:11000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4},
+  // Fillers
+  {name:'Jonathan David',     pos:'AT', rat:73, salary:42000, value:16500000,   nat:'🇨🇦', tier:4},
+  {name:'Takefusa Kubo',      pos:'AD', rat:73, salary:42000, value:17000000,   nat:'🇯🇵', tier:4},
+  {name:'Manu Koné',          pos:'MD', rat:72, salary:40000, value:15000000,   nat:'🇫🇷', tier:4},
+
+  // ── TIER 5 : Ligue 1 (76–81) ───────────────
+  // Inter Milan Legends
+  {name:'Samir Handanovič',   pos:'GB', rat:79, salary:90000, value:28000000,   nat:'🇸🇮', tier:5},
+  {name:'Javier Zanetti',     pos:'DD', rat:80, salary:110000,value:32000000,   nat:'🇦🇷', tier:5},
+  {name:'Walter Samuel',      pos:'DC', rat:78, salary:88000, value:26000000,   nat:'🇦🇷', tier:5},
+  {name:'Lucio',              pos:'DC', rat:79, salary:92000, value:28000000,   nat:'🇧🇷', tier:5},
+  {name:'Giacinto Facchetti', pos:'DG', rat:78, salary:88000, value:26000000,   nat:'🇮🇹', tier:5},
+  {name:'Esteban Cambiasso',  pos:'MD', rat:80, salary:110000,value:32000000,   nat:'🇦🇷', tier:5},
+  {name:'Wesley Sneijder',    pos:'MC', rat:81, salary:120000,value:36000000,   nat:'🇳🇱', tier:5},
+  {name:'Dejan Stanković',    pos:'MC', rat:79, salary:92000, value:28000000,   nat:'🇷🇸', tier:5},
+  {name:'Diego Milito',       pos:'AT', rat:79, salary:92000, value:28000000,   nat:'🇦🇷', tier:5},
+  {name:'Ronaldo Nazário',    pos:'AT', rat:81, salary:120000,value:36000000,   nat:'🇧🇷', tier:5},
+  {name:'Sandro Mazzola',     pos:'MC', rat:77, salary:80000, value:22000000,   nat:'🇮🇹', tier:5},
+  // Fillers
+  {name:'Warren Zaïre-Emery', pos:'MC', rat:78, salary:85000, value:24000000,   nat:'🇫🇷', tier:5},
+  {name:'Alejandro Garnacho', pos:'AG', rat:79, salary:90000, value:27000000,   nat:'🇦🇷', tier:5},
+  {name:'Theo Hernández',     pos:'DG', rat:80, salary:105000,value:30000000,   nat:'🇫🇷', tier:5},
+
+  // ── TIER 6 : Champions League (82–87) ──────
+  // Juventus Legends
+  {name:'Gianluigi Buffon',   pos:'GB', rat:87, salary:210000,value:65000000,   nat:'🇮🇹', tier:6},
+  {name:'Gianluca Zambrotta', pos:'DD', rat:84, salary:165000,value:42000000,   nat:'🇮🇹', tier:6},
+  {name:'Giorgio Chiellini',  pos:'DC', rat:86, salary:195000,value:58000000,   nat:'🇮🇹', tier:6},
+  {name:'Leonardo Bonucci',   pos:'DC', rat:85, salary:180000,value:52000000,   nat:'🇮🇹', tier:6},
+  {name:'Antonio Cabrini',    pos:'DG', rat:83, salary:155000,value:38000000,   nat:'🇮🇹', tier:6},
+  {name:'Claudio Marchisio',  pos:'MC', rat:84, salary:165000,value:42000000,   nat:'🇮🇹', tier:6},
+  {name:'Pavel Nedvěd',       pos:'MC', rat:86, salary:195000,value:58000000,   nat:'🇨🇿', tier:6},
+  {name:'Alessandro Del Piero',pos:'AT',rat:87, salary:210000,value:65000000,   nat:'🇮🇹', tier:6},
+  {name:'David Trezeguet',    pos:'AT', rat:85, salary:180000,value:52000000,   nat:'🇫🇷', tier:6},
+  {name:'Michel Platini',     pos:'MC', rat:87, salary:210000,value:65000000,   nat:'🇫🇷', tier:6},
+  {name:'Roberto Baggio',     pos:'AT', rat:87, salary:210000,value:65000000,   nat:'🇮🇹', tier:6},
+  // Fillers
+  {name:'Declan Rice',        pos:'MD', rat:84, salary:165000,value:45000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:6},
+  {name:'Phil Foden',         pos:'MC', rat:86, salary:195000,value:60000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:6},
+  {name:'Khvicha Kvaratskhelia',pos:'AG',rat:85,salary:180000,value:55000000,   nat:'🇬🇪', tier:6},
+
+  // ── TIER 7 : Coupe du Monde (88–92) ────────
+  // Manchester United Legends
+  {name:'Peter Schmeichel',   pos:'GB', rat:91, salary:310000,value:140000000,  nat:'🇩🇰', tier:7},
+  {name:'Gary Neville',       pos:'DD', rat:88, salary:240000,value:80000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Rio Ferdinand',      pos:'DC', rat:90, salary:280000,value:115000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Nemanja Vidić',      pos:'DC', rat:89, salary:260000,value:100000000,  nat:'🇷🇸', tier:7},
+  {name:'Denis Irwin',        pos:'DG', rat:88, salary:240000,value:80000000,   nat:'🇮🇪', tier:7},
+  {name:'Paul Scholes',       pos:'MC', rat:91, salary:310000,value:140000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Roy Keane',          pos:'MD', rat:91, salary:310000,value:140000000,  nat:'🇮🇪', tier:7},
+  {name:'David Beckham',      pos:'AD', rat:89, salary:260000,value:100000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Ryan Giggs',         pos:'AG', rat:90, salary:280000,value:115000000,  nat:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', tier:7},
+  {name:'Wayne Rooney',       pos:'AT', rat:90, salary:280000,value:115000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Eric Cantona',       pos:'AT', rat:91, salary:310000,value:140000000,  nat:'🇫🇷', tier:7},
+  // Fillers
+  {name:'Erling Haaland',     pos:'AT', rat:92, salary:380000,value:190000000,  nat:'🇳🇴', tier:7},
+  {name:'Jude Bellingham',    pos:'MC', rat:91, salary:310000,value:170000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Vinícius Jr.',       pos:'AG', rat:92, salary:370000,value:185000000,  nat:'🇧🇷', tier:7},
+
+  // ── TIER 8 : Légende (93–96) ───────────────
+  // Liverpool Legends
+  {name:'Alisson Becker',     pos:'GB', rat:93, salary:360000,value:180000000,  nat:'🇧🇷', tier:8},
+  {name:'Trent Alexander-Arnold',pos:'DD',rat:93,salary:360000,value:180000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:8},
+  {name:'Virgil van Dijk',    pos:'DC', rat:94, salary:400000,value:200000000,  nat:'🇳🇱', tier:8},
+  {name:'Jamie Carragher',    pos:'DC', rat:93, salary:360000,value:175000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:8},
+  {name:'Andrew Robertson',   pos:'DG', rat:93, salary:360000,value:175000000,  nat:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', tier:8},
+  {name:'Steven Gerrard',     pos:'MC', rat:95, salary:440000,value:250000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:8},
+  {name:'Xabi Alonso',        pos:'MD', rat:94, salary:400000,value:210000000,  nat:'🇪🇸', tier:8},
+  {name:'Graeme Souness',     pos:'MD', rat:93, salary:360000,value:175000000,  nat:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', tier:8},
+  {name:'Mohamed Salah',      pos:'AD', rat:94, salary:400000,value:210000000,  nat:'🇪🇬', tier:8},
+  {name:'Kenny Dalglish',     pos:'AT', rat:95, salary:440000,value:250000000,  nat:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', tier:8},
+  {name:'Ian Rush',           pos:'AT', rat:93, salary:360000,value:175000000,  nat:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', tier:8},
+  // Fillers
+  {name:'Kevin De Bruyne',    pos:'MC', rat:95, salary:420000,value:230000000,  nat:'🇧🇪', tier:8},
+  {name:'Luka Modrić',        pos:'MC', rat:93, salary:360000,value:175000000,  nat:'🇭🇷', tier:8},
+
+  // ── TIER 9 : Ballon d'Or (93–96) ───────────
+  // AC Milan Legends
+  {name:'Dida',               pos:'GB', rat:93, salary:360000,value:180000000,  nat:'🇧🇷', tier:9},
+  {name:'Paolo Maldini',      pos:'DG', rat:96, salary:480000,value:280000000,  nat:'🇮🇹', tier:9},
+  {name:'Alessandro Nesta',   pos:'DC', rat:95, salary:440000,value:250000000,  nat:'🇮🇹', tier:9},
+  {name:'Franco Baresi',      pos:'DC', rat:96, salary:480000,value:280000000,  nat:'🇮🇹', tier:9},
+  {name:'Cafú',               pos:'DD', rat:94, salary:400000,value:210000000,  nat:'🇧🇷', tier:9},
+  {name:'Andrea Pirlo',       pos:'MC', rat:96, salary:480000,value:280000000,  nat:'🇮🇹', tier:9},
+  {name:'Gennaro Gattuso',    pos:'MD', rat:93, salary:360000,value:180000000,  nat:'🇮🇹', tier:9},
+  {name:'Clarence Seedorf',   pos:'MC', rat:94, salary:400000,value:210000000,  nat:'🇳🇱', tier:9},
+  {name:'Kaká',               pos:'MC', rat:96, salary:480000,value:280000000,  nat:'🇧🇷', tier:9},
+  {name:'Andriy Shevchenko',  pos:'AT', rat:95, salary:440000,value:250000000,  nat:'🇺🇦', tier:9},
+  {name:'Pippo Inzaghi',      pos:'AT', rat:93, salary:360000,value:180000000,  nat:'🇮🇹', tier:9},
+  // Fillers
+  {name:'Karim Benzema',      pos:'AT', rat:94, salary:420000,value:220000000,  nat:'🇫🇷', tier:9},
+  {name:'Robert Lewandowski', pos:'AT', rat:93, salary:360000,value:180000000,  nat:'🇵🇱', tier:9},
+
+  // ── TIER 10 : GOAT (97–99) ─────────────────
+  // Bayern Munich Legends
+  {name:'Manuel Neuer',       pos:'GB', rat:97, salary:600000,value:450000000,  nat:'🇩🇪', tier:10},
+  {name:'Philipp Lahm',       pos:'DD', rat:97, salary:600000,value:450000000,  nat:'🇩🇪', tier:10},
+  {name:'Franz Beckenbauer',  pos:'DC', rat:99, salary:900000,value:800000000,  nat:'🇩🇪', tier:10},
+  {name:'Jérôme Boateng',     pos:'DC', rat:97, salary:600000,value:450000000,  nat:'🇩🇪', tier:10},
+  {name:'David Alaba',        pos:'DG', rat:97, salary:600000,value:450000000,  nat:'🇦🇹', tier:10},
+  {name:'Lothar Matthäus',    pos:'MD', rat:98, salary:750000,value:600000000,  nat:'🇩🇪', tier:10},
+  {name:'Bastian Schweinsteiger',pos:'MC',rat:97,salary:600000,value:450000000, nat:'🇩🇪', tier:10},
+  {name:'Thomas Müller',      pos:'AT', rat:97, salary:600000,value:450000000,  nat:'🇩🇪', tier:10},
+  {name:'Arjen Robben',       pos:'AD', rat:98, salary:750000,value:600000000,  nat:'🇳🇱', tier:10},
+  {name:'Franck Ribéry',      pos:'AG', rat:98, salary:750000,value:600000000,  nat:'🇫🇷', tier:10},
+  {name:'Robert Lewandowski', pos:'AT', rat:97, salary:600000,value:450000000,  nat:'🇵🇱', tier:10},
+
+  // ── TIER 11 : GOAT Suprême (97–99) ─────────
+  // Real Madrid Legends
+  {name:'Iker Casillas',      pos:'GB', rat:98, salary:750000,value:650000000,  nat:'🇪🇸', tier:11},
+  {name:'Roberto Carlos',     pos:'DG', rat:98, salary:750000,value:650000000,  nat:'🇧🇷', tier:11},
+  {name:'Sergio Ramos',       pos:'DC', rat:97, salary:620000,value:500000000,  nat:'🇪🇸', tier:11},
+  {name:'Fernando Hierro',    pos:'DC', rat:97, salary:620000,value:500000000,  nat:'🇪🇸', tier:11},
+  {name:'Dani Carvajal',      pos:'DD', rat:97, salary:620000,value:500000000,  nat:'🇪🇸', tier:11},
+  {name:'Zinédine Zidane',    pos:'MC', rat:99, salary:950000,value:900000000,  nat:'🇫🇷', tier:11},
+  {name:'Luka Modrić',        pos:'MC', rat:98, salary:750000,value:650000000,  nat:'🇭🇷', tier:11},
+  {name:'Toni Kroos',         pos:'MC', rat:98, salary:750000,value:650000000,  nat:'🇩🇪', tier:11},
+  {name:'Cristiano Ronaldo',  pos:'AT', rat:99, salary:950000,value:900000000,  nat:'🇵🇹', tier:11},
+  {name:'Alfredo Di Stéfano', pos:'AT', rat:99, salary:950000,value:900000000,  nat:'🇦🇷', tier:11},
+  {name:'Raúl González',      pos:'AT', rat:97, salary:620000,value:500000000,  nat:'🇪🇸', tier:11},
+
+  // ── TIER 12 : GOAT Ultime (99) ─────────────
+  // Barcelona Legends
+  {name:'Víctor Valdés',      pos:'GB', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Dani Alves',         pos:'DD', rat:99, salary:1000000,value:1000000000,nat:'🇧🇷', tier:12},
+  {name:'Gerard Piqué',       pos:'DC', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Carles Puyol',       pos:'DC', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Jordi Alba',         pos:'DG', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Xavi Hernández',     pos:'MC', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Andrés Iniesta',     pos:'MC', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Sergio Busquets',    pos:'MD', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
+  {name:'Lionel Messi',       pos:'AG', rat:99, salary:1000000,value:1000000000,nat:'🇦🇷', tier:12},
+  {name:'Ronaldinho',         pos:'AG', rat:99, salary:1000000,value:1000000000,nat:'🇧🇷', tier:12},
+  {name:'Luis Suárez',        pos:'AT', rat:99, salary:1000000,value:1000000000,nat:'🇺🇾', tier:12},
 ];
 
 // Club upgrades (with levels)
