@@ -443,8 +443,8 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
     <div id="football-locked">
       <span class="lock-emoji" style="display:block;margin-bottom:14px"><?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#6B7C93" stroke-width="1.4"><path d="M3 20V8l9-4 9 4v12"/><path d="M3 14h18M6 14v6M10 14v6M14 14v6M18 14v6"/></svg></span>
       <h2>Club de Football</h2>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:4px">Investissement nécessaire</p>
-      <div class="needed">100 000 €</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:4px">Fonds nécessaires</p>
+      <div class="needed">1 000 €</div>
       <div class="progress-big"><div class="progress-big-fill" id="fb-prog-fill" style="width:0%"></div></div>
       <div id="football-progress-text" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:7px">Progression : 0%</div>
     </div>
@@ -453,14 +453,14 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
         <button class="club-tab active" onclick="switchClubTab('overview',this)">Vue générale</button>
         <button class="club-tab" onclick="switchClubTab('squad',this)">Effectif</button>
         <button class="club-tab" onclick="switchClubTab('transfers',this)">Transferts</button>
-        <button class="club-tab" onclick="switchClubTab('match',this)">Match</button>
-        <button class="club-tab" onclick="switchClubTab('league',this)">Championnat</button>
+        <button class="club-tab" onclick="switchClubTab('ranked',this)">Ranked</button>
+        <button class="club-tab" onclick="switchClubTab('championships',this)">Championnats</button>
       </div>
       <div id="club-overview" class="club-subpanel active"></div>
       <div id="club-squad" class="club-subpanel"></div>
       <div id="club-transfers" class="club-subpanel"></div>
-      <div id="club-match" class="club-subpanel"></div>
-      <div id="club-league" class="club-subpanel"></div>
+      <div id="club-ranked" class="club-subpanel"></div>
+      <div id="club-championships" class="club-subpanel"></div>
     </div>
   </div>
 
@@ -840,67 +840,127 @@ function getUpgLevel(id) {
 }
 
 // ══════════════════════════════════════════════
-// PLAYERS POOL (50+)
+// PLAYERS POOL (120+) — catégories par palier
+// tier: 1=District(30-45), 2=Régional(46-59), 3=National(60-69),
+//       4=Ligue2(70-75), 5=Ligue1(76-81), 6=UCL(82-87),
+//       7=Worldcup(88-92), 8=Legend(93-96), 9=GOAT(97-99)
 // ══════════════════════════════════════════════
 const PLAYERS_POOL = [
-  // Élites (90+)
-  {name:'Kylian Mbappé',      pos:'AT', rat:97, salary:450000, value:220000000, nat:'🇫🇷'},
-  {name:'Erling Haaland',     pos:'AT', rat:96, salary:430000, value:200000000, nat:'🇳🇴'},
-  {name:'Vinícius Jr.',       pos:'AG', rat:95, salary:400000, value:190000000, nat:'🇧🇷'},
-  {name:'Rodri',              pos:'MC', rat:94, salary:370000, value:170000000, nat:'🇪🇸'},
-  {name:'Pedri',              pos:'MC', rat:92, salary:340000, value:150000000, nat:'🇪🇸'},
-  // Très bons (85-89)
-  {name:'Bukayo Saka',        pos:'AD', rat:89, salary:290000, value:110000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {name:'Jude Bellingham',    pos:'MC', rat:91, salary:310000, value:180000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {name:'Bernardo Silva',     pos:'MC', rat:88, salary:260000, value:85000000,  nat:'🇵🇹'},
-  {name:'Lautaro Martínez',   pos:'AT', rat:88, salary:250000, value:80000000,  nat:'🇦🇷'},
-  {name:'Florian Wirtz',      pos:'MC', rat:87, salary:230000, value:130000000, nat:'🇩🇪'},
-  {name:'Declan Rice',        pos:'MD', rat:86, salary:210000, value:70000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {name:'Phil Foden',         pos:'MC', rat:88, salary:270000, value:120000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  // Bons (80-84)
-  {name:'William Saliba',     pos:'DC', rat:85, salary:195000, value:55000000,  nat:'🇫🇷'},
-  {name:'Aurélien Tchouaméni',pos:'MD', rat:83, salary:170000, value:48000000,  nat:'🇫🇷'},
-  {name:'Gavi',               pos:'MD', rat:84, salary:180000, value:50000000,  nat:'🇪🇸'},
-  {name:'Marquinhos',         pos:'DC', rat:84, salary:175000, value:45000000,  nat:'🇧🇷'},
-  {name:'Victor Osimhen',     pos:'AT', rat:87, salary:240000, value:100000000, nat:'🇳🇬'},
-  {name:'Mike Maignan',       pos:'GB', rat:88, salary:220000, value:60000000,  nat:'🇫🇷'},
-  {name:'Virgil van Dijk',    pos:'DC', rat:86, salary:200000, value:40000000,  nat:'🇳🇱'},
-  {name:'Leroy Sané',         pos:'AG', rat:83, salary:160000, value:35000000,  nat:'🇩🇪'},
-  // Moyens (74-79)
-  {name:'Theo Hernández',     pos:'DG', rat:83, salary:155000, value:60000000,  nat:'🇫🇷'},
-  {name:'Yusuf Yazıcı',       pos:'MC', rat:78, salary:90000,  value:20000000,  nat:'🇹🇷'},
-  {name:'Ismaïla Sarr',       pos:'AG', rat:78, salary:85000,  value:18000000,  nat:'🇸🇳'},
-  {name:'Alexis Mac Allister', pos:'MC', rat:83, salary:165000, value:55000000,  nat:'🇦🇷'},
-  {name:'Lucas Hernández',    pos:'DC', rat:81, salary:140000, value:28000000,  nat:'🇫🇷'},
-  {name:'Takefusa Kubo',      pos:'AD', rat:80, salary:120000, value:50000000,  nat:'🇯🇵'},
-  {name:'Jonathan David',     pos:'AT', rat:84, salary:170000, value:65000000,  nat:'🇨🇦'},
-  {name:'Carlos Baleba',      pos:'MD', rat:76, salary:72000,  value:14000000,  nat:'🇨🇲'},
-  {name:'Idrissa Gueye',      pos:'MD', rat:76, salary:68000,  value:9000000,   nat:'🇸🇳'},
-  // Corrects (68-73)
-  {name:'Folarin Balogun',    pos:'AT', rat:75, salary:65000,  value:12000000,  nat:'🇺🇸'},
-  {name:'David Okereke',      pos:'AD', rat:73, salary:50000,  value:7000000,   nat:'🇳🇬'},
-  {name:'Kasper Dolberg',     pos:'AT', rat:73, salary:48000,  value:6500000,   nat:'🇩🇰'},
-  {name:'Filip Kostić',       pos:'DG', rat:76, salary:70000,  value:13000000,  nat:'🇷🇸'},
-  {name:'Lorenzo Pellegrini', pos:'MC', rat:79, salary:95000,  value:22000000,  nat:'🇮🇹'},
-  {name:'Patrik Schick',      pos:'AT', rat:78, salary:88000,  value:20000000,  nat:'🇨🇿'},
-  {name:'Bilal El Khannouss', pos:'MC', rat:74, salary:55000,  value:10000000,  nat:'🇲🇦'},
-  {name:'Rayan Cherki',       pos:'MC', rat:77, salary:75000,  value:40000000,  nat:'🇫🇷'},
-  // Développement (60-67)
-  {name:'Manu Koné',          pos:'MD', rat:77, salary:80000,  value:18000000,  nat:'🇫🇷'},
-  {name:'Lee Kang-in',        pos:'MC', rat:78, salary:82000,  value:30000000,  nat:'🇰🇷'},
-  {name:'Arjun Gaikwad',      pos:'DC', rat:64, salary:17000,  value:1200000,   nat:'🇮🇳'},
-  {name:'Cédric Hountondji',  pos:'DC', rat:66, salary:19000,  value:1500000,   nat:'🇧🇯'},
-  {name:'Mateus Fernandes',   pos:'MC', rat:72, salary:40000,  value:5000000,   nat:'🇵🇹'},
-  {name:'Mathys Tel',         pos:'AT', rat:74, salary:52000,  value:20000000,  nat:'🇫🇷'},
-  {name:'Warren Zaïre-Emery', pos:'MC', rat:78, salary:85000,  value:45000000,  nat:'🇫🇷'},
-  {name:'Sverre Nypan',       pos:'MC', rat:69, salary:25000,  value:4000000,   nat:'🇳🇴'},
-  {name:'Savio',              pos:'AD', rat:79, salary:90000,  value:40000000,  nat:'🇧🇷'},
-  {name:'Lamine Yamal',       pos:'AD', rat:87, salary:80000,  value:160000000, nat:'🇪🇸'},
-  {name:'Endrick',            pos:'AT', rat:76, salary:65000,  value:60000000,  nat:'🇧🇷'},
-  {name:'Alejandro Garnacho', pos:'AG', rat:81, salary:130000, value:55000000,  nat:'🇦🇷'},
-  {name:'Evan Ndicka',        pos:'DC', rat:78, salary:85000,  value:25000000,  nat:'🇫🇷'},
-  {name:'Ibrahim Sangaré',    pos:'MD', rat:78, salary:80000,  value:18000000,  nat:'🇨🇮'},
-  {name:'Loïc Badé',          pos:'DC', rat:77, salary:72000,  value:18000000,  nat:'🇫🇷'},
+  // ── TIER 1 : District (30–45) ──────────────
+  {name:'Julien Moreau',      pos:'AT', rat:40, salary:800,    value:5000,      nat:'🇫🇷', tier:1},
+  {name:'Kevin Petit',        pos:'DC', rat:38, salary:600,    value:4000,      nat:'🇫🇷', tier:1},
+  {name:'Baptiste Roux',      pos:'MC', rat:42, salary:900,    value:6000,      nat:'🇫🇷', tier:1},
+  {name:'Lucas Blanc',        pos:'GB', rat:35, salary:500,    value:3000,      nat:'🇫🇷', tier:1},
+  {name:'Théo Garnier',       pos:'DG', rat:39, salary:700,    value:4500,      nat:'🇫🇷', tier:1},
+  {name:'Amine Benali',       pos:'AT', rat:43, salary:950,    value:6500,      nat:'🇲🇦', tier:1},
+  {name:'Moussa Diallo',      pos:'MD', rat:37, salary:550,    value:3500,      nat:'🇸🇳', tier:1},
+  {name:'Pierre Lefèvre',     pos:'AD', rat:41, salary:850,    value:5500,      nat:'🇫🇷', tier:1},
+  {name:'Adrien Martin',      pos:'DC', rat:36, salary:520,    value:3200,      nat:'🇫🇷', tier:1},
+  {name:'Samuel Fontaine',    pos:'AT', rat:44, salary:1000,   value:7000,      nat:'🇫🇷', tier:1},
+  {name:'Yoann Girard',       pos:'MC', rat:33, salary:450,    value:2800,      nat:'🇫🇷', tier:1},
+  {name:'Nabil Hamdi',        pos:'AG', rat:45, salary:1100,   value:8000,      nat:'🇩🇿', tier:1},
+  // ── TIER 2 : Régional (46–59) ──────────────
+  {name:'Thomas Leclercq',    pos:'AT', rat:54, salary:3500,   value:80000,     nat:'🇧🇪', tier:2},
+  {name:'Sofiane Rahmani',    pos:'MC', rat:56, salary:4000,   value:100000,    nat:'🇩🇿', tier:2},
+  {name:'Omar Abdi',          pos:'AT', rat:52, salary:3000,   value:70000,     nat:'🇸🇴', tier:2},
+  {name:'Yann Cozic',         pos:'DC', rat:49, salary:2500,   value:55000,     nat:'🇫🇷', tier:2},
+  {name:'Hamza Essalhi',      pos:'MD', rat:57, salary:4200,   value:110000,    nat:'🇲🇦', tier:2},
+  {name:'Florent Dupuis',     pos:'DG', rat:50, salary:2800,   value:62000,     nat:'🇫🇷', tier:2},
+  {name:'Marcus Adeyemi',     pos:'AT', rat:58, salary:4800,   value:130000,    nat:'🇳🇬', tier:2},
+  {name:'Cédric Ntomba',      pos:'DC', rat:47, salary:2200,   value:48000,     nat:'🇨🇩', tier:2},
+  {name:'Sébastien Aubert',   pos:'GB', rat:53, salary:3200,   value:75000,     nat:'🇫🇷', tier:2},
+  {name:'Jérémy Konan',       pos:'AG', rat:59, salary:5200,   value:150000,    nat:'🇨🇮', tier:2},
+  {name:'Paul Renard',        pos:'MC', rat:46, salary:2000,   value:40000,     nat:'🇫🇷', tier:2},
+  {name:'Amir Sayoud',        pos:'AD', rat:55, salary:3800,   value:95000,     nat:'🇩🇿', tier:2},
+  // ── TIER 3 : National (60–69) ──────────────
+  {name:'Bilal El Khannouss', pos:'MC', rat:67, salary:20000,  value:8000000,   nat:'🇲🇦', tier:3},
+  {name:'Rayan Cherki',       pos:'MC', rat:68, salary:22000,  value:12000000,  nat:'🇫🇷', tier:3},
+  {name:'Sverre Nypan',       pos:'MC', rat:66, salary:18000,  value:7000000,   nat:'🇳🇴', tier:3},
+  {name:'Arjun Gaikwad',      pos:'DC', rat:62, salary:14000,  value:4000000,   nat:'🇮🇳', tier:3},
+  {name:'Cédric Hountondji',  pos:'DC', rat:64, salary:16000,  value:5500000,   nat:'🇧🇯', tier:3},
+  {name:'Folarin Balogun',    pos:'AT', rat:69, salary:24000,  value:14000000,  nat:'🇺🇸', tier:3},
+  {name:'David Okereke',      pos:'AD', rat:65, salary:17000,  value:6000000,   nat:'🇳🇬', tier:3},
+  {name:'Kasper Dolberg',     pos:'AT', rat:65, salary:17500,  value:6500000,   nat:'🇩🇰', tier:3},
+  {name:'Yusuf Yazıcı',       pos:'MC', rat:68, salary:21000,  value:11000000,  nat:'🇹🇷', tier:3},
+  {name:'Carlos Baleba',      pos:'MD', rat:67, salary:19000,  value:9000000,   nat:'🇨🇲', tier:3},
+  {name:'Idrissa Gueye',      pos:'MD', rat:65, salary:16500,  value:7000000,   nat:'🇸🇳', tier:3},
+  {name:'Patrik Schick',      pos:'AT', rat:68, salary:20000,  value:10000000,  nat:'🇨🇿', tier:3},
+  {name:'Filip Kostić',       pos:'DG', rat:66, salary:18500,  value:8000000,   nat:'🇷🇸', tier:3},
+  {name:'Mateus Fernandes',   pos:'MC', rat:63, salary:15000,  value:5000000,   nat:'🇵🇹', tier:3},
+  // ── TIER 4 : Ligue 2 (70–75) ───────────────
+  {name:'Manu Koné',          pos:'MD', rat:74, salary:45000,  value:18000000,  nat:'🇫🇷', tier:4},
+  {name:'Lee Kang-in',        pos:'MC', rat:74, salary:48000,  value:20000000,  nat:'🇰🇷', tier:4},
+  {name:'Loïc Badé',          pos:'DC', rat:73, salary:42000,  value:16000000,  nat:'🇫🇷', tier:4},
+  {name:'Ibrahim Sangaré',    pos:'MD', rat:72, salary:40000,  value:14000000,  nat:'🇨🇮', tier:4},
+  {name:'Evan Ndicka',        pos:'DC', rat:74, salary:46000,  value:19000000,  nat:'🇫🇷', tier:4},
+  {name:'Ismaïla Sarr',       pos:'AG', rat:73, salary:43000,  value:17000000,  nat:'🇸🇳', tier:4},
+  {name:'Endrick',            pos:'AT', rat:73, salary:44000,  value:22000000,  nat:'🇧🇷', tier:4},
+  {name:'Mathys Tel',         pos:'AT', rat:72, salary:38000,  value:18000000,  nat:'🇫🇷', tier:4},
+  {name:'Savio',              pos:'AD', rat:74, salary:47000,  value:25000000,  nat:'🇧🇷', tier:4},
+  {name:'Lorenzo Pellegrini', pos:'MC', rat:74, salary:45000,  value:22000000,  nat:'🇮🇹', tier:4},
+  {name:'Takefusa Kubo',      pos:'AD', rat:75, salary:52000,  value:28000000,  nat:'🇯🇵', tier:4},
+  {name:'Jonathan David',     pos:'AT', rat:75, salary:55000,  value:32000000,  nat:'🇨🇦', tier:4},
+  // ── TIER 5 : Ligue 1 (76–81) ───────────────
+  {name:'Warren Zaïre-Emery', pos:'MC', rat:78, salary:75000,  value:45000000,  nat:'🇫🇷', tier:5},
+  {name:'Leroy Sané',         pos:'AG', rat:80, salary:110000, value:40000000,  nat:'🇩🇪', tier:5},
+  {name:'Lucas Hernández',    pos:'DC', rat:79, salary:90000,  value:28000000,  nat:'🇫🇷', tier:5},
+  {name:'Theo Hernández',     pos:'DG', rat:81, salary:120000, value:55000000,  nat:'🇫🇷', tier:5},
+  {name:'Alejandro Garnacho', pos:'AG', rat:79, salary:88000,  value:48000000,  nat:'🇦🇷', tier:5},
+  {name:'Alexis Mac Allister',pos:'MC', rat:81, salary:125000, value:55000000,  nat:'🇦🇷', tier:5},
+  {name:'Gavi',               pos:'MD', rat:81, salary:120000, value:52000000,  nat:'🇪🇸', tier:5},
+  {name:'Marquinhos',         pos:'DC', rat:81, salary:118000, value:45000000,  nat:'🇧🇷', tier:5},
+  {name:'Aurélien Tchouaméni',pos:'MD', rat:80, salary:110000, value:48000000,  nat:'🇫🇷', tier:5},
+  {name:'William Saliba',     pos:'DC', rat:81, salary:122000, value:55000000,  nat:'🇫🇷', tier:5},
+  {name:'Virgil van Dijk',    pos:'DC', rat:82, salary:140000, value:42000000,  nat:'🇳🇱', tier:5},
+  {name:'Lamine Yamal',       pos:'AD', rat:82, salary:90000,  value:160000000, nat:'🇪🇸', tier:5},
+  // ── TIER 6 : Champions League (82–87) ──────
+  {name:'Declan Rice',        pos:'MD', rat:84, salary:170000, value:70000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:6},
+  {name:'Florian Wirtz',      pos:'MC', rat:85, salary:180000, value:130000000, nat:'🇩🇪', tier:6},
+  {name:'Lautaro Martínez',   pos:'AT', rat:86, salary:200000, value:80000000,  nat:'🇦🇷', tier:6},
+  {name:'Bernardo Silva',     pos:'MC', rat:86, salary:195000, value:85000000,  nat:'🇵🇹', tier:6},
+  {name:'Victor Osimhen',     pos:'AT', rat:85, salary:185000, value:100000000, nat:'🇳🇬', tier:6},
+  {name:'Phil Foden',         pos:'MC', rat:86, salary:200000, value:120000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:6},
+  {name:'Bukayo Saka',        pos:'AD', rat:87, salary:210000, value:110000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:6},
+  {name:'Mike Maignan',       pos:'GB', rat:86, salary:190000, value:60000000,  nat:'🇫🇷', tier:6},
+  {name:'Pedri',              pos:'MC', rat:87, salary:215000, value:150000000, nat:'🇪🇸', tier:6},
+  {name:'Alejandro Balde',    pos:'DG', rat:84, salary:165000, value:70000000,  nat:'🇪🇸', tier:6},
+  {name:'Goncalo Ramos',      pos:'AT', rat:83, salary:155000, value:65000000,  nat:'🇵🇹', tier:6},
+  {name:'Khvicha Kvaratskhelia',pos:'AG',rat:87,salary:220000, value:120000000, nat:'🇬🇪', tier:6},
+  // ── TIER 7 : Coupe du Monde (88–92) ────────
+  {name:'Jude Bellingham',    pos:'MC', rat:91, salary:310000, value:180000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Rodri',              pos:'MC', rat:91, salary:330000, value:170000000, nat:'🇪🇸', tier:7},
+  {name:'Vinícius Jr.',       pos:'AG', rat:92, salary:380000, value:190000000, nat:'🇧🇷', tier:7},
+  {name:'Erling Haaland',     pos:'AT', rat:92, salary:390000, value:200000000, nat:'🇳🇴', tier:7},
+  {name:'Pedri',              pos:'MC', rat:88, salary:240000, value:155000000, nat:'🇪🇸', tier:7},
+  {name:'Alisson Becker',     pos:'GB', rat:90, salary:280000, value:70000000,  nat:'🇧🇷', tier:7},
+  {name:'Rúben Dias',         pos:'DC', rat:89, salary:260000, value:80000000,  nat:'🇵🇹', tier:7},
+  {name:'Trent Alexander-Arnold',pos:'DD',rat:89,salary:250000,value:90000000, nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Federico Valverde',  pos:'MC', rat:88, salary:240000, value:100000000, nat:'🇺🇾', tier:7},
+  {name:'Antoine Griezmann',  pos:'AT', rat:88, salary:235000, value:40000000,  nat:'🇫🇷', tier:7},
+  {name:'Harry Kane',         pos:'AT', rat:90, salary:290000, value:80000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Rafael Leão',        pos:'AG', rat:88, salary:245000, value:120000000, nat:'🇵🇹', tier:7},
+  // ── TIER 8 : Légende (93–96) ───────────────
+  {name:'Kylian Mbappé',      pos:'AT', rat:95, salary:420000, value:220000000, nat:'🇫🇷', tier:8},
+  {name:'Lionel Messi',       pos:'MC', rat:94, salary:450000, value:30000000,  nat:'🇦🇷', tier:8},
+  {name:'Cristiano Ronaldo',  pos:'AT', rat:93, salary:400000, value:20000000,  nat:'🇵🇹', tier:8},
+  {name:'Neymar Jr.',         pos:'AG', rat:93, salary:380000, value:35000000,  nat:'🇧🇷', tier:8},
+  {name:'Mohamed Salah',      pos:'AD', rat:93, salary:370000, value:50000000,  nat:'🇪🇬', tier:8},
+  {name:'Robert Lewandowski', pos:'AT', rat:93, salary:360000, value:25000000,  nat:'🇵🇱', tier:8},
+  {name:'Karim Benzema',      pos:'AT', rat:94, salary:440000, value:20000000,  nat:'🇫🇷', tier:8},
+  {name:'Kevin De Bruyne',    pos:'MC', rat:95, salary:430000, value:60000000,  nat:'🇧🇪', tier:8},
+  {name:'Luka Modrić',        pos:'MC', rat:93, salary:350000, value:15000000,  nat:'🇭🇷', tier:8},
+  {name:'Sergio Busquets',    pos:'MD', rat:93, salary:340000, value:8000000,   nat:'🇪🇸', tier:8},
+  // ── TIER 9 : GOAT (97–99) ──────────────────
+  {name:'Ronaldinho',         pos:'AG', rat:98, salary:800000, value:500000000, nat:'🇧🇷', tier:9},
+  {name:'Zinédine Zidane',    pos:'MC', rat:98, salary:820000, value:600000000, nat:'🇫🇷', tier:9},
+  {name:'Ronaldo R9',         pos:'AT', rat:99, salary:900000, value:700000000, nat:'🇧🇷', tier:9},
+  {name:'Pelé',               pos:'AT', rat:99, salary:950000, value:900000000, nat:'🇧🇷', tier:9},
+  {name:'Diego Maradona',     pos:'MC', rat:99, salary:940000, value:850000000, nat:'🇦🇷', tier:9},
+  {name:'Johan Cruyff',       pos:'AG', rat:97, salary:750000, value:500000000, nat:'🇳🇱', tier:9},
+  {name:'Michel Platini',     pos:'MC', rat:97, salary:740000, value:480000000, nat:'🇫🇷', tier:9},
+  {name:'Marco van Basten',   pos:'AT', rat:98, salary:800000, value:520000000, nat:'🇳🇱', tier:9},
+  {name:'Messi Prime',        pos:'AG', rat:99, salary:1000000,value:1000000000,nat:'🇦🇷', tier:9},
+  {name:'Ronaldo 2008',       pos:'AT', rat:98, salary:880000, value:750000000, nat:'🇵🇹', tier:9},
 ];
 
 // Club upgrades (with levels)
@@ -939,8 +999,222 @@ const CRYPTOS = [
 const BADGE_OPTIONS = ['⚽','🦅','🐯','🦁','🐺','🦊','🐉','⭐','🔥','🛡️','👑','🌟','🚀','💎','🏆'];
 
 // ══════════════════════════════════════════════
-// LEAGUE TEAMS
+// RANKED SYSTEM
 // ══════════════════════════════════════════════
+const RANKED_TIERS = [
+  {id:'district',    name:'District',         icon:'🏘️', color:'#8a9db5'},
+  {id:'regional',    name:'Régional',         icon:'🗺️', color:'#7ab8c8'},
+  {id:'national',    name:'National',         icon:'🇫🇷', color:'#5da0d0'},
+  {id:'ligue2',      name:'Ligue 2',          icon:'⚽', color:'#6B7C93'},
+  {id:'ligue1',      name:'Ligue 1',          icon:'🏟️', color:'#D4AF37'},
+  {id:'ucl',         name:'Champions League', icon:'🌟', color:'#e8cc5a'},
+  {id:'worldcup',    name:'Coupe du Monde',   icon:'🏆', color:'#f0a000'},
+  {id:'legend',      name:'Légende',          icon:'👑', color:'#c87aff'},
+  {id:'ballondor',   name:'Ballon d\'Or',     icon:'🌙', color:'#ff9f40'},
+  {id:'goat',        name:'GOAT',             icon:'🐐', color:'#ff4466'},
+  {id:'goat_supreme',name:'GOAT Suprême',     icon:'💎', color:'#ff6688'},
+  {id:'goat_ultime', name:'GOAT Ultime',      icon:'🔥', color:'#ff8800'},
+];
+const RANK_SUBLVLS = ['Bas','Mid','Haut','Champion'];
+
+// ══════════════════════════════════════════════
+// CHAMPIONSHIP TIERS DATA
+// ══════════════════════════════════════════════
+const CHAMPIONSHIP_TIERS = [
+  {
+    id:'c1', name:'1K – 10K', minMoney:1000, maxMoney:10000,
+    rankRequired: null, // first one, free
+    prize:[20000,10000,5000,2000,1000,500,200,100,50,20],
+    teams:[
+      {name:'Amateurs du Nord', ovr:30, badge:'🏘️'},
+      {name:'FC Village',       ovr:28, badge:'⭐'},
+      {name:'Stade Champêtre',  ovr:32, badge:'☀️'},
+      {name:'Union Locale',     ovr:27, badge:'🛡️'},
+      {name:'AS Campagne',      ovr:35, badge:'🌿'},
+      {name:'CS Banlieue',      ovr:33, badge:'🌙'},
+      {name:'RC Faubourg',      ovr:29, badge:'🔵'},
+      {name:'SC Quartier',      ovr:31, badge:'🌍'},
+      {name:'FC Périphérie',    ovr:26, badge:'🌐'},
+    ]
+  },
+  {
+    id:'c2', name:'10K – 100K', minMoney:10000, maxMoney:100000,
+    rankRequired:'district',
+    prize:[200000,100000,50000,20000,10000,5000,2000,1000,500,200],
+    teams:[
+      {name:'US Régionale',      ovr:40, badge:'🗺️'},
+      {name:'Sporting District', ovr:38, badge:'⭐'},
+      {name:'FC Villes',         ovr:42, badge:'🏙️'},
+      {name:'AS Comté',          ovr:37, badge:'🛡️'},
+      {name:'Entente Provinciale',ovr:45,badge:'🌟'},
+      {name:'SC Métropole',      ovr:43, badge:'☀️'},
+      {name:'RC Agglo',          ovr:39, badge:'👑'},
+      {name:'Union Régionale',   ovr:41, badge:'🏆'},
+      {name:'FC Département',    ovr:36, badge:'🔷'},
+    ]
+  },
+  {
+    id:'c3', name:'100K – 1M', minMoney:100000, maxMoney:1000000,
+    rankRequired:'regional',
+    prize:[2000000,1000000,500000,200000,100000,50000,20000,10000,5000,2000],
+    teams:[
+      {name:'FC National A',     ovr:52, badge:'🇫🇷'},
+      {name:'AS République',     ovr:50, badge:'⭐'},
+      {name:'Sporting Nation',   ovr:55, badge:'🏆'},
+      {name:'Union Tricolore',   ovr:48, badge:'🛡️'},
+      {name:'Entente Nationale', ovr:58, badge:'🌟'},
+      {name:'RC Hexagone',       ovr:54, badge:'☀️'},
+      {name:'SC Frontière',      ovr:51, badge:'👑'},
+      {name:'Stade Patrie',      ovr:53, badge:'🏟️'},
+      {name:'AS Capitale',       ovr:49, badge:'🗽'},
+    ]
+  },
+  {
+    id:'c4', name:'1M – 100M', minMoney:1000000, maxMoney:100000000,
+    rankRequired:'national',
+    prize:[5000000,2500000,1200000,600000,300000,150000,80000,40000,20000,10000],
+    teams:[
+      {name:'FC Ligue 2 Elite',  ovr:62, badge:'⚽'},
+      {name:'AS Promotion',      ovr:60, badge:'⭐'},
+      {name:'Sporting Montée',   ovr:65, badge:'🏆'},
+      {name:'RC Division',       ovr:58, badge:'🛡️'},
+      {name:'Lyon B FC',         ovr:67, badge:'🦁'},
+      {name:'Bordeaux United',   ovr:63, badge:'🍷'},
+      {name:'Nantes City',       ovr:59, badge:'🌊'},
+      {name:'Nice Côte d\'Azur', ovr:61, badge:'☀️'},
+      {name:'Toulouse Violet',   ovr:64, badge:'🔷'},
+    ]
+  },
+  {
+    id:'c5', name:'100M – 1Md', minMoney:100000000, maxMoney:1000000000,
+    rankRequired:'ligue2',
+    prize:[20000000,10000000,5000000,2500000,1200000,600000,300000,150000,80000,40000],
+    teams:[
+      {name:'PSG Reserves',      ovr:72, badge:'🗼'},
+      {name:'Marseille OM',      ovr:70, badge:'🌊'},
+      {name:'OL Lyon',           ovr:71, badge:'🦁'},
+      {name:'AS Monaco',         ovr:74, badge:'🎰'},
+      {name:'Lille OSC',         ovr:69, badge:'🐺'},
+      {name:'Rennes FC',         ovr:68, badge:'🛡️'},
+      {name:'RC Lens',           ovr:73, badge:'🔴'},
+      {name:'Nice Aiglons',      ovr:67, badge:'🦅'},
+      {name:'Reims FC',          ovr:66, badge:'⭐'},
+    ]
+  },
+  {
+    id:'c6', name:'1Md – 100Md', minMoney:1e9, maxMoney:1e11,
+    rankRequired:'ligue1',
+    prize:[100000000,50000000,25000000,12000000,6000000,3000000,1500000,800000,400000,200000],
+    teams:[
+      {name:'Real Madrid CF',    ovr:80, badge:'⭐'},
+      {name:'FC Barcelona',      ovr:82, badge:'🔵'},
+      {name:'Manchester City',   ovr:83, badge:'🔷'},
+      {name:'Bayern München',    ovr:81, badge:'🏆'},
+      {name:'Liverpool FC',      ovr:80, badge:'🔴'},
+      {name:'Arsenal FC',        ovr:79, badge:'🦅'},
+      {name:'Chelsea FC',        ovr:78, badge:'💎'},
+      {name:'Juventus',          ovr:77, badge:'⚫'},
+      {name:'Inter Milan',       ovr:79, badge:'🖤'},
+    ]
+  },
+  {
+    id:'c7', name:'100Md – 1Bi', minMoney:1e11, maxMoney:1e12,
+    rankRequired:'ucl',
+    prize:[500000000,250000000,125000000,60000000,30000000,15000000,7500000,3750000,1875000,937500],
+    teams:[
+      {name:'Manchester United',  ovr:82, badge:'🔴'},
+      {name:'Atlético Madrid',    ovr:83, badge:'🔴'},
+      {name:'PSG Élite',          ovr:86, badge:'🗼'},
+      {name:'Dortmund BVB',       ovr:80, badge:'🟡'},
+      {name:'Napoli SSC',         ovr:81, badge:'💙'},
+      {name:'Porto FC',           ovr:79, badge:'🐉'},
+      {name:'Ajax Amsterdam',     ovr:80, badge:'🔴'},
+      {name:'Celtic FC',          ovr:78, badge:'🍀'},
+      {name:'Rangers FC',         ovr:77, badge:'🏴'},
+    ]
+  },
+  {
+    id:'c8', name:'1Bi – 100Bi', minMoney:1e12, maxMoney:1e14,
+    rankRequired:'worldcup',
+    prize:[2000000000,1000000000,500000000,250000000,125000000,62500000,31250000,15625000,7812500,3906250],
+    teams:[
+      {name:'Brazil Seleção ★',   ovr:87, badge:'🟡'},
+      {name:'France FFF ★',       ovr:88, badge:'🇫🇷'},
+      {name:'Argentina AFA ★',    ovr:89, badge:'🔵'},
+      {name:'Germany DFB ★',      ovr:86, badge:'⚫'},
+      {name:'Spain RFEF ★',       ovr:87, badge:'🔴'},
+      {name:'England FA ★',       ovr:85, badge:'🦁'},
+      {name:'Italy FIGC ★',       ovr:84, badge:'💙'},
+      {name:'Portugal FPF ★',     ovr:86, badge:'🔴'},
+      {name:'Netherlands KNVB ★', ovr:85, badge:'🟠'},
+    ]
+  },
+  {
+    id:'c9', name:'100Bi – 1Tr', minMoney:1e14, maxMoney:1e15,
+    rankRequired:'legend',
+    prize:[1e10,5e9,2.5e9,1.25e9,625000000,312500000,156250000,78125000,39062500,19531250],
+    teams:[
+      {name:'All-Stars World XI', ovr:91, badge:'🌍'},
+      {name:'Galácticos Élite',   ovr:93, badge:'⭐'},
+      {name:'Dream Team \'94',    ovr:90, badge:'🏅'},
+      {name:'Ballon d\'Or XI',    ovr:92, badge:'🏆'},
+      {name:'Ligue des Titans',   ovr:89, badge:'⚡'},
+      {name:'Super Stars United', ovr:91, badge:'💫'},
+      {name:'Legend Masters',     ovr:88, badge:'👑'},
+      {name:'Champions of Gods',  ovr:90, badge:'🔥'},
+      {name:'Universe FC',        ovr:87, badge:'🌌'},
+    ]
+  },
+  {
+    id:'c10', name:'1Tr – 100Tr', minMoney:1e15, maxMoney:1e17,
+    rankRequired:'ballondor',
+    prize:[5e10,2.5e10,1.25e10,6.25e9,3.125e9,1.5625e9,7.8125e8,3.90625e8,1.953125e8,9.765625e7],
+    teams:[
+      {name:'Barça Invincibles 2009', ovr:95, badge:'🔵'},
+      {name:'Real Madrid 2014',       ovr:94, badge:'⭐'},
+      {name:'Arsenal 2003-04',        ovr:93, badge:'🦅'},
+      {name:'AC Milan 2007',          ovr:94, badge:'💎'},
+      {name:'Bayern 2013',            ovr:92, badge:'🏆'},
+      {name:'France 1998',            ovr:93, badge:'🇫🇷'},
+      {name:'Brazil 1970',            ovr:95, badge:'🟡'},
+      {name:'Man United 1999',        ovr:91, badge:'🔴'},
+      {name:'Ajax 1995',              ovr:90, badge:'🔴'},
+    ]
+  },
+  {
+    id:'c11', name:'100Tr – 1Qd', minMoney:1e17, maxMoney:1e18,
+    rankRequired:'goat',
+    prize:[2e11,1e11,5e10,2.5e10,1.25e10,6.25e9,3.125e9,1.5625e9,7.8125e8,3.90625e8],
+    teams:[
+      {name:'Messi Prime XI',        ovr:97, badge:'🐐'},
+      {name:'Ronaldo Peak XI',       ovr:97, badge:'🔥'},
+      {name:'Pelé Santos \'62',      ovr:98, badge:'🟡'},
+      {name:'Maradona \'86 XI',      ovr:98, badge:'💎'},
+      {name:'Di Stéfano Real XI',    ovr:96, badge:'⭐'},
+      {name:'Cruyff Total XI',       ovr:95, badge:'🟠'},
+      {name:'Zidane Juve 2002',      ovr:96, badge:'👑'},
+      {name:'Ronaldinho Barça',      ovr:97, badge:'🔵'},
+      {name:'Ronaldo R9 Brésil',     ovr:96, badge:'🟡'},
+    ]
+  },
+  {
+    id:'c12', name:'1Qd +', minMoney:1e18, maxMoney:Infinity,
+    rankRequired:'goat_supreme',
+    prize:[1e12,5e11,2.5e11,1.25e11,6.25e10,3.125e10,1.5625e10,7.8125e9,3.90625e9,1.953125e9],
+    teams:[
+      {name:'Olympe United',         ovr:99, badge:'🌌'},
+      {name:'FC Immortel',           ovr:99, badge:'💫'},
+      {name:'All-Time GOAT XI',      ovr:99, badge:'🐐'},
+      {name:'Universe Ballers',      ovr:99, badge:'🔥'},
+      {name:'Beyond Legend FC',      ovr:99, badge:'💎'},
+      {name:'Cosmic Titans',         ovr:99, badge:'⭐'},
+      {name:'Absolute Legends',      ovr:99, badge:'👑'},
+      {name:'Transcendent XI',       ovr:99, badge:'🌙'},
+      {name:'God Mode FC',           ovr:99, badge:'⚡'},
+    ]
+  },
+];
+
 function makeLeagueTeams(clubName, clubOverall) {
   const rivals = [
     {name:'FC Metropolis',   ovr:72, badge:'🏙️'},
@@ -961,7 +1235,7 @@ function makeLeagueTeams(clubName, clubOverall) {
 // ══════════════════════════════════════════════
 // CONSTANTS
 // ══════════════════════════════════════════════
-const CLUB_UNLOCK_THRESHOLD = 100000;
+const CLUB_UNLOCK_THRESHOLD = 1000;
 const PRESTIGE_THRESHOLD = 1e10;
 const MILESTONE_COUNTS = [5,10,25,50,100,200,500];
 const KEY_OPTIONS = [
@@ -986,13 +1260,19 @@ function defaultState() {
       name:'Empire FC', badge:'⚽', nat:'France',
       players:[], stadiumBonus:0, tvBonus:0, formBonus:0, merchBonus:0,
       overallBonus:0, scouts:false, staffDiscount:0, upgrades:{},
-      season:null, seasonPlayed:false,
+      season:null, seasonPlayed:false, activeChampsId:null,
       bilan:{ w:0, d:0, l:0, gf:0, ga:0, totalRevenue:0 },
       moral:50, sponsorLevel:0, sponsorIncome:0,
       prestige:0,
+      // Ranked system
+      ranked: {
+        tierId: 'district',
+        tierIdx: 0,
+        subLevel: 0, // 0=Bas, 1=Mid, 2=Haut, 3=Champion
+        wins: 0,
+      },
     },
     crypto:{ holdings:{}, prices:{}, history:{} },
-
     hotkey:' ',
     adminUsed:false,
   };
@@ -1020,13 +1300,13 @@ function loadGame() {
       const base = defaultState();
       const merged = {...base, ...saved};
       merged.club = {...base.club, ...(saved.club||{})};
+      merged.club.ranked = {...base.club.ranked, ...(saved.club?.ranked||{})};
       merged.crypto = {...base.crypto, ...(saved.crypto||{})};
       merged.crypto.holdings = merged.crypto.holdings||{};
       merged.crypto.prices = merged.crypto.prices||{};
       merged.crypto.history = merged.crypto.history||{};
       merged.upgrades = merged.upgrades||{};
       merged.incMult = merged.incMult||1;
-
       return merged;
     }
   } catch(e){}
@@ -1547,16 +1827,7 @@ function playSeasonMatchday() {
 }
 
 function collectSeasonPrize() {
-  if (!G.club.season||!G.club.seasonPlayed) return;
-  const teams = [...G.club.season].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));
-  const myPos = teams.findIndex(t=>t.isPlayer)+1;
-  const prizes=[2000000,1000000,600000,300000,150000,80000,50000,30000,20000,10000];
-  const prize=prizes[myPos-1]||5000;
-  G.money+=prize;
-  G.club.season=null;
-  G.club.seasonPlayed=false;
-  showToast(`★ Fin de saison ! ${myPos}e place. +${fmt(prize)}`);
-  renderClubAll(); updateUI();
+  collectChampionshipPrize();
 }
 
 function openClubModal() {
@@ -1618,7 +1889,6 @@ function switchClubTab(name, btn) {
   if (btn) btn.classList.add('active');
   renderClubAll();
 }
-
 // ══════════════════════════════════════════════
 // CRYPTO
 // ══════════════════════════════════════════════
@@ -1854,8 +2124,310 @@ function renderClubAll() {
   renderClubOverview();
   renderClubSquad();
   renderClubTransfers();
-  renderClubMatch();
-  renderClubLeague();
+  renderClubRanked();
+  renderClubChampionships();
+}
+
+// ══════════════════════════════════════════════
+// RANKED RENDER
+// ══════════════════════════════════════════════
+function getRankedState() {
+  if (!G.club.ranked) G.club.ranked = {tierId:'district',tierIdx:0,subLevel:0,wins:0};
+  return G.club.ranked;
+}
+
+function getRankedLabel() {
+  const r = getRankedState();
+  const tier = RANKED_TIERS[r.tierIdx] || RANKED_TIERS[0];
+  const sub = RANK_SUBLVLS[r.subLevel] || 'Bas';
+  return `${tier.name} — ${sub}`;
+}
+
+function onRankedMatchWin() {
+  const r = getRankedState();
+  r.wins = (r.wins||0) + 1;
+  r.subLevel = (r.subLevel||0) + 1;
+  if (r.subLevel >= 4) {
+    // Promote to next tier
+    if (r.tierIdx < RANKED_TIERS.length - 1) {
+      r.tierIdx++;
+      r.tierId = RANKED_TIERS[r.tierIdx].id;
+      r.subLevel = 0;
+      showToast(`★ Ranked monté : ${RANKED_TIERS[r.tierIdx].name} !`);
+    } else {
+      r.subLevel = 3; // cap at champion of last tier
+      showToast('✨ Vous êtes GOAT Ultime — rang maximum !');
+    }
+  }
+}
+
+function getRankedOpponent(tierIdx) {
+  const base = 20 + tierIdx * 7;
+  return {
+    name: ['FC Rival','AS Challenge','RC Duel','SC Combat','Union Battle','Stade Fight'][Math.floor(Math.random()*6)],
+    ovr: base + Math.floor(Math.random()*10),
+    badge: ['⭐','🏆','🛡️','👑','🔥','⚽'][Math.floor(Math.random()*6)],
+  };
+}
+
+function playRankedMatch() {
+  const c = G.club;
+  if (c.players.length < 5) { showToast('! Il faut au moins 5 joueurs !'); return; }
+  const r = getRankedState();
+  const opp = getRankedOpponent(r.tierIdx);
+  const myOvr = getClubOverall();
+  const matchCost = Math.floor(c.players.reduce((s,p)=>s+p.salary,0)*0.05+10000);
+  if (G.money < matchCost) { showToast(`— Coûts : ${fmt(matchCost)}`); return; }
+  G.money -= matchCost;
+  const diff = myOvr - opp.ovr;
+  const winProb = 45 + diff * 1.3;
+  const rnd = Math.random() * 100;
+  if (!c.bilan) c.bilan = {w:0,d:0,l:0,gf:0,ga:0,totalRevenue:0};
+  let result, myGoals, oppGoals, prize = 0;
+  if (rnd < winProb) {
+    result = 'win';
+    myGoals = Math.floor(1+Math.random()*4);
+    oppGoals = Math.floor(Math.random()*myGoals);
+    const prize = Math.floor(50000 * (r.tierIdx+1) * (r.subLevel+1));
+    G.money += prize;
+    c.bilan.w++; c.bilan.gf+=myGoals; c.bilan.ga+=oppGoals; c.bilan.totalRevenue+=prize;
+    c.moral = Math.min(100,(c.moral||50)+5);
+    c.prestige = (c.prestige||0)+1;
+    c.lastMatch = {result,myGoals,oppGoals,oppName:opp.name,oppOvr:opp.ovr,oppBadge:opp.badge,prize};
+    onRankedMatchWin();
+    showToast(`▲ Victoire Ranked ! +${fmt(prize)} — Rang: ${getRankedLabel()}`);
+  } else {
+    result = 'lose';
+    oppGoals = Math.floor(1+Math.random()*4);
+    myGoals = Math.floor(Math.random()*oppGoals);
+    c.bilan.l++; c.bilan.gf+=myGoals; c.bilan.ga+=oppGoals;
+    c.moral = Math.max(0,(c.moral||50)-8);
+    c.lastMatch = {result,myGoals,oppGoals,oppName:opp.name,oppOvr:opp.ovr,oppBadge:opp.badge,prize:0};
+    showToast(`▼ Défaite Ranked — Rang inchangé: ${getRankedLabel()}`);
+  }
+  flashMilestone();
+  renderClubAll(); updateUI();
+}
+
+function renderClubRanked() {
+  const panel = document.getElementById('club-ranked');
+  if (!panel) return;
+  const r = getRankedState();
+  const tier = RANKED_TIERS[r.tierIdx] || RANKED_TIERS[0];
+  const sub = RANK_SUBLVLS[r.subLevel] || 'Bas';
+  const c = G.club;
+  const matchCost = Math.floor(c.players.reduce((s,p)=>s+p.salary,0)*0.05+10000);
+  const lm = c.lastMatch;
+  const progress = r.subLevel / 4;
+
+  panel.innerHTML = `
+    <div class="match-zone" style="margin-bottom:8px">
+      <div class="section-title">Classement Ranked</div>
+      <div style="text-align:center;padding:16px 0 10px">
+        <div style="font-size:32px;margin-bottom:6px">${tier.icon||'⭐'}</div>
+        <div style="font-size:18px;font-weight:800;color:${tier.color}">${tier.name}</div>
+        <div style="font-family:var(--font-mono);font-size:13px;color:var(--text2);margin-top:3px">${sub}</div>
+        <div style="margin:10px auto;width:200px;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${(r.subLevel/4)*100}%;background:${tier.color};border-radius:3px;transition:width .4s"></div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${r.subLevel}/4 victoires pour monter</div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--gold);margin-top:4px">Victoires totales : ${r.wins||0}</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-bottom:12px">
+        ${RANKED_TIERS.map((t,i)=>`
+          <div style="padding:3px 7px;border-radius:4px;font-size:9px;font-weight:700;background:${i<r.tierIdx?'rgba(212,175,55,0.15)':i===r.tierIdx?'rgba(212,175,55,0.3)':'var(--bg3)'};color:${i<=r.tierIdx?t.color:'var(--text3)'};border:1px solid ${i===r.tierIdx?t.color:'transparent'}">${t.icon||''} ${t.name}</div>
+        `).join('')}
+      </div>
+      ${lm?`
+        <div style="background:var(--bg2);border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+          <div style="text-align:center;flex:1">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px">${getIcon(c.badge||'⚽','18px')}<span style="font-size:10px;font-weight:700;color:var(--text1)">${c.name}</span></div>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;padding:0 10px;color:${lm.result==='win'?'var(--success)':lm.result==='lose'?'var(--danger)':'var(--gold)'}">${lm.myGoals} — ${lm.oppGoals}</div>
+          <div style="text-align:center;flex:1">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px">${getIcon(lm.oppBadge||'⭐','18px')}<span style="font-size:10px;font-weight:700;color:var(--text2)">${lm.oppName}</span></div>
+          </div>
+        </div>`:''}
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:8px;text-align:center">Coût match : ${fmt(matchCost)} · Note équipe : ${getClubOverall()||'--'}</div>
+      <button class="match-btn" onclick="playRankedMatch()" ${c.players.length<5?'disabled':''}>
+        ▶ Jouer un match Ranked
+      </button>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// CHAMPIONSHIPS RENDER
+// ══════════════════════════════════════════════
+function getUnlockedChampionships() {
+  const r = getRankedState();
+  return CHAMPIONSHIP_TIERS.filter(ct => {
+    if (G.money < ct.minMoney) return false;
+    if (!ct.rankRequired) return true;
+    const reqIdx = RANKED_TIERS.findIndex(t=>t.id===ct.rankRequired);
+    return r.tierIdx >= reqIdx;
+  });
+}
+
+function startChampionship(champId) {
+  const c = G.club;
+  if (c.players.length < 5) { showToast('! Il faut au moins 5 joueurs !'); return; }
+  const champ = CHAMPIONSHIP_TIERS.find(ct=>ct.id===champId);
+  if (!champ) return;
+  // Check rank requirement
+  if (champ.rankRequired) {
+    const r = getRankedState();
+    const reqIdx = RANKED_TIERS.findIndex(t=>t.id===champ.rankRequired);
+    if (r.tierIdx < reqIdx) {
+      showToast(`! Rang requis : ${RANKED_TIERS[reqIdx].name}`);
+      return;
+    }
+  }
+  const myOvr = getClubOverall();
+  const teams = champ.teams.map(t=>({...t,pts:0,w:0,d:0,l:0,gf:0,ga:0,played:[]}));
+  teams.splice(Math.floor(Math.random()*teams.length),0,{name:c.name,ovr:myOvr,badge:c.badge||'⚽',pts:0,w:0,d:0,l:0,gf:0,ga:0,played:[],isPlayer:true});
+  c.season = teams;
+  c.seasonPlayed = false;
+  c.seasonMatchday = 0;
+  c.lastLeagueMatch = null;
+  c.activeChampsId = champId;
+  renderClubAll();
+  showToast(`★ Championnat ${champ.name} lancé !`);
+}
+
+function renderClubChampionships() {
+  const panel = document.getElementById('club-championships');
+  if (!panel) return;
+  const c = G.club;
+
+  // If a championship is active, show it
+  if (c.season && c.activeChampsId) {
+    renderActiveChampionship(panel);
+    return;
+  }
+
+  const r = getRankedState();
+  const ranked = RANKED_TIERS[r.tierIdx];
+
+  let html = `<div class="section-title">Championnats disponibles</div>`;
+  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+    <span style="font-size:18px">${ranked.icon||'⭐'}</span>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:${ranked.color}">Rang actuel : ${ranked.name} — ${RANK_SUBLVLS[r.subLevel]||'Bas'}</div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">Montez en ranked pour débloquer plus de championnats</div>
+    </div>
+  </div>`;
+
+  CHAMPIONSHIP_TIERS.forEach(ct => {
+    const moneyOk = G.money >= ct.minMoney;
+    const rankOk = !ct.rankRequired || (() => {
+      const reqIdx = RANKED_TIERS.findIndex(t=>t.id===ct.rankRequired);
+      return r.tierIdx >= reqIdx;
+    })();
+    const locked = !moneyOk || !rankOk;
+    const reqTierName = ct.rankRequired ? RANKED_TIERS.find(t=>t.id===ct.rankRequired)?.name : null;
+    html += `
+      <div style="background:var(--bg2);border:1px solid ${locked?'rgba(255,255,255,0.06)':'rgba(212,175,55,0.3)'};border-radius:10px;padding:12px;margin-bottom:8px;${locked?'opacity:.55':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:${locked?'var(--text3)':'var(--text1)'}">${ct.name}</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">10 équipes · Round-robin</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">1er: ${fmt(ct.prize[0])}</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">2e: ${fmt(ct.prize[1])}</div>
+          </div>
+        </div>
+        ${!moneyOk?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--danger);margin-bottom:6px">💰 Fonds requis: ${fmt(ct.minMoney)}</div>`:''}
+        ${moneyOk&&!rankOk?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--danger);margin-bottom:6px">🏅 Rang requis: ${reqTierName} (Ranked)</div>`:''}
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+          ${ct.teams.slice(0,5).map(t=>`<span style="font-size:9px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-family:var(--font-mono);color:var(--text2)">${getIcon(t.badge,'11px')} ${t.name.split(' ').slice(0,2).join(' ')} (${t.ovr})</span>`).join('')}
+          ${ct.teams.length>5?`<span style="font-size:9px;color:var(--text3);padding:2px 6px">+${ct.teams.length-5}...</span>`:''}
+        </div>
+        <button onclick="startChampionship('${ct.id}')" ${locked||c.players.length<5?'disabled':''} style="width:100%;padding:8px;border-radius:7px;border:1px solid ${locked?'var(--bg4)':'var(--mint)'};background:transparent;color:${locked?'var(--text3)':'var(--mint)'};font-size:11px;font-weight:700;cursor:${locked?'not-allowed':'pointer'};font-family:var(--font-head)">
+          ${locked?'🔒 Verrouillé':'★ Lancer le Championnat'}
+        </button>
+      </div>`;
+  });
+
+  panel.innerHTML = html;
+}
+
+function renderActiveChampionship(panel) {
+  const c = G.club;
+  const champ = CHAMPIONSHIP_TIERS.find(ct=>ct.id===c.activeChampsId);
+  const teams = [...c.season].sort((a,b)=>b.pts-a.pts||((b.gf-b.ga)-(a.gf-a.ga)));
+  const myTeam = c.season.find(t=>t.isPlayer);
+  const totalMatches = c.season.length - 1;
+  const played = c.seasonMatchday || 0;
+  const remaining = totalMatches - played;
+  const lm = c.lastLeagueMatch;
+  const cost = Math.floor(c.players.reduce((s,p)=>s+p.salary,0)*0.05+10000);
+
+  panel.innerHTML=`
+    <div class="match-zone">
+      <div class="section-title">Championnat ${champ?champ.name:''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">
+          Journée <span style="color:var(--gold)">${played}</span> / ${totalMatches}
+        </div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">
+          ${remaining > 0 ? `${remaining} match${remaining>1?'s':''} restant${remaining>1?'s':''}` : '⭐ Saison terminée'}
+        </div>
+      </div>
+      ${lm ? `
+      <div style="background:var(--bg2);border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div style="text-align:center;flex:1">
+          <div style="display:flex;align-items:center;justify-content:center;gap:5px">${getIcon(c.badge||'⚽','18px')}<span style="font-size:10px;font-weight:700;color:var(--text1)">${c.name}</span></div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;padding:0 10px;color:${lm.result==='win'?'var(--success)':lm.result==='lose'?'var(--danger)':'var(--gold)'}">${lm.myGoals} — ${lm.oppGoals}</div>
+        <div style="text-align:center;flex:1">
+          <div style="display:flex;align-items:center;justify-content:center;gap:5px">${getIcon(lm.oppBadge||'⭐','18px')}<span style="font-size:10px;font-weight:700;color:var(--text2)">${lm.oppName}</span></div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${lm.oppOvr}</div>
+        </div>
+      </div>` : ''}
+      <table class="standings-table">
+        <thead><tr><th>#</th><th>Équipe</th><th>MJ</th><th>Pts</th><th>V</th><th>N</th><th>D</th><th>DB</th></tr></thead>
+        <tbody>
+          ${teams.map((t,i)=>`<tr${t.isPlayer?' class="my-team"':''}>
+            <td>${i+1}</td><td style='display:flex;align-items:center;gap:5px'>${getIcon(t.badge||'⚽','14px')}<span>${t.name}</span></td>
+            <td>${(t.w||0)+(t.d||0)+(t.l||0)}</td>
+            <td>${t.pts}</td>
+            <td>${t.w||0}</td><td>${t.d||0}</td><td>${t.l||0}</td>
+            <td>${(t.gf-t.ga)>=0?'+':''}${t.gf-t.ga}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${c.seasonPlayed?
+        `<button class="match-btn" onclick="collectChampionshipPrize()" style="margin-top:8px;border-color:var(--gold);color:var(--gold)">★ Réclamer prix de fin de championnat</button>`
+        :`<button class="match-btn" onclick="playSeasonMatchday()" style="margin-top:8px">▶ Match J${played+1} vs ? (${fmt(cost)})</button>`
+      }
+      <button class="match-btn" onclick="abandonChampionship()" style="margin-top:4px;border-color:var(--danger);color:var(--danger)">✕ Abandonner le championnat</button>
+    </div>`;
+}
+
+function abandonChampionship() {
+  showConfirm('✕ Abandonner', 'Quitter le championnat en cours ? Votre progression sera perdue.', () => {
+    G.club.season = null;
+    G.club.seasonPlayed = false;
+    G.club.seasonMatchday = 0;
+    G.club.activeChampsId = null;
+    renderClubAll();
+  });
+}
+
+function collectChampionshipPrize() {
+  if (!G.club.season||!G.club.seasonPlayed) return;
+  const champ = CHAMPIONSHIP_TIERS.find(ct=>ct.id===G.club.activeChampsId);
+  const teams = [...G.club.season].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));
+  const myPos = teams.findIndex(t=>t.isPlayer)+1;
+  const prizes = champ ? champ.prize : [2000000,1000000,600000,300000,150000,80000,50000,30000,20000,10000];
+  const prize = prizes[myPos-1]||5000;
+  G.money += prize;
+  G.club.season = null;
+  G.club.seasonPlayed = false;
+  G.club.activeChampsId = null;
+  showToast(`★ Fin de championnat ! ${myPos}e place. +${fmt(prize)}`);
+  renderClubAll(); updateUI();
 }
 
 function renderClubOverview() {
@@ -1964,103 +2536,9 @@ function renderClubTransfers() {
     </div>`;
 }
 
-function renderClubMatch() {
-  const panel = document.getElementById('club-match');
-  if (!panel) return;
-  const c = G.club;
-  const ovr = getClubOverall();
-  const salary = c.players.reduce((s,p)=>s+p.salary,0);
-  const matchCost = Math.floor(salary*0.05+10000);
-  const lm = c.lastMatch;
-  panel.innerHTML = `
-    <div class="match-zone">
-      <div class="section-title">Simulation de match</div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:8px">Coût du match : ${fmt(matchCost)} · Note d'équipe : ${ovr||'--'}</div>
-      ${lm?`
-        <div class="match-scoreboard">
-          <div class="team-side">
-            ${getIcon(c.badge||'⚽','20px')}<div class="team-name-small">${c.name}</div>
-            <div class="team-ovr" style="color:var(--mint)">${ovr}</div>
-          </div>
-          <div class="score-center">${lm.myGoals} — ${lm.oppGoals}</div>
-          <div class="team-side">
-            ${getIcon(lm.oppBadge||'⭐','20px')}<div class="team-name-small">${lm.oppName}</div>
-            <div class="team-ovr">${lm.oppOvr}</div>
-          </div>
-        </div>
-        <div class="match-result ${lm.result}">
-          ${lm.result==='win'?`▲ Victoire ! +${fmt(lm.prize)}`:lm.result==='draw'?'— Match nul':'▼ Défaite'}
-        </div>`:
-        '<div style="text-align:center;padding:12px;color:var(--text3);font-size:12px">Aucun match joué</div>'}
-      <button class="match-btn" onclick="simulateMatch()" ${c.players.length<5?'disabled':''}>
-        → Jouer un match amical
-      </button>
-    </div>`;
-}
+// renderClubMatch replaced by renderClubRanked
 
-function renderClubLeague() {
-  const panel = document.getElementById('club-league');
-  if (!panel) return;
-  const c = G.club;
-  if (!c.season) {
-    panel.innerHTML = `
-      <div class="match-zone">
-        <div class="section-title">Mini-Championnat</div>
-        <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px">
-          Un championnat de 10 équipes en matchs aller-retour.<br>
-          <span style="color:var(--gold)">1er : 2M€ · 2e : 1M€ · 3e : 600k€</span>
-        </p>
-        <button class="match-btn" onclick="startSeason()" ${c.players.length<5?'disabled':''}>★ Lancer la saison</button>
-      </div>`;
-  } else {
-    const teams=[...c.season].sort((a,b)=>b.pts-a.pts||((b.gf-b.ga)-(a.gf-a.ga)));
-    const myTeam = c.season.find(t=>t.isPlayer);
-    const totalMatches = c.season.length - 1;
-    const played = c.seasonMatchday || 0;
-    const remaining = totalMatches - played;
-    const lm = c.lastLeagueMatch;
-    const cost = Math.floor(c.players.reduce((s,p)=>s+p.salary,0)*0.05+10000);
-    panel.innerHTML=`
-      <div class="match-zone">
-        <div class="section-title">Championnat</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">
-            Journée <span style="color:var(--gold)">${played}</span> / ${totalMatches}
-          </div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">
-            ${remaining > 0 ? `${remaining} match${remaining>1?'s':''} restant${remaining>1?'s':''}` : '⭐ Saison terminée'}
-          </div>
-        </div>
-        ${lm ? `
-        <div style="background:var(--bg2);border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-          <div style="text-align:center;flex:1">
-            <div style="display:flex;align-items:center;justify-content:center;gap:5px">${getIcon(c.badge||'⚽','18px')}<span style="font-size:10px;font-weight:700;color:var(--text1)">${c.name}</span></div>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;padding:0 10px;color:${lm.result==='win'?'var(--success)':lm.result==='lose'?'var(--danger)':'var(--gold)'}">${lm.myGoals} — ${lm.oppGoals}</div>
-          <div style="text-align:center;flex:1">
-            <div style="display:flex;align-items:center;justify-content:center;gap:5px">${getIcon(lm.oppBadge||'⭐','18px')}<span style="font-size:10px;font-weight:700;color:var(--text2)">${lm.oppName}</span></div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${lm.oppOvr}</div>
-          </div>
-        </div>` : ''}
-        <table class="standings-table">
-          <thead><tr><th>#</th><th>Équipe</th><th>MJ</th><th>Pts</th><th>V</th><th>N</th><th>D</th><th>DB</th></tr></thead>
-          <tbody>
-            ${teams.map((t,i)=>`<tr${t.isPlayer?' class="my-team"':''}>
-              <td>${i+1}</td><td style='display:flex;align-items:center;gap:5px'>${getIcon(t.badge||'⚽','14px')}<span>${t.name}</span></td>
-              <td>${(t.w||0)+(t.d||0)+(t.l||0)}</td>
-              <td>${t.pts}</td>
-              <td>${t.w||0}</td><td>${t.d||0}</td><td>${t.l||0}</td>
-              <td>${(t.gf-t.ga)>=0?'+':''}${t.gf-t.ga}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-        ${c.seasonPlayed?
-          `<button class="match-btn" onclick="collectSeasonPrize()" style="margin-top:8px;border-color:var(--gold);color:var(--gold)">★ Réclamer prix de fin de saison</button>`
-          :`<button class="match-btn" onclick="playSeasonMatchday()" style="margin-top:8px">▶ Match J${played+1} vs ? (${fmt(cost)})</button>`
-        }
-      </div>`;
-  }
-}
+// renderClubLeague replaced by renderClubChampionships
 
 function renderCryptoList() {
   const list = document.getElementById('crypto-list');
@@ -2419,8 +2897,7 @@ function updateFootballTab() {
   const panel=document.getElementById('club-panel');
   if (!G.clubUnlocked && G.money>=CLUB_UNLOCK_THRESHOLD) {
     G.clubUnlocked=true; flashMilestone();
-    showToast('★ Club de Football débloqué ! Investissement de 100k€ !');
-    G.money -= CLUB_UNLOCK_THRESHOLD;
+    showToast('★ Club de Football débloqué !');
     renderClubAll();
   }
   const pct=Math.min(100,(G.money/CLUB_UNLOCK_THRESHOLD*100));
