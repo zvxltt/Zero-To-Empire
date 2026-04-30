@@ -2292,7 +2292,24 @@ function renderClubRankedFull() {
     </div>`;
   });
   html += `</div></div>`;
-
+  
+// ── RANK LADDER ──
+  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;">
+    <div class="section-title">Échelle des rangs</div>
+    <div style="display:flex;flex-direction:column;gap:3px;">`;
+  RANKED_TIERS.slice().reverse().forEach((t,ri)=>{
+    const idx = RANKED_TIERS.length - 1 - ri;
+    const isCurrent = idx === r.tierIdx;
+    const isUnlocked = idx <= r.tierIdx;
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:${isCurrent?`${t.color}1a`:'transparent'};border:1px solid ${isCurrent?t.color:'transparent'}">
+      <span style="font-size:16px">${t.icon||'⭐'}</span>
+      <span style="font-size:11px;font-weight:700;color:${isUnlocked?t.color:'var(--text3)'};flex:1">${t.name}</span>
+      ${isCurrent?`<div style="display:flex;gap:3px">${[0,1,2,3].map(i=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<r.subLevel?t.color:i===r.subLevel?t.color+'80':'var(--bg4)'}"></div>`).join('')}</div>`:''}
+      ${idx < r.tierIdx?`<span style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">✓</span>`:''}
+    </div>`;
+  });
+  html += `</div></div>`;
+  
   // ── CHAMPIONSHIPS LIST ──
   html += `<div class="section-title" style="margin-top:4px">Championnats</div>`;
   CHAMPIONSHIP_TIERS.forEach(ct => {
