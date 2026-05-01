@@ -2198,7 +2198,21 @@ function renderClubAll() {
   renderClubRankedFull(); // merged ranked + championships
 }
 
-// Called after winning a championship that corresponds to current rank
+// ══════════════════════════════════════════════
+// RANKED STATE HELPERS
+// ══════════════════════════════════════════════
+function getRankedState() {
+  if (!G.club.ranked) G.club.ranked = {tierId:'district',tierIdx:0,subLevel:0,wins:0,champWins:{}};
+  if (!G.club.ranked.champWins) G.club.ranked.champWins = {};
+  return G.club.ranked;
+}
+function getRankedLabel() {
+  const r = getRankedState();
+  const tier = RANKED_TIERS[r.tierIdx] || RANKED_TIERS[0];
+  const sub = RANK_SUBLVLS[r.subLevel] || 'Bas';
+  return `${tier.name} — ${sub}`;
+}
+  // Called after winning a championship that corresponds to current rank
 function onChampionshipWin(champId) {
   const r = getRankedState();
   const champ = CHAMPIONSHIP_TIERS.find(ct=>ct.id===champId);
