@@ -302,8 +302,9 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 .modal-btn.cancel{border-color:var(--bg4);background:transparent;color:var(--text3);}
 
 .badge-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px;}
-.badge-opt{width:100%;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid rgba(212,175,55,0.18);background:var(--bg2);transition:border-color .15s,background .15s;}
-.badge-opt.selected{border-color:var(--gold);}
+.badge-opt{width:100%;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid rgba(212,175,55,0.18);background:var(--bg2);user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.badge-opt.selected{border-color:var(--gold);background:rgba(212,175,55,0.1);}
+.badge-opt *{pointer-events:none !important;}
 
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -1841,9 +1842,7 @@ function simulateMatch() {
 }
 
 function startSeason() {
-  if (G.club.players.length < 5) { showToast('! Il faut au moins 5 joueurs !'); return; }
-  const myOvr = getClubOverall();
-  const teams = makeLeagueTeams(G.club.name, myOvr);
+  if (G.club.players.length < 11) { showToast('! Il faut au moins 11 joueurs !'); return; }
   teams.forEach(t => { t.played = []; });
   G.club.season = teams;
   G.club.seasonPlayed = false;
@@ -1861,87 +1860,112 @@ function playSeasonMatchday() {
   G.money -= cost;
 
   const teams = G.club.season;
+  const n = teams.length; // 10 teams total
   const myTeam = teams.find(t=>t.isPlayer);
   if (!myTeam) return;
 
-  // Build schedule: each team plays each other once (round-robin)
-  // Find our next unplayed opponent
-  if (!myTeam.played) myTeam.played = [];
-  const opponent = teams.find(t=>!t.isPlayer && !myTeam.played.includes(t.name));
+  // Build round-robin schedule once if not already done
+  // Using the circle method: fix team[0], rotate the rest
+  if (!G.club.seasonSchedule) {
+    const ids = teams.map((_,i)=>i);
+    const schedule = [];
+    const half = Math.floor(n/2);
+    const rotating = ids.slice(1);
+    for (let r = 0; r < n-1; r++) {
+      const round = [];
+      const circle = [ids[0], ...rotating];
+      for (let i = 0; i < half; i++) {
+        round.push([circle[i], circle[n-1-i]]);
+      }
+      schedule.push(round);
+      rotating.push(rotating.shift()); // rotate
+    }
+    G.club.seasonSchedule = schedule;
+  }
 
-  if (!opponent) {
+  const md = G.club.seasonMatchday || 0;
+  const schedule = G.club.seasonSchedule;
+
+  if (md >= schedule.length) {
     G.club.seasonPlayed = true;
     renderClubAll(); updateUI();
     showToast('★ Saison terminée ! Réclamez votre prix.');
     return;
   }
 
-  // Simulate our match vs opponent
-  const myOvr = getClubOverall();
-  const diff = myOvr - opponent.ovr;
-  const winProb = 45 + diff * 1.3;
-  const rnd = Math.random() * 100;
-  const myGoals = Math.floor(Math.random() * 4);
-  const oppGoals = Math.floor(Math.random() * 4);
-
+  const round = schedule[md];
   if (!G.club.bilan) G.club.bilan = { w:0, d:0, l:0, gf:0, ga:0, totalRevenue:0 };
-  let result;
-  if (rnd < winProb) {
-    result = 'win';
-    const mg = Math.max(myGoals, oppGoals + 1), og = Math.min(oppGoals, mg - 1);
-    myTeam.w++; myTeam.pts += 3; myTeam.gf += mg; myTeam.ga += og;
-    opponent.l++; opponent.gf += og; opponent.ga += mg;
-    G.club.lastLeagueMatch = {result, myGoals: mg, oppGoals: og, oppName: opponent.name, oppOvr: opponent.ovr.toFixed(0), oppBadge: '⚽'};
-    G.club.bilan.w++; G.club.bilan.gf += mg; G.club.bilan.ga += og;
-    G.club.moral = Math.min(100, (G.club.moral||50) + 5);
-    G.club.prestige = (G.club.prestige||0) + 1;
-    const prize = Math.floor(100000 + getClubOverall()*5000);
-    G.money += prize; G.club.bilan.totalRevenue += prize;
-  } else if (rnd < winProb + 18) {
-    result = 'draw';
-    const g = Math.floor(Math.random() * 3);
-    myTeam.d++; myTeam.pts++; myTeam.gf += g; myTeam.ga += g;
-    opponent.d++; opponent.pts++; opponent.gf += g; opponent.ga += g;
-    G.club.lastLeagueMatch = {result, myGoals: g, oppGoals: g, oppName: opponent.name, oppOvr: opponent.ovr.toFixed(0), oppBadge: '⚽'};
-    G.club.bilan.d++; G.club.bilan.gf += g; G.club.bilan.ga += g;
-    G.club.moral = Math.max(0, (G.club.moral||50) - 2);
-  } else {
-    result = 'lose';
-    const og = Math.max(myGoals, oppGoals + 1), mg = Math.min(myGoals, og - 1);
-    myTeam.l++; myTeam.gf += mg; myTeam.ga += og;
-    opponent.w++; opponent.pts += 3; opponent.gf += og; opponent.ga += mg;
-    G.club.lastLeagueMatch = {result, myGoals: mg, oppGoals: og, oppName: opponent.name, oppOvr: opponent.ovr.toFixed(0)};
-    G.club.bilan.l++; G.club.bilan.gf += mg; G.club.bilan.ga += og;
-    G.club.moral = Math.max(0, (G.club.moral||50) - 8);
-  }
 
-  // Also simulate all other matches of this round quickly
-  teams.forEach(a => {
-    if (a.isPlayer) return;
-    if (!a.played) a.played = [];
-    const b = teams.find(t => !t.isPlayer && t.name !== a.name && !a.played.includes(t.name) && !t.played?.includes(a.name));
-    if (!b) return;
-    if (!b.played) b.played = [];
-    const d = a.ovr - b.ovr;
-    const p = 50 + d * 1.2;
-    const r = Math.random() * 100;
-    const gA = Math.floor(Math.random() * 4), gB = Math.floor(Math.random() * 4);
-    if (r < p) { a.w++; a.pts+=3; a.gf+=gA+1; a.ga+=gB; b.l++; b.gf+=gB; b.ga+=gA+1; }
-    else if (r < p+15) { a.d++; a.pts++; b.d++; b.pts++; a.gf+=gA; a.ga+=gA; b.gf+=gA; b.ga+=gA; }
-    else { b.w++; b.pts+=3; b.gf+=gB+1; b.ga+=gA; a.l++; a.gf+=gA; a.ga+=gB+1; }
-    a.played.push(b.name);
-    b.played.push(a.name);
+  let myResult = null, myGoalsF = 0, myGoalsA = 0, myOppName = '';
+
+  // Simulate every match of this round
+  round.forEach(([iA, iB]) => {
+    const tA = teams[iA];
+    const tB = teams[iB];
+    if (!tA || !tB) return;
+
+    const isMyMatch = tA.isPlayer || tB.isPlayer;
+    const myIsA = tA.isPlayer;
+
+    let ovrA = tA.isPlayer ? getClubOverall() : tA.ovr;
+    let ovrB = tB.isPlayer ? getClubOverall() : tB.ovr;
+    const diff = ovrA - ovrB;
+    const winProb = 45 + diff * 1.3;
+    const rnd = Math.random() * 100;
+    const gA = Math.floor(Math.random() * 4);
+    const gB = Math.floor(Math.random() * 4);
+
+    let result;
+    if (rnd < winProb) {
+      // A wins
+      const mg = Math.max(gA, gB + 1), og = Math.min(gB, mg - 1);
+      tA.w++; tA.pts += 3; tA.gf += mg; tA.ga += og;
+      tB.l++; tB.gf += og; tB.ga += mg;
+      result = myIsA ? 'win' : (isMyMatch ? 'lose' : null);
+      if (isMyMatch) { myGoalsF = myIsA ? mg : og; myGoalsA = myIsA ? og : mg; }
+    } else if (rnd < winProb + 18) {
+      // Draw
+      const g = Math.floor(Math.random() * 3);
+      tA.d++; tA.pts++; tA.gf += g; tA.ga += g;
+      tB.d++; tB.pts++; tB.gf += g; tB.ga += g;
+      result = isMyMatch ? 'draw' : null;
+      if (isMyMatch) { myGoalsF = g; myGoalsA = g; }
+    } else {
+      // B wins
+      const mg = Math.max(gB, gA + 1), og = Math.min(gA, mg - 1);
+      tB.w++; tB.pts += 3; tB.gf += mg; tB.ga += og;
+      tA.l++; tA.gf += og; tA.ga += mg;
+      result = myIsA ? 'lose' : (isMyMatch ? 'win' : null);
+      if (isMyMatch) { myGoalsF = myIsA ? og : mg; myGoalsA = myIsA ? mg : og; }
+    }
+
+    if (isMyMatch) {
+      myResult = result;
+      const opp = myIsA ? tB : tA;
+      myOppName = opp.name;
+      G.club.lastLeagueMatch = {result, myGoals: myGoalsF, oppGoals: myGoalsA, oppName: opp.name, oppOvr: opp.ovr?.toFixed(0)||'?', oppBadge:'⚽'};
+
+      if (result === 'win') {
+        G.club.bilan.w++; G.club.bilan.gf += myGoalsF; G.club.bilan.ga += myGoalsA;
+        G.club.moral = Math.min(100, (G.club.moral||50) + 5);
+        G.club.prestige = (G.club.prestige||0) + 1;
+        const prize = Math.floor(100000 + getClubOverall()*5000);
+        G.money += prize; G.club.bilan.totalRevenue += prize;
+      } else if (result === 'draw') {
+        G.club.bilan.d++; G.club.bilan.gf += myGoalsF; G.club.bilan.ga += myGoalsA;
+        G.club.moral = Math.max(0, (G.club.moral||50) - 2);
+      } else {
+        G.club.bilan.l++; G.club.bilan.gf += myGoalsF; G.club.bilan.ga += myGoalsA;
+        G.club.moral = Math.max(0, (G.club.moral||50) - 8);
+      }
+    }
   });
 
-  myTeam.played.push(opponent.name);
-  G.club.seasonMatchday = (G.club.seasonMatchday || 0) + 1;
-
-  const totalMatches = teams.length - 1; // matches for our team
-  const remaining = totalMatches - G.club.seasonMatchday;
-  if (remaining <= 0) G.club.seasonPlayed = true;
+  G.club.seasonMatchday = md + 1;
+  if (G.club.seasonMatchday >= schedule.length) G.club.seasonPlayed = true;
 
   renderClubAll(); updateUI();
-  showToast(result==='win'?`▲ Victoire vs ${opponent.name} !`:result==='draw'?`— Nul vs ${opponent.name}`:`▼ Défaite vs ${opponent.name}`);
+  if (myResult) showToast(myResult==='win'?`▲ Victoire vs ${myOppName} !`:myResult==='draw'?`— Nul vs ${myOppName}`:`▼ Défaite vs ${myOppName}`);
 }
 
 function collectSeasonPrize() {
@@ -1953,21 +1977,40 @@ function openClubModal() {
   m.style.display='flex';
   document.getElementById('modal-club-name').value = G.club.name||'';
   document.getElementById('modal-club-nat').value = G.club.nat||'';
-  const bs = document.getElementById('badge-selector');
-  bs.innerHTML = BADGE_OPTIONS.map(b=>`<div class="badge-opt${G.club.badge===b?' selected':''}" data-badge="${b}" onclick="selectBadge('${b}')">${getIcon(b,'26px')}</div>`).join('');
+  renderBadgeSelector('badge-selector', (b)=>{ G.club.badge=b; updateBadgeSelected('badge-selector',b); });
 }
 function initOnboardingBadges() {
   const bs = document.getElementById('ob-badge-selector');
   if (!bs) return;
-  bs.innerHTML = BADGE_OPTIONS.map(b=>`<div class="badge-opt${G.club.badge===b?' selected':''}" data-badge="${b}" onclick="selectObBadge('${b}')">${getIcon(b,'26px')}</div>`).join('');
+  renderBadgeSelector('ob-badge-selector', (b)=>{ G.club.badge=b; updateBadgeSelected('ob-badge-selector',b); });
 }
-function selectObBadge(b) {
-  G.club.badge = b;
-  document.querySelectorAll('#ob-badge-selector .badge-opt').forEach(el=>el.classList.toggle('selected',el.dataset.badge===b));
+function renderBadgeSelector(containerId, onSelect) {
+  const bs = document.getElementById(containerId);
+  if (!bs) return;
+  bs.innerHTML = '';
+  BADGE_OPTIONS.forEach((badge, i) => {
+    const div = document.createElement('div');
+    div.className = 'badge-opt' + (G.club.badge === badge ? ' selected' : '');
+    // Get icon then force pointer-events:none on every inner element
+    let iconHtml = getIcon(badge, '26px');
+    iconHtml = iconHtml.replace(/<svg /g, '<svg style="pointer-events:none" ')
+                       .replace(/<span /g, '<span style="pointer-events:none" ');
+    div.innerHTML = iconHtml;
+    div.addEventListener('pointerdown', function(e) {
+      e.preventDefault();
+      onSelect(badge);
+    });
+    bs.appendChild(div);
+  });
+}
+function updateBadgeSelected(containerId, badge) {
+  const bs = document.getElementById(containerId);
+  if (!bs) return;
+  bs.querySelectorAll('.badge-opt').forEach((el, i) => el.classList.toggle('selected', BADGE_OPTIONS[i] === badge));
 }
 function selectBadge(b) {
   G.club.badge = b;
-  document.querySelectorAll('.badge-opt').forEach(el=>el.classList.toggle('selected',el.dataset.badge===b));
+  updateBadgeSelected('badge-selector', b);
 }
 function saveClubCustom() {
   const name = document.getElementById('modal-club-name').value.trim();
@@ -2386,8 +2429,8 @@ function renderClubRankedFull() {
       </div>
       ${!moneyOk?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--danger);margin-bottom:6px">💰 ${fmt(ct.minMoney)} requis</div>`:''}
       ${moneyOk&&!rankOk?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--danger);margin-bottom:6px">🏅 Rang requis : ${reqTierName}</div>`:''}
-      <button onclick="startChampionship('${ct.id}')" ${locked||c.players.length<5?'disabled':''} style="width:100%;padding:8px;border-radius:7px;border:1px solid ${locked?'var(--bg4)':isRankChamp?'var(--gold)':'var(--mint)'};background:transparent;color:${locked?'var(--text3)':isRankChamp?'var(--gold)':'var(--mint)'};font-size:11px;font-weight:700;cursor:${locked?'not-allowed':'pointer'};font-family:var(--font-head)">
-        ${locked?'🔒 Verrouillé':c.players.length<5?'5 joueurs min.':'★ Lancer le Championnat'}
+      <button onclick="startChampionship('${ct.id}')" ${locked||c.players.length<11?'disabled':''} style="width:100%;padding:8px;border-radius:7px;border:1px solid ${locked?'var(--bg4)':isRankChamp?'var(--gold)':'var(--mint)'};background:transparent;color:${locked?'var(--text3)':isRankChamp?'var(--gold)':'var(--mint)'};font-size:11px;font-weight:700;cursor:${locked?'not-allowed':'pointer'};font-family:var(--font-head)">
+        ${locked?'🔒 Verrouillé':c.players.length<11?'11 joueurs min.':'★ Lancer le Championnat'}
       </button>
     </div>`;
   });
@@ -2464,7 +2507,7 @@ function renderActiveChampionship(panel) {
 
 function startChampionship(champId) {
   const c = G.club;
-  if (c.players.length < 5) { showToast('! Il faut au moins 5 joueurs !'); return; }
+  if (c.players.length < 11) { showToast('! Il faut au moins 11 joueurs !'); return; }
   const champ = CHAMPIONSHIP_TIERS.find(ct=>ct.id===champId);
   if (!champ) { showToast('Championnat introuvable'); return; }
   const r = getRankedState();
@@ -2479,6 +2522,7 @@ function startChampionship(champId) {
   c.season = teams;
   c.seasonPlayed = false;
   c.seasonMatchday = 0;
+  c.seasonSchedule = null;
   c.lastLeagueMatch = null;
   c.activeChampsId = champId;
   showToast(`★ Championnat ${champ.name} lancé !`);
@@ -2490,6 +2534,7 @@ function abandonChampionship() {
     G.club.season = null;
     G.club.seasonPlayed = false;
     G.club.seasonMatchday = 0;
+    G.club.seasonSchedule = null;
     G.club.activeChampsId = null;
     renderClubAll();
   });
