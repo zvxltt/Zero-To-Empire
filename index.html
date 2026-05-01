@@ -19,9 +19,31 @@
 </style>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-button{touch-action:manipulation;-webkit-appearance:none;appearance:none;color:inherit;background:transparent;font-family:inherit;}
+button{
+  touch-action:manipulation;
+  -webkit-appearance:none;appearance:none;
+  font-family:inherit;
+  background:transparent;
+  border:1px solid transparent;
+  outline:none;
+  cursor:pointer;
+}
+input,select,textarea{
+  -webkit-appearance:none;appearance:none;
+  font-family:inherit;
+  background:var(--bg2,#161d25);
+  color:var(--text1,#e8eaf0);
+  -webkit-text-fill-color:var(--text1,#e8eaf0);
+  border:1px solid transparent;
+  outline:none;
+}
+input::placeholder,textarea::placeholder{
+  color:var(--text3,#4a5f72);
+  -webkit-text-fill-color:var(--text3,#4a5f72);
+  opacity:1;
+}
 :root{color-scheme:dark;}
-html,body{color-scheme:dark;}
+html,body{color-scheme:dark;-webkit-text-size-adjust:100%;}
 :root{
   --gold:#D4AF37;--gold-light:#e8cc5a;--gold-dim:#8a6e10;
   --mint:#6B7C93;--mint-dark:#4a5d70;
@@ -2555,7 +2577,7 @@ function renderActiveChampionship(panel) {
       </table>
       ${c.seasonPlayed
         ?`<button onclick="collectChampionshipPrize()" style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">★ Réclamer le prix</button>`
-        :`<button onclick="playSeasonMatchday()" style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)"> Jouer J${played+1} (${fmt(cost)})</button>`
+        :`<button onclick="playSeasonMatchday()" style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)"> Match J${played+1} (${fmt(cost)})</button>`
       }
       <button onclick="pauseChampionship()" style="width:100%;margin-top:5px;padding:8px;border-radius:8px;border:1px solid var(--text3);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)"> Mettre en pause (revenir plus tard)</button>
       <button onclick="abandonChampionship()" style="width:100%;margin-top:5px;padding:6px;border-radius:8px;border:none;background:transparent;color:var(--danger);font-size:9px;font-weight:600;cursor:pointer;font-family:var(--font-head);opacity:0.6">✕ Abandonner le championnat</button>
