@@ -437,8 +437,6 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
     <div id="biz-list"></div>
   </div>
 
-  <!-- FOOTBALL -->
-
   <div class="tab-panel" id="tab-football">
     <div id="football-locked">
       <span class="lock-emoji" style="display:block;margin-bottom:14px"><?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#6B7C93" stroke-width="1.4"><path d="M3 20V8l9-4 9 4v12"/><path d="M3 14h18M6 14v6M10 14v6M14 14v6M18 14v6"/></svg></span>
@@ -447,6 +445,52 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
       <div class="needed">1 000 €</div>
       <div class="progress-big"><div class="progress-big-fill" id="fb-prog-fill" style="width:0%"></div></div>
       <div id="football-progress-text" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:7px">Progression : 0%</div>
+      <button id="fb-unlock-btn" class="buy-btn cant-buy" onclick="buyFootballMode()" style="width:80%;max-width:240px;margin:14px auto 0;display:block;padding:11px;font-size:12px;border-radius:8px">🏟️ Débloquer le Mode Football</button>
+    </div>
+
+    <!-- ONBOARDING SCREEN -->
+    <div id="football-onboarding" style="display:none;padding:16px;">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:40px;margin-bottom:10px">🏟️</div>
+        <div style="font-size:17px;font-weight:800;color:var(--gold);margin-bottom:6px">Mode Football débloqué !</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.6">Personnalisez votre club avant de commencer.</div>
+      </div>
+
+      <!-- Personnalisation -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
+        <div class="section-title">Votre Club</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Nom du club</div>
+        <input class="modal-input" id="ob-club-name" placeholder="Ex: Paris Empire FC" maxlength="24" value="Empire FC">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Nationalité</div>
+        <input class="modal-input" id="ob-club-nat" placeholder="Ex: France" maxlength="20" value="France">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Écusson</div>
+        <div class="badge-selector" id="ob-badge-selector"></div>
+      </div>
+
+      <!-- Explication du mode -->
+      <div style="background:var(--bg2);border:1px solid rgba(212,175,55,0.3);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div class="section-title">Ce qui vous attend</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:16px;flex-shrink:0">🔄</span>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Recrutez des joueurs</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Marché des transferts — du gardien à l'attaquant</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:16px;flex-shrink:0">⚽</span>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Jouez des championnats</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">12 ligues progressives, du district au GOAT Ultime</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:16px;flex-shrink:0">🏅</span>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Montez en Ranked</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Progressez de District → Légende → GOAT Ultime</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:16px;flex-shrink:0">💰</span>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Générez des revenus</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Les victoires rapportent de l'argent passif en continu</div></div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="finishOnboarding()" style="width:100%;padding:13px;border-radius:10px;border:1px solid var(--gold);background:rgba(212,175,55,0.1);color:var(--gold);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">★ Lancer mon Club !</button>
     </div>
     <div id="club-panel" style="display:none">
       <div class="club-tabs">
@@ -514,6 +558,7 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
     <h3>Statistiques de session</h3>
     <div class="setting-row"><span class="s-key">Clics totaux</span><span class="s-val" id="s-clicks">0</span></div>
     <div class="setting-row"><span class="s-key">Niveau prestige</span><span class="s-val" id="s-prest">0</span></div>
+    <div class="setting-row"><span class="s-key">Rang le plus élevé atteint</span><span class="s-val" id="s-maxrank">District — Bas</span></div>
     <div class="setting-row"><span class="s-key">Entreprises achetées</span><span class="s-val" id="s-biz">0</span></div>
     <div class="setting-row"><span class="s-key">Fortune max atteinte</span><span class="s-val" id="s-maxfort">0 €</span></div>
     <div class="setting-row"><span class="s-key">Revenus cumulés</span><span class="s-val" id="s-total">0 €</span></div>
@@ -1341,6 +1386,8 @@ function defaultState() {
         tierIdx: 0,
         subLevel: 0, // 0=Bas, 1=Mid, 2=Haut, 3=Champion
         wins: 0,
+        maxTierIdx: 0,
+        maxSubLevel: 0,
       },
     },
     crypto:{ holdings:{}, prices:{}, history:{} },
@@ -1909,6 +1956,15 @@ function openClubModal() {
   const bs = document.getElementById('badge-selector');
   bs.innerHTML = BADGE_OPTIONS.map(b=>`<div class="badge-opt${G.club.badge===b?' selected':''}" data-badge="${b}" onclick="selectBadge('${b}')">${getIcon(b,'26px')}</div>`).join('');
 }
+function initOnboardingBadges() {
+  const bs = document.getElementById('ob-badge-selector');
+  if (!bs) return;
+  bs.innerHTML = BADGE_OPTIONS.map(b=>`<div class="badge-opt${G.club.badge===b?' selected':''}" data-badge="${b}" onclick="selectObBadge('${b}')">${getIcon(b,'26px')}</div>`).join('');
+}
+function selectObBadge(b) {
+  G.club.badge = b;
+  document.querySelectorAll('#ob-badge-selector .badge-opt').forEach(el=>el.classList.toggle('selected',el.dataset.badge===b));
+}
 function selectBadge(b) {
   G.club.badge = b;
   document.querySelectorAll('.badge-opt').forEach(el=>el.classList.toggle('selected',el.dataset.badge===b));
@@ -2239,11 +2295,20 @@ function onChampionshipWin(champId) {
   }
 
   r.subLevel = (r.subLevel || 0) + 1;
+  // Track max rank reached
+  if (!r.maxTierIdx) r.maxTierIdx = 0;
+  if (!r.maxSubLevel) r.maxSubLevel = 0;
+  if (r.tierIdx > r.maxTierIdx || (r.tierIdx === r.maxTierIdx && r.subLevel > r.maxSubLevel)) {
+    r.maxTierIdx = r.tierIdx;
+    r.maxSubLevel = r.subLevel;
+  }
   if (r.subLevel >= 4) {
     if (r.tierIdx < RANKED_TIERS.length - 1) {
       r.tierIdx++;
       r.tierId = RANKED_TIERS[r.tierIdx].id;
       r.subLevel = 0;
+      // Update max rank
+      if (r.tierIdx > (r.maxTierIdx||0)) { r.maxTierIdx = r.tierIdx; r.maxSubLevel = 0; }
       showToast(`🏆 Rang monté : ${RANKED_TIERS[r.tierIdx].name} !`);
     } else {
       r.subLevel = 3;
@@ -2290,23 +2355,6 @@ function renderClubRankedFull() {
     <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${isMax?'🔥 Rang Maximum Atteint !':r.subLevel+'/4 victoires pour monter au prochain rang'}</div>
     ${!isMax?`<div style="font-size:9px;color:var(--text3);margin-top:4px">Gagnez le championnat <strong style="color:${tier.color}">${getRankCorrespondingChampName(r.tierIdx)}</strong> pour progresser</div>`:''}
   </div>`;
-  
-// ── RANK LADDER ──
-  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;">
-    <div class="section-title">Échelle des rangs</div>
-    <div style="display:flex;flex-direction:column;gap:3px;">`;
-  RANKED_TIERS.slice().reverse().forEach((t,ri)=>{
-    const idx = RANKED_TIERS.length - 1 - ri;
-    const isCurrent = idx === r.tierIdx;
-    const isUnlocked = idx <= r.tierIdx;
-    html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:${isCurrent?`${t.color}1a`:'transparent'};border:1px solid ${isCurrent?t.color:'transparent'}">
-      <span style="font-size:16px">${t.icon||'⭐'}</span>
-      <span style="font-size:11px;font-weight:700;color:${isUnlocked?t.color:'var(--text3)'};flex:1">${t.name}</span>
-      ${isCurrent?`<div style="display:flex;gap:3px">${[0,1,2,3].map(i=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<r.subLevel?t.color:i===r.subLevel?t.color+'80':'var(--bg4)'}"></div>`).join('')}</div>`:''}
-      ${idx < r.tierIdx?`<span style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">✓</span>`:''}
-    </div>`;
-  });
-  html += `</div></div>`;
   
   // ── CHAMPIONSHIPS LIST ──
   html += `<div class="section-title" style="margin-top:4px">Championnats</div>`;
@@ -2610,7 +2658,7 @@ function renderClubTransfers() {
   if (available.length === 0) {
     html += `<p style="text-align:center;padding:16px;font-size:12px;color:var(--text3)">Tous les joueurs de cette catégorie sont recrutés !</p>`;
   } else {
-    available.sort((a,b)=>b.rat-a.rat).forEach(p => {
+    available.sort((a,b)=>(POSTE_ORDRE[a.pos]||99)-(POSTE_ORDRE[b.pos]||99)).forEach(p => {
       const idx = PLAYERS_POOL.indexOf(p);
       const canBuy = G.money >= p.value;
       const ratingClass = p.rat>=97?'elite':p.rat>=88?'good':p.rat>=75?'avg':'rare';
@@ -2984,6 +3032,21 @@ function updateUI() {
   document.getElementById('s-clicks').textContent=G.clicks.toLocaleString('fr-FR');
   document.getElementById('s-prest').textContent=G.prestigeLevel;
   document.getElementById('s-biz').textContent=Object.values(G.owned).reduce((a,b)=>a+b,0);
+  // Max rank stat
+  const smr = document.getElementById('s-maxrank');
+  if (smr) {
+    if (G.clubUnlocked) {
+      const r = G.club.ranked || {};
+      const mti = r.maxTierIdx || 0;
+      const msl = r.maxSubLevel || 0;
+      const mt = RANKED_TIERS[mti] || RANKED_TIERS[0];
+      smr.textContent = `${mt.name} — ${RANK_SUBLVLS[Math.min(msl,3)]||'Bas'}`;
+      smr.style.color = mt.color || 'var(--mint)';
+    } else {
+      smr.textContent = '—';
+      smr.style.color = 'var(--text3)';
+    }
+  }
   document.getElementById('s-maxfort').textContent=fmt(G.maxMoney);
   document.getElementById('s-total').textContent=fmt(G.totalEarned);
   const pni=document.getElementById('prestige-next-info'); if(pni) pni.textContent=`Prochain prestige → ×${(1+(G.prestigeLevel+1)*0.25).toFixed(2)}`;
@@ -2998,11 +3061,15 @@ function updateUI() {
 function updateFootballTab() {
   const locked=document.getElementById('football-locked');
   const panel=document.getElementById('club-panel');
-  if (!G.clubUnlocked && G.money>=CLUB_UNLOCK_THRESHOLD) {
-    G.clubUnlocked=true; flashMilestone();
-    showToast('★ Club de Football débloqué !');
-    renderClubAll();
+  const onboarding=document.getElementById('football-onboarding');
+  // Show onboarding if unlocked but not yet customized (first time)
+  if (G.clubUnlocked && G.club.showOnboarding) {
+    locked.style.display='none';
+    panel.style.display='none';
+    if (onboarding) { onboarding.style.display='block'; initOnboardingBadges(); }
+    return;
   }
+  if (onboarding) onboarding.style.display='none';
   const pct=Math.min(100,(G.money/CLUB_UNLOCK_THRESHOLD*100));
   if (G.clubUnlocked) {
     locked.style.display='none'; panel.style.display='flex';
@@ -3011,7 +3078,36 @@ function updateFootballTab() {
     const fill=document.getElementById('fb-prog-fill');
     if (fill) fill.style.width=pct.toFixed(1)+'%';
     document.getElementById('football-progress-text').textContent=`Progression : ${pct.toFixed(1)}% — ${fmt(G.money)} / ${fmt(CLUB_UNLOCK_THRESHOLD)}`;
+    const buyBtn=document.getElementById('fb-unlock-btn');
+    if (buyBtn) {
+      buyBtn.disabled = G.money < CLUB_UNLOCK_THRESHOLD;
+      buyBtn.className = G.money >= CLUB_UNLOCK_THRESHOLD ? 'buy-btn can-buy' : 'buy-btn cant-buy';
+    }
   }
+}
+
+function buyFootballMode() {
+  if (G.money < CLUB_UNLOCK_THRESHOLD) { showToast('— Fonds insuffisants !'); return; }
+  G.money -= CLUB_UNLOCK_THRESHOLD;
+  G.clubUnlocked = true;
+  G.club.showOnboarding = true;
+  flashMilestone();
+  showToast('★ Club de Football débloqué ! Personnalisez votre club.');
+  updateUI();
+}
+
+function finishOnboarding() {
+  const nameEl = document.getElementById('ob-club-name');
+  const natEl = document.getElementById('ob-club-nat');
+  const name = nameEl ? nameEl.value.trim() : '';
+  const nat = natEl ? natEl.value.trim() : '';
+  if (name) G.club.name = name;
+  if (nat) G.club.nat = nat;
+  G.club.showOnboarding = false;
+  flashMilestone();
+  showToast(`★ Bienvenue dans le Mode Football — ${G.club.name} !`);
+  renderClubAll();
+  updateUI();
 }
 
 function renderAll() {
