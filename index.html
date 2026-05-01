@@ -2276,6 +2276,21 @@ function renderClubRankedFull() {
 
   let html = '';
 
+ / ── RANKED CARD ──
+  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;text-align:center;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,${tier.color}18,transparent 65%);pointer-events:none"></div>
+    <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;font-weight:600;">Rang Actuel</div>
+    <div style="font-size:36px;margin-bottom:6px">${tier.icon||'⭐'}</div>
+    <div style="font-size:20px;font-weight:800;color:${tier.color};margin-bottom:3px">${tier.name}</div>
+    <div style="font-family:var(--font-mono);font-size:12px;color:var(--text2);margin-bottom:14px">${sub}</div>
+    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:8px">
+      ${[0,1,2,3].map(i=>`
+        <div style="width:36px;height:6px;border-radius:3px;background:${i<=r.subLevel?tier.color:'var(--bg4)'};transition:background .3s"></div>
+      `).join('')}
+    </div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${isMax?'🔥 Rang Maximum Atteint !':r.subLevel+'/4 victoires pour monter au prochain rang'}</div>
+    ${!isMax?`<div style="font-size:9px;color:var(--text3);margin-top:4px">Gagnez le championnat <strong style="color:${tier.color}">${getRankCorrespondingChampName(r.tierIdx)}</strong> pour progresser</div>`:''}
+  </div>`;
   
 // ── RANK LADDER ──
   html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;">
