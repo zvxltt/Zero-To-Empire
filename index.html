@@ -107,6 +107,33 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 #offline-notice .oi-text{font-size:11px;color:var(--gold-light);}
 #offline-notice .oi-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;margin-left:auto;}
 
+/* INACTIVITY WARNING BANNER */
+#inactivity-banner{
+  position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:500;
+  background:linear-gradient(135deg,rgba(20,10,5,0.97),rgba(30,15,5,0.97));
+  border:1px solid rgba(224,92,92,0.6);border-radius:12px;
+  padding:10px 14px;display:none;align-items:center;gap:10px;
+  max-width:340px;width:calc(100% - 28px);
+  box-shadow:0 4px 24px rgba(224,92,92,0.25);
+  animation:bannerPulse 2s ease-in-out infinite;
+}
+#inactivity-banner.show{display:flex;}
+@keyframes bannerPulse{
+  0%,100%{box-shadow:0 4px 24px rgba(224,92,92,0.2);}
+  50%{box-shadow:0 4px 32px rgba(224,92,92,0.45);}
+}
+#inactivity-banner .ib-icon{font-size:20px;flex-shrink:0;}
+#inactivity-banner .ib-text{flex:1;min-width:0;}
+#inactivity-banner .ib-title{font-size:11px;font-weight:700;color:var(--danger);letter-spacing:1px;text-transform:uppercase;}
+#inactivity-banner .ib-sub{font-family:var(--font-mono);font-size:9px;color:var(--text2);margin-top:2px;}
+#inactivity-banner .ib-pct{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--danger);flex-shrink:0;}
+#inactive-mode-indicator{
+  position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;
+  font-size:8px;font-weight:700;border-radius:4px;padding:2px 5px;
+  letter-spacing:0.5px;display:none;
+}
+#inactive-mode-indicator.show{display:block;}
+
 /* TIER HEADERS */
 .tier-header{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin:12px 0 7px;display:flex;align-items:center;gap:8px;}
 .tier-header .tier-badge{padding:2px 8px;border-radius:3px;font-size:8px;letter-spacing:1.5px;}
@@ -439,6 +466,7 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
           <div id="main-btn" onclick="handleClick(event)">
             <div id="click-floats"></div>
             <svg id="btn-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+            <div id="inactive-mode-indicator">5%</div>
           </div>
         </div>
         <div id="btn-label">Stade 1 — Pièce de monnaie</div>
@@ -507,19 +535,19 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
     <div style="display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;gap:10px;align-items:flex-start">
         <span style="font-size:16px;flex-shrink:0">🔄</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Recrutez des joueurs</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Avec le marché des transferts, achèete tout les plus grands joueurs</div></div>
+        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Recrutez des joueurs</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Marché des transferts — du gardien à l'attaquant</div></div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start">
         <span style="font-size:16px;flex-shrink:0">⚽</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Jouez des championnats</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Des championnats à 10 équipes vous attendent</div></div>
+        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Jouez des championnats</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">12 ligues progressives, du district au GOAT Ultime</div></div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start">
         <span style="font-size:16px;flex-shrink:0">🏅</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Montez en Ranked</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Progressez de District jusqu'à GOAT Ultime</div></div>
+        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Montez en Ranked</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Progressez de District → Légende → GOAT Ultime</div></div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start">
         <span style="font-size:16px;flex-shrink:0">💰</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Générez des revenus</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Chaque victoire vous fais gagné de l'argent</div></div>
+        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Générez des revenus</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Les victoires rapportent de l'argent passif en continu</div></div>
       </div>
     </div>
   </div>
@@ -943,7 +971,7 @@ const PLAYERS_POOL = [
   {name:'NGolo Kanté',      pos:'MD', rat:43, salary:1000,  value:8000,       nat:'🇫🇷', tier:1},
   {name:'Eden Hazard',        pos:'AG', rat:44, salary:1100,  value:9500,       nat:'🇧🇪', tier:1},
   {name:'Didier Drogba',      pos:'AT', rat:45, salary:1200,  value:10000,      nat:'🇨🇮', tier:1},
-  {name:'Hugo Oliveira',    pos:'MC', rat:40, salary:800,   value:6000,       nat:'🇵🇹', tier:1},
+  {name:'Gianfranco Zola',    pos:'MC', rat:40, salary:800,   value:6000,       nat:'🇮🇹', tier:1},
  
   // ── TIER 2 : Régional (46–59) ──────────────
   // Atlético Madrid Legends
@@ -1705,9 +1733,62 @@ function getClubOverall() {
 }
 
 // ══════════════════════════════════════════════
+// INACTIVITY SYSTEM
+// ══════════════════════════════════════════════
+const INACTIVITY_THRESHOLD = 5 * 60 * 1000; // 5 minutes en ms
+const INACTIVITY_INCOME_MULT = 0.05;         // 5% des revenus si inactif
+let lastInteractionTime = Date.now();
+let inactivityWarningShown = false;
+let isInactiveMode = false;
+
+function recordInteraction() {
+  const wasInactive = isInactiveMode;
+  lastInteractionTime = Date.now();
+  inactivityWarningShown = false;
+  isInactiveMode = false;
+  // Masquer la bannière
+  const banner = document.getElementById('inactivity-banner');
+  if (banner) banner.classList.remove('show');
+  const indicator = document.getElementById('inactive-mode-indicator');
+  if (indicator) indicator.classList.remove('show');
+  // Message de retour si on était inactif
+  if (wasInactive) {
+    showToast('✓ Revenus complets rétablis — 100% actif !');
+  }
+}
+
+function checkInactivity() {
+  const elapsed = Date.now() - lastInteractionTime;
+  const banner = document.getElementById('inactivity-banner');
+  const indicator = document.getElementById('inactive-mode-indicator');
+  const subText = document.getElementById('ib-sub-text');
+
+  if (elapsed >= INACTIVITY_THRESHOLD) {
+    // Mode inactif
+    if (!isInactiveMode) {
+      isInactiveMode = true;
+    }
+    if (banner) banner.classList.add('show');
+    if (indicator) indicator.classList.add('show');
+    // Mettre à jour le texte du sous-message avec le temps écoulé
+    const minutes = Math.floor(elapsed / 60000);
+    if (subText) subText.textContent = `Inactif depuis ${minutes} min — Cliquez le bouton pour 100%`;
+  } else if (elapsed >= INACTIVITY_THRESHOLD * 0.8 && !inactivityWarningShown) {
+    // Avertissement à 4 minutes (80% du seuil)
+    inactivityWarningShown = true;
+    showToast('⚠️ Attention — Revenus réduits à 5% dans 1 min sans clic !');
+  } else {
+    isInactiveMode = false;
+    if (banner) banner.classList.remove('show');
+    if (indicator) indicator.classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════════
 // CLICK
 // ══════════════════════════════════════════════
 function handleClick(e) {
+  recordInteraction();
   const cv = getClickValue();
   G.money += cv; G.totalEarned += cv; G.clicks++;
   if (G.money > G.maxMoney) G.maxMoney = G.money;
@@ -3331,13 +3412,17 @@ function flashMilestone() {
 // GAME LOOP
 // ══════════════════════════════════════════════
 let cryptoTick=0;
+let inactivityCheckTick=0;
 function tick() {
   const now=Date.now(), dt=(now-lastTick)/1000;
   lastTick=now;
   const income=getIncome();
   G.playTime = (G.playTime||0) + dt;
   if (income>0) {
-    G.money+=income*dt; G.totalEarned+=income*dt;
+    // Appliquer le multiplicateur d'inactivité si nécessaire
+    const incomeMult = isInactiveMode ? INACTIVITY_INCOME_MULT : 1;
+    const earned = income * dt * incomeMult;
+    G.money += earned; G.totalEarned += earned;
     if (G.money>G.maxMoney) G.maxMoney=G.money;
   }
   cryptoTick++;
@@ -3345,6 +3430,11 @@ function tick() {
     tickCrypto();
     cryptoTick=0;
     if (currentTab==='bourse') { renderCryptoList(); updateCryptoPortfolio(); }
+  }
+  inactivityCheckTick++;
+  if (inactivityCheckTick>=10) { // every 1s
+    checkInactivity();
+    inactivityCheckTick=0;
   }
 }
 
@@ -3356,6 +3446,7 @@ document.addEventListener('keydown', e=>{
   if (key===G.hotkey && !hotkeyPressed) {
     hotkeyPressed = true;
     e.preventDefault();
+    recordInteraction();
     handleClick(null);
   }
 });
@@ -3522,6 +3613,16 @@ function cnpSell() {
 </script>
 
 <!-- CRYPTO NUMPAD OVERLAY -->
+
+<!-- INACTIVITY WARNING BANNER -->
+<div id="inactivity-banner">
+  <div class="ib-icon">⚠️</div>
+  <div class="ib-text">
+    <div class="ib-title">Mode Inactif</div>
+      <div class="ib-sub" id="ib-sub-text">Cliquez le bouton pour recevoir 100% de vos revenus</div>
+  </div>
+  <div class="ib-pct">5%</div>
+</div>
 
 <div id="crypto-numpad-overlay" onclick="cnpClickOutside(event)">
   <div id="crypto-numpad-box">
