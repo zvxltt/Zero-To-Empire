@@ -443,18 +443,11 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
           </div>
         </div>
         <div id="btn-label">Stade 1 — Pièce de monnaie</div>
-        <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--font-mono)">Touche : ESPACE</div>
       </div>
-      <!-- Améliorations collapsible in Home -->
+      <!-- Améliorations always visible in Home -->
       <div id="home-amelios-section">
-        <button onclick="toggleHomeAmelios()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--bg1);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;font-family:var(--font-head);font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:0" id="amelios-toggle-btn">
-          <span>Améliorations</span>
-          <span id="amelios-toggle-arrow" style="font-size:14px;transition:transform .2s">▼</span>
-        </button>
-        <div id="home-amelios-panel" style="display:none;margin-top:6px">
-          <div class="pill-tabs" id="upg-tabs-home"></div>
-          <div id="upgrades-list-home"></div>
-        </div>
+        <div class="section-title">Améliorations</div>
+        <div id="upgrades-list-home"></div>
       </div>
 
   </div><!-- /#dashboard -->
@@ -871,10 +864,10 @@ const BUSINESSES = [
   // Tier 6 — Empire
   {id:'techgiant',  name:'GAFAM rival',               icon:'💻', tier:6, baseCost:1e15,         baseIncome:8e9},
   {id:'bz8',        name:'Fonds Souverain',           icon:'💎', tier:6, baseCost:2e15,         baseIncome:1e11,       isBizness:true, costBi:2000,  incPerBi:18000000},
-  {id:'armement',   name:'Conglomérat défense',       icon:'🛡️', tier:6, baseCost:5e15,         baseIncome:4e10},
+  {id:'armement',   name:'Conglomérat défense',       icon:'🛡️', tier:7, baseCost:5e15,         baseIncome:4e10},
   {id:'bz9',        name:'Agence Spatiale Privée',    icon:'🚀', tier:6, baseCost:8e15,         baseIncome:6e11,       isBizness:true, costBi:5000,  incPerBi:45000000},
+  {id:'bz10',       name:'Corporation Mondiale',      icon:'👑', tier:6, baseCost:15e15,        baseIncome:5e12,       isBizness:true, costBi:15000, incPerBi:120000000},
   // Tier 7 — Domination Absolue
-  {id:'bz10',       name:'Corporation Mondiale',      icon:'👑', tier:7, baseCost:15e15,        baseIncome:5e12,       isBizness:true, costBi:15000, incPerBi:120000000},
   {id:'empire',     name:'Empire Mondial',            icon:'👑', tier:7, baseCost:1e18,         baseIncome:2e12},
   {id:'quantumcorp',name:'Quantum Corp',              icon:'🔮', tier:7, baseCost:5e18,         baseIncome:1.5e13},
   {id:'omniplex',   name:'Omniplex Global',           icon:'🌍', tier:7, baseCost:2e19,         baseIncome:8e13},
@@ -940,42 +933,94 @@ const TIER_LABELS = {
 const TIER_COLORS = {1:'tier1',2:'tier2',3:'tier3',4:'tier4',5:'tier5',6:'tier6',7:'tier7'};
 
 // ══════════════════════════════════════════════
-// UPGRADES — système de niveaux
+// UPGRADES — 50 améliorations × 3 niveaux
+// Chaque amélioration se débloque une par une (UI one-at-a-time)
+// Nv1 = baseCost, Nv2 = baseCost×4, Nv3 = baseCost×12
+// L'effet est appliqué UNE FOIS par niveau acheté (fn reçoit G + delta d'1 niveau)
 // ══════════════════════════════════════════════
 const UPGRADES = [
-  // Clic — infrastracture
-  {id:'ent1',  name:'Entrepôt',            icon:'📦', desc:'Capacité de stockage',            baseEffect:'+2€/clic',    baseCost:500,        maxLv:5,  fn:(g,lv)=>{g.cpc+=2*lv;}},
-  {id:'mac1',  name:'Outillage',           icon:'🔧', desc:'Machines de base',                baseEffect:'+1€/clic',    baseCost:200,        maxLv:5,  fn:(g,lv)=>{g.cpc+=1*lv;}},
-  {id:'per1',  name:'Recrutement',         icon:'👤', desc:'Première équipe',                 baseEffect:'+5€/clic',    baseCost:1000,       maxLv:5,  fn:(g,lv)=>{g.cpc+=5*lv;}},
-  {id:'tec1',  name:'Site web',            icon:'🌐', desc:'Présence digitale',               baseEffect:'+20€/clic',   baseCost:3000,       maxLv:5,  fn:(g,lv)=>{g.cpc+=20*lv;}},
-  {id:'mac2',  name:'Machine CNC',         icon:'⚙️', desc:'Usinage de précision',            baseEffect:'+15€/clic',   baseCost:20000,      maxLv:5,  fn:(g,lv)=>{g.cpc+=15*lv;}},
-  {id:'per2',  name:'Force de vente',      icon:'👥', desc:'Commerciaux',                     baseEffect:'+30€/clic',   baseCost:30000,      maxLv:5,  fn:(g,lv)=>{g.cpc+=30*lv;}},
-  {id:'ent2',  name:'Logistique avancée',  icon:'🏭', desc:'Réseau de distribution',          baseEffect:'+50€/clic',   baseCost:150000,     maxLv:5,  fn:(g,lv)=>{g.cpc+=50*lv;}},
-  {id:'tec2',  name:'App mobile',          icon:'📱', desc:'Canal de vente direct',           baseEffect:'+150€/clic',  baseCost:80000,      maxLv:4,  fn:(g,lv)=>{g.cpc+=150*lv;}},
-  {id:'per3',  name:'Département R&D',     icon:'🔬', desc:'Innovation interne',              baseEffect:'+200€/clic',  baseCost:700000,     maxLv:4,  fn:(g,lv)=>{g.cpc+=200*lv;}},
-  {id:'mac3',  name:'Usine 4.0',           icon:'🤖', desc:'Automatisation totale',           baseEffect:'+1k€/clic',   baseCost:8000000,    maxLv:4,  fn:(g,lv)=>{g.cpc+=1000*lv;}},
-  {id:'per4',  name:'Direction',           icon:'👔', desc:'PDG et directeurs',               baseEffect:'+2k€/clic',   baseCost:15000000,   maxLv:3,  fn:(g,lv)=>{g.cpc+=2000*lv;}},
-  {id:'ent3',  name:'Hub mondial',         icon:'✈️', desc:'Livraison internationale',        baseEffect:'+2k€/clic',   baseCost:50000000,   maxLv:3,  fn:(g,lv)=>{g.cpc+=2000*lv;}},
-  {id:'mac4',  name:'Méga-usine IA',       icon:'🧠', desc:'IA pilote la production',         baseEffect:'+10k€/clic',  baseCost:200000000,  maxLv:3,  fn:(g,lv)=>{g.cpc+=10000*lv;}},
-  {id:'tec3',  name:'IA interne',          icon:'💡', desc:'Optimisation IA',                 baseEffect:'×2 clics',    baseCost:2000000,    maxLv:3,  fn:(g,lv)=>{g.cpc*=2;}},
-  {id:'tec4',  name:'Blockchain',          icon:'⛓️', desc:'Transactions sécurisées',         baseEffect:'×3 clics',    baseCost:80000000,   maxLv:2,  fn:(g,lv)=>{g.cpc*=3;}},
-  // Nouvelles — revenus passifs (post-mid game)
-  {id:'rev1',  name:'Réseau de franchise', icon:'🗺️', desc:'Exploitation de licences',        baseEffect:'+500€/s',     baseCost:500000,     maxLv:5,  fn:(g,lv)=>{g._revBonus=(g._revBonus||0)+500*lv;}},
-  {id:'rev2',  name:'Centre de données',   icon:'🖥️', desc:'Serveurs haute dispo',            baseEffect:'+5k€/s',      baseCost:8000000,    maxLv:4,  fn:(g,lv)=>{g._revBonus=(g._revBonus||0)+5000*lv;}},
-  {id:'rev3',  name:'Fonds d\'investissement',icon:'💼',desc:'Placements diversifiés',        baseEffect:'+30k€/s',     baseCost:100000000,  maxLv:4,  fn:(g,lv)=>{g._revBonus=(g._revBonus||0)+30000*lv;}},
-  {id:'rev4',  name:'Infrastructure énergétique',icon:'⚡',desc:'Réseau de distribution électrique',baseEffect:'+200k€/s',baseCost:2000000000,maxLv:3,fn:(g,lv)=>{g._revBonus=(g._revBonus||0)+200000*lv;}},
-  {id:'rev5',  name:'Empire médiatique',   icon:'📡', desc:'Chaînes TV + streaming',          baseEffect:'+2M€/s',      baseCost:50000000000,maxLv:3,  fn:(g,lv)=>{g._revBonus=(g._revBonus||0)+2000000*lv;}},
-  // Prestige & endgame
-  {id:'end1',  name:'Stratégie globale',   icon:'🌍', desc:'Expansion tous continents',       baseEffect:'+50k€/clic',  baseCost:500000000,  maxLv:3,  fn:(g,lv)=>{g.cpc+=50000*lv;}},
-  {id:'end2',  name:'Quantum Computing',   icon:'🔮', desc:'Calcul ultra-rapide',             baseEffect:'+500k€/clic', baseCost:20000000000,maxLv:3,  fn:(g,lv)=>{g.cpc+=500000*lv;}},
-  {id:'end3',  name:'Conglomérat mondial', icon:'👑', desc:'Toutes industries consolidées',   baseEffect:'+5M€/s',      baseCost:1e12,       maxLv:2,  fn:(g,lv)=>{g._revBonus=(g._revBonus||0)+5000000*lv;}},
+  // ── 1-5 : Débuts (clics, très early) ──────────────────────────────
+  {id:'u01', name:'Stylo & Carnet',       icon:'📝', desc:'Première prise de notes commerciale',   costs:[200,400,800],       effects:['+1 €/clic','+2 €/clic','+3 €/clic'],         fn:(g)=>{const add=[1,2,5];g.cpc+=add[g._upgLvApply];}},
+  {id:'u02', name:'Boîte à outils',       icon:'🔧', desc:'Outillage de base pour travailler vite', costs:[200,800,2400],     effects:['+3 €/clic','+6 €/clic','+10 €/clic'],        fn:(g)=>{const add=[3,6,15];g.cpc+=add[g._upgLvApply];}},
+  {id:'u03', name:'Vélo de livraison',    icon:'🚲', desc:'Livraisons rapides dans le quartier',   costs:[500,2000,6000],    effects:['+6 €/clic','+12 €/clic','+20 €/clic'],       fn:(g)=>{const add=[6,12,30];g.cpc+=add[g._upgLvApply];}},
+  {id:'u04', name:'Téléphone portable',   icon:'📱', desc:'Démarchage direct des clients',         costs:[1500,6000,18000],  effects:['+15 €/clic','+30 €/clic','+60 €/clic'],      fn:(g)=>{const add=[15,30,75];g.cpc+=add[g._upgLvApply];}},
+  {id:'u05', name:'Site vitrine',         icon:'🌐', desc:'Présence en ligne basique',             costs:[4000,16000,48000], effects:['+40 €/clic','+80 €/clic','+150 €/clic'],     fn:(g)=>{const add=[40,80,200];g.cpc+=add[g._upgLvApply];}},
+
+  // ── 6-10 : Petite entreprise ──────────────────────────────────────
+  {id:'u06', name:'Local commercial',     icon:'🏪', desc:'Premier local pour vendre',             costs:[12000,48000,144000],    effects:['+100 €/clic','+200 €/clic','+350 €/clic'],    fn:(g)=>{const add=[100,200,500];g.cpc+=add[g._upgLvApply];}},
+  {id:'u07', name:'Employé junior',       icon:'👤', desc:'Premier salarié = plus de productivité',costs:[30000,120000,360000],   effects:['+250 €/clic','+500 €/clic','+1k €/clic'],   fn:(g)=>{const add=[250,500,1250];g.cpc+=add[g._upgLvApply];}},
+  {id:'u08', name:'Caisse enregistreuse', icon:'💳', desc:'Flux de paiements accélérés',           costs:[80000,320000,960000],   effects:['+120 €/s','+240 €/s','+500 €/s'],             fn:(g)=>{const add=[120,240,600];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u09', name:'Camionnette',          icon:'🚚', desc:'Livraisons en volume',                  costs:[200000,800000,2400000], effects:['+600 €/clic','+1.2k €/clic','+2k €/clic'],    fn:(g)=>{const add=[600,1200,3000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u10', name:'Logiciel comptable',   icon:'💻', desc:'Optimisation des marges',               costs:[500000,2000000,6000000],effects:['+1k €/s','+2k €/s','+4k €/s'],               fn:(g)=>{const add=[1000,2000,5000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+
+  // ── 11-15 : PME en croissance ─────────────────────────────────────
+  {id:'u11', name:'Équipe commerciale',   icon:'👥', desc:'Force de vente structurée',             costs:[1500000,6000000,18000000],    effects:['+2k €/clic','+4k €/clic','+7k €/clic'],  fn:(g)=>{const add=[2000,4000,10000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u12', name:'App mobile maison',    icon:'📲', desc:'Canal de vente direct client',          costs:[4000000,16000000,48000000],   effects:['+6k €/s','+12k €/s','+15k €/s'],          fn:(g)=>{const add=[6000,12000,30000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u13', name:'Entrepôt automatisé',  icon:'🏭', desc:'Stockage et préparation ultra-rapide',  costs:[10000000,40000000,120000000], effects:['+5k €/clic','+10k €/clic','+15k €/clic'], fn:(g)=>{const add=[5000,10000,25000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u14', name:'Partenariat bancaire', icon:'🏦', desc:'Accès au crédit avantageux',            costs:[25000000,100000000,300000000],effects:['+20k €/s','+40k €/s','+50k €/s'],        fn:(g)=>{const add=[20000,40000,100000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u15', name:'Département R&D',      icon:'🔬', desc:'Innovation produits et procédés',       costs:[60000000,240000000,720000000],effects:['+15k €/clic','+30k €/clic','+45k €/clic'],fn:(g)=>{const add=[15000,30000,75000];g.cpc+=add[g._upgLvApply];}},
+
+  // ── 16-20 : Industrie ────────────────────────────────────────────
+  {id:'u16', name:'Usine 4.0',            icon:'🤖', desc:'Robots et chaînes de production',       costs:[200000000,800000000,2400000000],     effects:['+50k €/clic','+100k €/clic','+250k €/clic'], fn:(g)=>{const add=[50000,100000,250000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u17', name:'Réseau de franchise',  icon:'🗺️', desc:'Licences et points de vente partout',   costs:[500000000,2000000000,6000000000],    effects:['+80k €/s','+160k €/s','+400k €/s'],          fn:(g)=>{const add=[80000,160000,400000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u18', name:'Centrale solaire',     icon:'☀️', desc:'Énergie propre pour couper les coûts',  costs:[1200000000,4800000000,14400000000],  effects:['+120k €/clic','+240k €/clic','+600k €/clic'],fn:(g)=>{const add=[120000,240000,600000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u19', name:'Blockchain privée',    icon:'⛓️', desc:'Transactions sécurisées sans frais',    costs:[3000000000,12000000000,36000000000], effects:['+300k €/s','+600k €/s','+1.5M€/s'],          fn:(g)=>{const add=[300000,600000,1500000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u20', name:'Hub logistique mondial',icon:'✈️', desc:'Fret aérien sur tous les continents',  costs:[8000000000,32000000000,96000000000], effects:['+400k €/clic','+800k €/clic','+2M €/clic'],   fn:(g)=>{const add=[400000,800000,2000000];g.cpc+=add[g._upgLvApply];}},
+
+  // ── 21-25 : Finance & Tech ────────────────────────────────────────
+  {id:'u21', name:'Data Center',          icon:'🖥️', desc:'Hébergement et traitement à la demande', costs:[20000000000,80000000000,240000000000],    effects:['+800k €/s','+1.6M€/s','+4M€/s'],            fn:(g)=>{const add=[800000,1600000,4000000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u22', name:'Startup IA interne',   icon:'💡', desc:'Algorithmes maison très rentables',      costs:[50000000000,200000000000,600000000000],   effects:['+1M€/clic','+2M€/clic','+5M€/clic'],        fn:(g)=>{const add=[1e6,2e6,5e6];g.cpc+=add[g._upgLvApply];}},
+  {id:'u23', name:'Fonds Spéculatif',     icon:'💼', desc:'Placements à haut rendement',           costs:[120000000000,480000000000,1440000000000], effects:['+3M€/s','+6M€/s','+15M€/s'],                fn:(g)=>{const add=[3e6,6e6,15e6];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u24', name:'Réseau médias global', icon:'📡', desc:'TV, streaming, réseaux sociaux',         costs:[3e11,1.2e12,3.6e12],                     effects:['+5M€/clic','+10M€/clic','+25M€/clic'],      fn:(g)=>{const add=[5e6,10e6,25e6];g.cpc+=add[g._upgLvApply];}},
+  {id:'u25', name:'Infrastructure Cloud', icon:'☁️', desc:'Services cloud à l\'échelle planétaire', costs:[8e11,3.2e12,9.6e12],                     effects:['+12M€/s','+24M€/s','+60M€/s'],              fn:(g)=>{const add=[12e6,24e6,60e6];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+
+  // ── 26-30 : Méga-Corp ────────────────────────────────────────────
+  {id:'u26', name:'Quantum Computing',    icon:'🔮', desc:'Calcul quantique = avantage absolu',     costs:[2e12,8e12,24e12],   effects:['+20M€/clic','+40M€/clic','+100M€/clic'],    fn:(g)=>{const add=[20e6,40e6,100e6];g.cpc+=add[g._upgLvApply];}},
+  {id:'u27', name:'Agence immobilière globale',icon:'🏗️',desc:'Portfolio immobilier mondial',       costs:[5e12,20e12,60e12],  effects:['+40M€/s','+80M€/s','+200M€/s'],             fn:(g)=>{const add=[40e6,80e6,200e6];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u28', name:'Réseau Télécom',       icon:'📶', desc:'Opérateur télécom sur 5 continents',     costs:[12e12,48e12,144e12], effects:['+60M€/clic','+120M€/clic','+300M€/clic'],   fn:(g)=>{const add=[60e6,120e6,300e6];g.cpc+=add[g._upgLvApply];}},
+  {id:'u29', name:'BigPharma',            icon:'🧬', desc:'Brevets médicaux ultra-rentables',       costs:[30e12,120e12,360e12],effects:['+120M€/s','+240M€/s','+600M€/s'],           fn:(g)=>{const add=[120e6,240e6,600e6];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u30', name:'Banque d\'Empire',     icon:'🏛️', desc:'Institution financière souveraine',      costs:[80e12,320e12,960e12],effects:['+200M€/clic','+400M€/clic','+1Md€/clic'],   fn:(g)=>{const add=[200e6,400e6,1e9];g.cpc+=add[g._upgLvApply];}},
+
+  // ── 31-35 : Empire ───────────────────────────────────────────────
+  {id:'u31', name:'Fonds Souverain',      icon:'🏦', desc:'Capital d\'État à votre service',        costs:[2e14,8e14,24e14],   effects:['+500M€/s','+1Md€/s','+2.5Md€/s'],          fn:(g)=>{const add=[500e6,1e9,2.5e9];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u32', name:'Conglomérat défense',  icon:'🛡️', desc:'Armement & sécurité internationale',     costs:[5e14,20e14,60e14],  effects:['+800M€/clic','+1.6Md€/clic','+4Md€/clic'], fn:(g)=>{const add=[800e6,1.6e9,4e9];g.cpc+=add[g._upgLvApply];}},
+  {id:'u33', name:'Studio Hollywood',     icon:'🎭', desc:'Droits ciné, musique, gaming',           costs:[12e14,48e14,144e14], effects:['+2Md€/s','+4Md€/s','+10Md€/s'],            fn:(g)=>{const add=[2e9,4e9,10e9];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u34', name:'Monopole planétaire',  icon:'🌍', desc:'Tous les marchés sous contrôle',         costs:[3e15,12e15,36e15],  effects:['+4Md€/clic','+8Md€/clic','+20Md€/clic'],   fn:(g)=>{const add=[4e9,8e9,20e9];g.cpc+=add[g._upgLvApply];}},
+  {id:'u35', name:'GAFAM Rival',          icon:'💻', desc:'Tech géant alternatif à l\'échelle US',  costs:[8e15,32e15,96e15],  effects:['+10Md€/s','+20Md€/s','+50Md€/s'],          fn:(g)=>{const add=[10e9,20e9,50e9];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+
+  // ── 36-40 : Domination ───────────────────────────────────────────
+  {id:'u36', name:'Agence Spatiale Privée',icon:'🚀',desc:'Satellites, fusées, colonies orbitales',  costs:[2e16,8e16,24e16],   effects:['+25Md€/clic','+50Md€/clic','+125Md€/clic'],fn:(g)=>{const add=[25e9,50e9,125e9];g.cpc+=add[g._upgLvApply];}},
+  {id:'u37', name:'Fusion nucléaire',      icon:'⚡', desc:'Énergie illimitée, coûts nuls',          costs:[5e16,20e16,60e16],  effects:['+50Md€/s','+100Md€/s','+250Md€/s'],        fn:(g)=>{const add=[50e9,100e9,250e9];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u38', name:'Empire médiatique',     icon:'📺', desc:'Contrôle total de l\'information',       costs:[12e16,48e16,144e16], effects:['+80Md€/clic','+160Md€/clic','+400Md€/clic'],fn:(g)=>{const add=[80e9,160e9,400e9];g.cpc+=add[g._upgLvApply];}},
+  {id:'u39', name:'Réseau galactique',     icon:'⭐', desc:'Commerce interstellaire fictif',          costs:[3e17,12e17,36e17],  effects:['+200Md€/s','+400Md€/s','+1Tr€/s'],         fn:(g)=>{const add=[200e9,400e9,1e12];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u40', name:'Singularité IA',        icon:'🧠', desc:'IA générale qui crée de la valeur',      costs:[8e17,32e17,96e17],  effects:['+400Md€/clic','+800Md€/clic','+2Tr€/clic'], fn:(g)=>{const add=[400e9,800e9,2e12];g.cpc+=add[g._upgLvApply];}},
+
+  // ── 41-45 : Cosmos ───────────────────────────────────────────────
+  {id:'u41', name:'Hyper-Algorithme',      icon:'💎', desc:'Prédiction parfaite des marchés',        costs:[2e18,8e18,24e18],   effects:['+1Tr€/s','+2Tr€/s','+5Tr€/s'],             fn:(g)=>{const add=[1e12,2e12,5e12];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u42', name:'Conscience digitale',   icon:'🌟', desc:'L\'IA est consciente et génère de la valeur', costs:[5e18,20e18,60e18], effects:['+2Tr€/clic','+4Tr€/clic','+10Tr€/clic'], fn:(g)=>{const add=[2e12,4e12,10e12];g.cpc+=add[g._upgLvApply];}},
+  {id:'u43', name:'Flux quantique',        icon:'🌑', desc:'Monnaie quantique instantanée',           costs:[12e18,48e18,144e18], effects:['+5Tr€/s','+10Tr€/s','+25Tr€/s'],          fn:(g)=>{const add=[5e12,10e12,25e12];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u44', name:'Matrice de richesse',   icon:'🔥', desc:'Contrôle de la réalité économique',       costs:[3e19,12e19,36e19],  effects:['+10Tr€/clic','+20Tr€/clic','+50Tr€/clic'], fn:(g)=>{const add=[10e12,20e12,50e12];g.cpc+=add[g._upgLvApply];}},
+  {id:'u45', name:'Capital Primordial',    icon:'👑', desc:'Actifs fondamentaux universels',           costs:[8e19,32e19,96e19],  effects:['+25Tr€/s','+50Tr€/s','+125Tr€/s'],         fn:(g)=>{const add=[25e12,50e12,125e12];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+
+  // ── 46-50 : Absolu ───────────────────────────────────────────────
+  {id:'u46', name:'Omnipotence fiscale',   icon:'🏆', desc:'Taxation de l\'univers entier',           costs:[2e20,8e20,24e20],   effects:['+50Tr€/clic','+100Tr€/clic','+250Tr€/clic'],fn:(g)=>{const add=[50e12,100e12,250e12];g.cpc+=add[g._upgLvApply];}},
+  {id:'u47', name:'Hyperspace financier',  icon:'🌈', desc:'Revenus hors dimension',                  costs:[5e20,20e20,60e20],  effects:['+100Tr€/s','+200Tr€/s','+500Tr€/s'],       fn:(g)=>{const add=[100e12,200e12,500e12];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u48', name:'Domination absolue',    icon:'⚔️', desc:'Toute économie sous contrôle',            costs:[12e20,48e20,144e20], effects:['+200Tr€/clic','+400Tr€/clic','+1Qd€/clic'], fn:(g)=>{const add=[200e12,400e12,1e15];g.cpc+=add[g._upgLvApply];}},
+  {id:'u49', name:'Empire Éternel',        icon:'🌠', desc:'Revenus transcendants perpétuels',        costs:[3e21,12e21,36e21],  effects:['+400Tr€/s','+800Tr€/s','+2Qd€/s'],         fn:(g)=>{const add=[400e12,800e12,2e15];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u50', name:'Zéro à l\'Infini',      icon:'∞',  desc:'L\'ultime amélioration — au delà de tout', costs:[1e22,4e22,12e22],  effects:['+1Qd€/clic','+2Qd€/clic','+5Qd€/clic'],    fn:(g)=>{const add=[1e15,2e15,5e15];g.cpc+=add[g._upgLvApply];}},
 ];
 
 function getUpgCost(u, level) {
-  return Math.ceil(u.baseCost * Math.pow(2.2, level - 1));
+  return u.costs[level - 1] || 0;
 }
 function getUpgLevel(id) {
   return G.upgrades[id] || 0;
+}
+function getActiveUpgradeIndex() {
+  for (let i = 0; i < UPGRADES.length; i++) {
+    if (getUpgLevel(UPGRADES[i].id) < 3) return i;
+  }
+  return UPGRADES.length - 1;
 }
 
 // ══════════════════════════════════════════════
@@ -1842,14 +1887,17 @@ function buyUpgrade(id) {
   const u = UPGRADES.find(x=>x.id===id);
   if (!u) return;
   const lv = getUpgLevel(id);
-  if (lv >= u.maxLv) { showToast('Niveau maximum atteint !'); return; }
+  if (lv >= 3) { showToast('Niveau maximum atteint !'); return; }
   const nextLv = lv + 1;
   const cost = getUpgCost(u, nextLv);
   if (G.money < cost) { showToast('— Fonds insuffisants !'); return; }
   G.money -= cost;
   G.upgrades[id] = nextLv;
-  u.fn(G, 1); // apply effect for 1 new level
-  showToast(`✓ ${u.name} Nv.${nextLv} activé !`);
+  // Pass which level index (0-based) was just purchased
+  G._upgLvApply = nextLv - 1;
+  u.fn(G);
+  delete G._upgLvApply;
+  showToast(`✓ ${u.name} Nv.${nextLv}/3 activé !`);
   flashMilestone();
   renderUpgrades();
   renderUpgradesHome();
@@ -2474,50 +2522,93 @@ function renderBizList() {
 
 function renderUpgradesInto(tabsId, listId, catVar, setCatFn) {
   const tabs = document.getElementById(tabsId);
-  if (tabs) tabs.innerHTML = ''; // no category tabs anymore
+  if (tabs) tabs.innerHTML = '';
   const list = document.getElementById(listId);
   if (!list) return;
-  list.innerHTML='';
-  // All upgrades sorted by current next-level cost (always increasing order)
-  const sorted = UPGRADES.slice().sort((a,b)=>{
-    const lvA = getUpgLevel(a.id), lvB = getUpgLevel(b.id);
-    const costA = lvA >= a.maxLv ? Infinity : getUpgCost(a, lvA+1);
-    const costB = lvB >= b.maxLv ? Infinity : getUpgCost(b, lvB+1);
-    if (costA === Infinity && costB === Infinity) return a.baseCost - b.baseCost;
-    if (costA === Infinity) return 1;
-    if (costB === Infinity) return -1;
-    return costA - costB;
-  });
-  sorted.forEach(u=>{
-    const lv = getUpgLevel(u.id);
-    const maxed = lv >= u.maxLv;
-    const nextLv = lv + 1;
-    const cost = maxed ? 0 : getUpgCost(u, nextLv);
-    const canBuy = !maxed && G.money >= cost;
-    const div=document.createElement('div');
-    div.className=`upg-card${maxed?' owned':''}`;
-    div.innerHTML=`
-      <div class="upg-icon">${getIcon(u.icon,'18px')}</div>
-      <div class="upg-info">
-        <div class="upg-name" style="display:flex;align-items:center;gap:6px">
-          ${u.name}
-          <span style="font-family:var(--font-mono);font-size:9px;background:${maxed?'rgba(212,175,55,0.15)':'rgba(107,124,147,0.15)'};color:${maxed?'var(--gold)':'var(--mint)'};border-radius:3px;padding:1px 5px">
-            ${maxed?`MAX (${u.maxLv})`:`Nv.${lv}/${u.maxLv}`}
-          </span>
+
+  const activeIdx = getActiveUpgradeIndex();
+  const allDone = UPGRADES.every(u => getUpgLevel(u.id) >= 3);
+  const u = UPGRADES[activeIdx];
+  const lv = getUpgLevel(u.id);
+  const maxed = lv >= 3;
+
+  // Counter bar
+  const completedCount = UPGRADES.filter(x => getUpgLevel(x.id) >= 3).length;
+  const total = UPGRADES.length;
+
+  // Build levels display
+  let levelsHtml = '';
+  for (let i = 1; i <= 3; i++) {
+    const done = lv >= i;
+    const isNext = lv === i - 1;
+    const cost = u.costs[i - 1];
+    const canAfford = G.money >= cost;
+    const effect = u.effects[i - 1];
+    levelsHtml += `
+      <div style="background:${done?'rgba(212,175,55,0.08)':isNext?'rgba(107,124,147,0.06)':'rgba(0,0,0,0.2)'};border:1px solid ${done?'rgba(212,175,55,0.5)':isNext?'rgba(107,124,147,0.35)':'rgba(255,255,255,0.06)'};border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:10px;transition:all .2s">
+        <div style="width:28px;height:28px;border-radius:50%;background:${done?'rgba(212,175,55,0.2)':isNext?'rgba(107,124,147,0.15)':'rgba(255,255,255,0.04)'};border:1.5px solid ${done?'var(--gold)':isNext?'var(--mint)':'var(--bg4)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-mono);font-size:11px;font-weight:700;color:${done?'var(--gold)':isNext?'var(--mint)':'var(--text3)'}">${done?'✓':i}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;font-weight:700;color:${done?'var(--gold)':isNext?'var(--text1)':'var(--text3)'};margin-bottom:2px">Niveau ${i} ${done?'— Acheté':''}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:${done?'var(--gold-dim)':isNext?'var(--mint)':'var(--text3)'}">Effet : ${effect}</div>
         </div>
-        <div class="upg-desc">${u.desc}</div>
-        <div class="upg-effect">${u.baseEffect} / niveau</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-family:var(--font-mono);font-size:10px;color:${maxed?'var(--gold)':'var(--text2)'}">
-          ${maxed?'✓ Max':'→ '+fmt(cost)}
+        <div style="text-align:right;flex-shrink:0">
+          ${done
+            ? `<div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">✓ MAX</div>`
+            : isNext
+              ? `<div style="font-family:var(--font-mono);font-size:10px;color:${canAfford?'var(--gold-light)':'var(--text2)'};margin-bottom:4px">${fmt(cost)}</div>
+                 <button onclick="buyUpgrade('${u.id}')" style="display:block;padding:5px 12px;border-radius:6px;border:1px solid ${canAfford?'var(--mint)':'#2d3e50'};background:${canAfford?'rgba(107,124,147,0.15)':'transparent'};color:${canAfford?'var(--mint)':'#4a5f72'};font-size:9px;font-weight:700;cursor:${canAfford?'pointer':'not-allowed'};font-family:var(--font-head);transition:all .15s" ${canAfford?'':'disabled'}>${canAfford?'Acheter':'Verrouillé'}</button>`
+              : `<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${fmt(cost)}</div>`
+          }
         </div>
-        <button class="upg-buy${maxed?' done':''}" onclick="buyUpgrade('${u.id}')" ${maxed?'disabled':''}>
-          ${maxed?'MAX':canBuy?'Acheter':'Verrouillé'}
-        </button>
       </div>`;
-    list.appendChild(div);
-  });
+  }
+
+  list.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <!-- Counter -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:8px">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600">Progression</div>
+        <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--gold)">${completedCount} / ${total}</div>
+      </div>
+      <!-- Progress bar -->
+      <div style="height:3px;background:var(--bg3);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${Math.round(completedCount/total*100)}%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width .5s"></div>
+      </div>
+
+      ${allDone ? `
+        <div style="text-align:center;padding:30px 20px">
+          <div style="font-size:32px;margin-bottom:10px">👑</div>
+          <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px">Toutes les améliorations achetées !</div>
+          <div style="font-size:11px;color:var(--text2)">Vous avez atteint le sommet absolu.</div>
+        </div>
+      ` : `
+      <!-- Amélioration active -->
+      <div style="background:var(--bg2);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:11px">
+          <div style="width:44px;height:44px;border-radius:10px;background:var(--bg3);border:1px solid rgba(212,175,55,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">${getIcon(u.icon,'22px')}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:var(--text1);margin-bottom:2px">${u.name}</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${u.desc}</div>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:10px;background:rgba(107,124,147,0.15);color:var(--mint);border-radius:4px;padding:3px 8px;flex-shrink:0">Nv.${lv}/3</div>
+        </div>
+        <!-- Niveau dots -->
+        <div style="display:flex;gap:4px;align-items:center">
+          ${[1,2,3].map(i=>`<div style="flex:1;height:3px;border-radius:2px;background:${lv>=i?'var(--gold)':'var(--bg4)'}"></div>`).join('')}
+        </div>
+        <!-- Les 3 niveaux -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${levelsHtml}
+        </div>
+      </div>
+
+      <!-- Amélioration précédente / suivante — navigation info -->
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${activeIdx > 0 ? '← ' + UPGRADES[activeIdx-1].name + ' ✓' : ''}</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${activeIdx < UPGRADES.length - 1 ? UPGRADES[activeIdx+1].name + ' →' : ''}</div>
+      </div>
+      `}
+    </div>`;
 }
 
 function renderUpgrades() {
@@ -2976,10 +3067,33 @@ function _buildTransferShell(panel, suggestedTier, activeTierNum, c) {
   panel.innerHTML = `
     <div class="section-title">Marché des transferts</div>
     <div id="transfer-full-warn" style="display:none;background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.35);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--danger);font-family:var(--font-mono)">⚠️ Effectif complet — 25/25 joueurs. Vendez un joueur pour recruter.</div>
-    <div id="transfer-tabs-bar" style="display:flex;gap:0;border:1px solid rgba(212,175,55,0.3);border-radius:8px;overflow-x:auto;overflow-y:hidden;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
+    <div id="transfer-tabs-wrap" style="position:relative;margin-bottom:10px;">
+      <div id="transfer-tabs-bar" style="display:flex;gap:0;border:1px solid rgba(212,175,55,0.3);border-radius:8px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
+      <div id="transfer-scroll-left" style="display:none;position:absolute;left:0;top:0;bottom:0;width:26px;background:linear-gradient(to right,var(--bg1) 30%,transparent);border-radius:8px 0 0 8px;pointer-events:none;align-items:center;justify-content:center;z-index:2;">
+        <span style="font-size:11px;font-weight:700;color:var(--gold);">&lt;</span>
+      </div>
+      <div id="transfer-scroll-right" style="display:flex;position:absolute;right:0;top:0;bottom:0;width:26px;background:linear-gradient(to left,var(--bg1) 30%,transparent);border-radius:0 8px 8px 0;pointer-events:none;align-items:center;justify-content:center;z-index:2;">
+        <span style="font-size:11px;font-weight:700;color:var(--gold);">&gt;</span>
+      </div>
+    </div>
     <div id="transfer-info-card" style="margin-bottom:10px;"></div>
     <div id="transfer-player-list" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px;"></div>
   `;
+  // Hook scroll listener after DOM insertion
+  setTimeout(() => {
+    const bar = document.getElementById('transfer-tabs-bar');
+    const left = document.getElementById('transfer-scroll-left');
+    const right = document.getElementById('transfer-scroll-right');
+    if (!bar || !left || !right) return;
+    function updateArrows() {
+      const atStart = bar.scrollLeft <= 4;
+      const atEnd = bar.scrollLeft >= bar.scrollWidth - bar.clientWidth - 4;
+      left.style.display = atStart ? 'none' : 'flex';
+      right.style.display = atEnd ? 'none' : 'flex';
+    }
+    bar.addEventListener('scroll', updateArrows, {passive:true});
+    updateArrows();
+  }, 0);
 }
 
 function _updateTransferTabs(activeTierNum, suggestedTier) {
@@ -2998,11 +3112,21 @@ function _updateTransferTabs(activeTierNum, suggestedTier) {
     btn.setAttribute('onclick', `switchTransferTab(${tl.tier})`);
     btn.style.cssText = `flex:1 0 auto;padding:7px 10px;background:${isActive?'var(--bg3)':'var(--bg2)'};border:none;border-right:1px solid rgba(212,175,55,0.15);color:${isActive?tl.color:'var(--text3)'};font-size:8.5px;font-weight:700;cursor:pointer;font-family:var(--font-head);white-space:nowrap;position:relative;transition:all .15s;min-width:70px`;
     btn.innerHTML = `<div>${tl.label}</div>
-      ${champForRank?`<div style="font-size:7px;color:${isActive?tl.color:'var(--text3)'};opacity:0.8;margin-top:1px">${champForRank.name}</div>`:''}
       ${isActive?`<div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:${tl.color};border-radius:2px 2px 0 0"></div>`:''}
       ${isSuggested&&!isActive?`<div style="position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--gold)"></div>`:''}`;
     bar.appendChild(btn);
   });
+  // Scroll active tab into view & refresh arrows
+  const activeBtn = bar.querySelector(`button[onclick="switchTransferTab(${activeTierNum})"]`);
+  if (activeBtn) activeBtn.scrollIntoView({block:'nearest',inline:'nearest'});
+  const left = document.getElementById('transfer-scroll-left');
+  const right = document.getElementById('transfer-scroll-right');
+  if (left && right) {
+    const atStart = bar.scrollLeft <= 4;
+    const atEnd = bar.scrollLeft >= bar.scrollWidth - bar.clientWidth - 4;
+    left.style.display = atStart ? 'none' : 'flex';
+    right.style.display = atEnd ? 'none' : 'flex';
+  }
 }
 
 function _updateTransferInfo(activeTierNum, suggestedTier) {
@@ -3542,7 +3666,7 @@ function renderAll() {
   G.hotkey = ' ';
   renderBizList();
   renderUpgrades();
-  if (homeAmeliosOpen) renderUpgradesHome();
+  renderUpgradesHome();
   if (G.clubUnlocked) renderClubAll();
   if (currentTab==='bourse') renderCryptoList();
   updateUI();
@@ -3599,7 +3723,7 @@ function tick() {
   let income=getIncome();
   G.playTime = (G.playTime||0) + dt;
 
-  // Inactivité : si le joueur est inactif, il ne reçoit que 5% de ses revenus
+  // Inactivité : si le joueur est inactif depuis INACTIVITY_DELAY, il ne reçoit que 5% de ses revenus
   const idleMs = now - lastInteractionTime;
   const isInactive = idleMs >= INACTIVITY_DELAY;
   const effectiveIncome = isInactive ? income * INACTIVITY_BONUS_RATE : income;
@@ -3607,6 +3731,11 @@ function tick() {
   if (effectiveIncome>0) {
     G.money+=effectiveIncome*dt; G.totalEarned+=effectiveIncome*dt;
     if (G.money>G.maxMoney) G.maxMoney=G.money;
+  }
+
+  // Accumulate missed income during inactivity for toast display on return
+  if (isInactive) {
+    inactivityAccumulated += income * (1 - INACTIVITY_BONUS_RATE) * dt;
   }
 
   cryptoTick++;
@@ -3647,6 +3776,10 @@ function showBigInactivityToast(bonus) {
 
 let lastInteractionTime = Date.now();
 function trackInteraction() {
+  const wasInactive = (Date.now() - lastInteractionTime) >= INACTIVITY_DELAY;
+  if (wasInactive && inactivityAccumulated > 1) {
+    showBigInactivityToast(inactivityAccumulated);
+  }
   lastInteractionTime = Date.now();
   lastInactivityBonus = Date.now();
   inactivityAccumulated = 0; // reset l'accumulation aussi
