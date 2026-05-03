@@ -1088,7 +1088,7 @@ const PLAYERS_POOL = [
   {name:'Paul Scholes',       pos:'MC', rat:91, salary:310000,value:5000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
   {name:'Roy Keane',          pos:'MD', rat:91, salary:310000,value:5000000000,  nat:'🇮🇪', tier:7},
   {name:'David Beckham',      pos:'AD', rat:89, salary:260000,value:2000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
-  {name:'Hugo Oliveira',      pos:'AT', rat:92, salary:280000,value:3000000000,  nat:'🇵🇹', tier:7},
+  {name:'Hugo Oliveira',      pos:'AT', rat:92, salary:280000,value:3000000000,  nat:'🇫🇷', tier:7},
   {name:'Wayne Rooney',       pos:'AT', rat:90, salary:280000,value:3000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
   {name:'Eric Cantona',       pos:'AT', rat:91, salary:310000,value:5000000000,  nat:'🇫🇷', tier:7},
 
@@ -1542,7 +1542,7 @@ function saveGame() {
 // OFFLINE EARNINGS
 // ══════════════════════════════════════════════
 function checkOffline() {
-  const OFFLINE_RATE = 0.20; // 20% des revenus normaux hors ligne
+  const OFFLINE_RATE = 0.05; // 5% des revenus normaux hors ligne
   const elapsed = (Date.now() - G.lastSave) / 1000;
   if (elapsed > 30) {
     const pps = getIncome();
@@ -2224,6 +2224,11 @@ function switchClubTab(name, btn) {
   const panel = document.getElementById('club-'+name);
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
+  // Reset transfer shell so it rebuilds on next render
+  if (name !== 'transfers') {
+    const tp = document.getElementById('club-transfers');
+    if (tp) tp.innerHTML = '';
+  }
   renderClubAll();
 }
 
@@ -2473,8 +2478,16 @@ function renderUpgradesInto(tabsId, listId, catVar, setCatFn) {
   const list = document.getElementById(listId);
   if (!list) return;
   list.innerHTML='';
-  // All upgrades sorted by baseCost
-  const sorted = UPGRADES.slice().sort((a,b)=>a.baseCost-b.baseCost);
+  // All upgrades sorted by current next-level cost (always increasing order)
+  const sorted = UPGRADES.slice().sort((a,b)=>{
+    const lvA = getUpgLevel(a.id), lvB = getUpgLevel(b.id);
+    const costA = lvA >= a.maxLv ? Infinity : getUpgCost(a, lvA+1);
+    const costB = lvB >= b.maxLv ? Infinity : getUpgCost(b, lvB+1);
+    if (costA === Infinity && costB === Infinity) return a.baseCost - b.baseCost;
+    if (costA === Infinity) return 1;
+    if (costB === Infinity) return -1;
+    return costA - costB;
+  });
   sorted.forEach(u=>{
     const lv = getUpgLevel(u.id);
     const maxed = lv >= u.maxLv;
@@ -2760,10 +2773,12 @@ function renderActiveChampionship(panel) {
       </table>
       ${c.seasonPlayed
         ?`<button onclick="collectChampionshipPrize()" style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">★ Réclamer le prix</button>`
-        :`<button onclick="playSeasonMatchday()" style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">▶ Match J${played+1} (${fmt(cost)})</button>`
+        :`<div style="display:flex;gap:6px;margin-top:10px">
+            <button onclick="pauseChampionship()" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--text3);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">⏸ Pause</button>
+            <button onclick="playSeasonMatchday()" style="flex:2;padding:9px;border-radius:8px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">▶ J${played+1} (${fmt(cost)})</button>
+            <button onclick="abandonChampionship()" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">✕ Stop</button>
+          </div>`
       }
-      <button onclick="pauseChampionship()" style="width:100%;margin-top:5px;padding:8px;border-radius:8px;border:1px solid var(--text3);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">⏸ Mettre en pause (revenir plus tard)</button>
-      <button onclick="abandonChampionship()" style="width:100%;margin-top:5px;padding:6px;border-radius:8px;border:none;background:transparent;color:var(--danger);font-size:9px;font-weight:600;cursor:pointer;font-family:var(--font-head);opacity:0.6">✕ Abandonner le championnat</button>
     </div>`;
 }
 
@@ -2920,78 +2935,116 @@ function renderClubSquad() {
     </div>`;
 }
 
+const TRANSFER_TIER_LABELS = [
+  {tier:1,  label:'Inconnu',         rankIdx:0,  color:'#6a7f95'},
+  {tier:2,  label:'Local',           rankIdx:1,  color:'#7ab8c8'},
+  {tier:3,  label:'Prometteur',      rankIdx:2,  color:'#5da0d0'},
+  {tier:4,  label:'Confirmé',        rankIdx:3,  color:'#6B7C93'},
+  {tier:5,  label:'Incontournable',  rankIdx:4,  color:'#D4AF37'},
+  {tier:6,  label:'Prestigieux',     rankIdx:5,  color:'#e8cc5a'},
+  {tier:7,  label:'Redouté',         rankIdx:6,  color:'#f0a000'},
+  {tier:8,  label:'Haut de Gamme',   rankIdx:7,  color:'#c87aff'},
+  {tier:9,  label:'Classe Mondiale', rankIdx:8,  color:'#ff9f40'},
+  {tier:10, label:'Icône',           rankIdx:9,  color:'#ff4466'},
+  {tier:11, label:'Légende',         rankIdx:10, color:'#ff6688'},
+  {tier:12, label:'Divin',           rankIdx:11, color:'#ff8800'},
+];
+
 function renderClubTransfers() {
   const panel = document.getElementById('club-transfers');
   if (!panel) return;
   const c = G.club;
   const r = getRankedState();
   const currentTierIdx = r.tierIdx;
-
-  // Map player pool tier → rank tier index
-  // tier 1=0(Inconnu), 2=1(Local), 3=2(Prometteur), 4=3(Confirmé), 5=4(Incontournable),
-  // 6=5(Prestigieux), 7=6(Redouté), 8=7(Haut de Gamme), 9=8(Classe Mondiale), 10=9(Icône), 11=10(Légende), 12=11(Divin)
-  const TIER_LABELS = [
-    {tier:1,  label:'Inconnu',         rankIdx:0,  color:'#6a7f95'},
-    {tier:2,  label:'Local',           rankIdx:1,  color:'#7ab8c8'},
-    {tier:3,  label:'Prometteur',      rankIdx:2,  color:'#5da0d0'},
-    {tier:4,  label:'Confirmé',        rankIdx:3,  color:'#6B7C93'},
-    {tier:5,  label:'Incontournable',  rankIdx:4,  color:'#D4AF37'},
-    {tier:6,  label:'Prestigieux',     rankIdx:5,  color:'#e8cc5a'},
-    {tier:7,  label:'Redouté',         rankIdx:6,  color:'#f0a000'},
-    {tier:8,  label:'Haut de Gamme',   rankIdx:7,  color:'#c87aff'},
-    {tier:9,  label:'Classe Mondiale', rankIdx:8,  color:'#ff9f40'},
-    {tier:10, label:'Icône',           rankIdx:9,  color:'#ff4466'},
-    {tier:11, label:'Légende',         rankIdx:10, color:'#ff6688'},
-    {tier:12, label:'Divin',           rankIdx:11, color:'#ff8800'},
-  ];
-
-  // Suggested tier = currentTierIdx+1 capped (tier field = rankIdx+1)
   const suggestedTier = Math.min(currentTierIdx + 1, 9);
-
-  // Get active tab from data attr
   const activeTab = panel.dataset.activeTab || String(suggestedTier);
-
   const activeTierNum = parseInt(activeTab);
-  const available = PLAYERS_POOL.filter(p => p.tier === activeTierNum && !c.players.find(x=>x.name===p.name));
-  const tl = TIER_LABELS.find(t=>t.tier===activeTierNum);
 
-  let html = `<div class="section-title">Marché des transferts</div>`;
-  if (c.players.length >= MAX_SQUAD_SIZE) {
-    html += `<div style="background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.35);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--danger);font-family:var(--font-mono)">⚠️ Effectif complet — 25/25 joueurs. Vendez un joueur pour recruter.</div>`;
+  // Build full HTML only on first render (no child elements yet)
+  if (!panel.querySelector('#transfer-tabs-bar')) {
+    _buildTransferShell(panel, suggestedTier, activeTierNum, c);
   }
 
-  // Tab bar
-  html += `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">`;
-  TIER_LABELS.forEach(tl => {
+  // Always update only the dynamic parts — NO full innerHTML replace
+  _updateTransferTabs(activeTierNum, suggestedTier);
+  _updateTransferInfo(activeTierNum, suggestedTier);
+  _updateTransferPlayers(activeTierNum, c);
+  panel.dataset.activeTab = activeTab;
+}
+
+function _buildTransferShell(panel, suggestedTier, activeTierNum, c) {
+  panel.innerHTML = `
+    <div class="section-title">Marché des transferts</div>
+    <div id="transfer-full-warn" style="display:none;background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.35);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--danger);font-family:var(--font-mono)">⚠️ Effectif complet — 25/25 joueurs. Vendez un joueur pour recruter.</div>
+    <div id="transfer-tabs-bar" style="display:flex;gap:0;border:1px solid rgba(212,175,55,0.3);border-radius:8px;overflow-x:auto;overflow-y:hidden;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
+    <div id="transfer-info-card" style="margin-bottom:10px;"></div>
+    <div id="transfer-player-list" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px;"></div>
+  `;
+}
+
+function _updateTransferTabs(activeTierNum, suggestedTier) {
+  const bar = document.getElementById('transfer-tabs-bar');
+  if (!bar) return;
+  bar.innerHTML = '';
+  TRANSFER_TIER_LABELS.forEach(tl => {
     const isActive = tl.tier === activeTierNum;
     const isSuggested = tl.tier === suggestedTier;
-    html += `<button onclick="switchTransferTab(${tl.tier})" style="padding:4px 9px;border-radius:6px;border:1px solid ${isActive?tl.color:'var(--border)'};background:${isActive?tl.color+'22':'transparent'};color:${isActive?tl.color:'var(--text3)'};font-size:9px;font-weight:700;cursor:pointer;font-family:var(--font-head);position:relative">
-      ${tl.label}${isSuggested?`<span style="position:absolute;top:-4px;right:-4px;width:7px;height:7px;border-radius:50%;background:var(--gold)"></span>`:''}
-    </button>`;
+    const champForRank = CHAMPIONSHIP_TIERS.find(ct => {
+      if (tl.rankIdx === 0) return ct.rankRequired === null;
+      const prevRankId = RANKED_TIERS[tl.rankIdx - 1]?.id;
+      return ct.rankRequired === prevRankId;
+    });
+    const btn = document.createElement('button');
+    btn.setAttribute('onclick', `switchTransferTab(${tl.tier})`);
+    btn.style.cssText = `flex:1 0 auto;padding:7px 10px;background:${isActive?'var(--bg3)':'var(--bg2)'};border:none;border-right:1px solid rgba(212,175,55,0.15);color:${isActive?tl.color:'var(--text3)'};font-size:8.5px;font-weight:700;cursor:pointer;font-family:var(--font-head);white-space:nowrap;position:relative;transition:all .15s;min-width:70px`;
+    btn.innerHTML = `<div>${tl.label}</div>
+      ${champForRank?`<div style="font-size:7px;color:${isActive?tl.color:'var(--text3)'};opacity:0.8;margin-top:1px">${champForRank.name}</div>`:''}
+      ${isActive?`<div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:${tl.color};border-radius:2px 2px 0 0"></div>`:''}
+      ${isSuggested&&!isActive?`<div style="position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--gold)"></div>`:''}`;
+    bar.appendChild(btn);
   });
-  html += `</div>`;
+}
 
-  // Tier description
-  if (tl) {
-    html += `<div style="background:var(--bg2);border:1px solid ${tl.color}33;border-radius:8px;padding:8px 11px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+function _updateTransferInfo(activeTierNum, suggestedTier) {
+  const card = document.getElementById('transfer-info-card');
+  if (!card) return;
+  const tl = TRANSFER_TIER_LABELS.find(t=>t.tier===activeTierNum);
+  if (!tl) { card.innerHTML=''; return; }
+  const champForActive = CHAMPIONSHIP_TIERS.find(ct => {
+    if (tl.rankIdx === 0) return ct.rankRequired === null;
+    const prevRankId = RANKED_TIERS[tl.rankIdx - 1]?.id;
+    return ct.rankRequired === prevRankId;
+  });
+  card.innerHTML = `<div style="background:var(--bg2);border:1px solid ${tl.color}33;border-radius:8px;padding:9px 12px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div style="font-size:11px;font-weight:700;color:${tl.color}">${tl.label}</div>
-        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">Conseillé pour le rang ${RANKED_TIERS[tl.rankIdx]?.name||'?'}</div>
+        <div style="font-size:12px;font-weight:700;color:${tl.color}">${tl.label}</div>
+        ${champForActive?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">Championnat : <span style="color:${tl.color}">${champForActive.name}</span></div>`:''}
       </div>
-      ${tl.tier===suggestedTier?`<div style="font-size:9px;font-family:var(--font-mono);color:var(--gold)">★ Recommandé</div>`:''}
-    </div>`;
-  }
+      <div style="text-align:right">
+        ${tl.tier===suggestedTier?`<div style="font-size:9px;font-family:var(--font-mono);color:var(--gold)">★ Recommandé</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
 
-  // Player list
-  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px;">`;
+function _updateTransferPlayers(activeTierNum, c) {
+  const listEl = document.getElementById('transfer-player-list');
+  if (!listEl) return;
+  const warn = document.getElementById('transfer-full-warn');
+  if (warn) warn.style.display = c.players.length >= MAX_SQUAD_SIZE ? 'block' : 'none';
+  const available = PLAYERS_POOL.filter(p => p.tier === activeTierNum && !c.players.find(x=>x.name===p.name));
   if (available.length === 0) {
-    html += `<p style="text-align:center;padding:16px;font-size:12px;color:var(--text3)">Tous les joueurs de cette catégorie sont recrutés !</p>`;
-  } else {
-    available.sort((a,b)=>(POSTE_ORDRE[a.pos]||99)-(POSTE_ORDRE[b.pos]||99)).forEach(p => {
+    listEl.innerHTML = `<p style="text-align:center;padding:16px;font-size:12px;color:var(--text3)">Tous les joueurs de cette catégorie sont recrutés !</p>`;
+    return;
+  }
+  listEl.innerHTML = available
+    .sort((a,b)=>(POSTE_ORDRE[a.pos]||99)-(POSTE_ORDRE[b.pos]||99))
+    .map(p => {
       const idx = PLAYERS_POOL.indexOf(p);
       const canBuy = G.money >= p.value && c.players.length < MAX_SQUAD_SIZE;
       const ratingClass = p.rat>=97?'elite':p.rat>=88?'good':p.rat>=75?'avg':'rare';
-      html += `<div class="player-row">
+      return `<div class="player-row">
         <div>
           <div class="p-name">${p.nat||''} ${p.name}</div>
           <div class="p-meta">${p.pos} · Val: ${fmt(p.value)}</div>
@@ -3001,19 +3054,19 @@ function renderClubTransfers() {
           <button class="transfer-btn buy-p" onclick="buyPlayer(${idx})" ${canBuy?'':'disabled'} style="${canBuy?'':'opacity:.35'}">${c.players.length>=MAX_SQUAD_SIZE?'Plein':fmt(p.value)}</button>
         </div>
       </div>`;
-    });
-  }
-  html += `</div>`;
-
-  panel.innerHTML = html;
-  panel.dataset.activeTab = activeTab;
+    }).join('');
 }
 
 function switchTransferTab(tierNum) {
   const panel = document.getElementById('club-transfers');
   if (!panel) return;
   panel.dataset.activeTab = String(tierNum);
-  renderClubTransfers();
+  // Only update the dynamic sub-elements — no full re-render, no scroll reset
+  const r = getRankedState();
+  const suggestedTier = Math.min(r.tierIdx + 1, 9);
+  _updateTransferTabs(tierNum, suggestedTier);
+  _updateTransferInfo(tierNum, suggestedTier);
+  _updateTransferPlayers(tierNum, G.club);
 }
 
 // renderClubMatch replaced by renderClubRanked
@@ -3386,11 +3439,14 @@ function updateBizButtons() {
 // ══════════════════════════════════════════════
 function updateUI() {
   const pps=getIncome();
+  const idleMs = Date.now() - lastInteractionTime;
+  const isInactive = idleMs >= INACTIVITY_DELAY;
+  const displayPps = isInactive ? pps * INACTIVITY_BONUS_RATE : pps;
   const fortStr=fmt(G.money);
   document.getElementById('fortune-val').textContent=fortStr;
-  document.getElementById('pps-val').textContent='+'+fmt(pps)+'/s';
+  document.getElementById('pps-val').textContent=(isInactive?'💤 ':'+') +fmt(displayPps)+'/s';
   document.getElementById('stat-fortune').textContent=fortStr;
-  document.getElementById('stat-pps').textContent=fmt(pps)+'/s';
+  document.getElementById('stat-pps').textContent=fmt(displayPps)+'/s'+(isInactive?' (inactif)':'');
   document.getElementById('stat-cpc').textContent=fmt(getClickValue());
   document.getElementById('stat-max').textContent='×'+G.prestigeMult.toFixed(2);
   const pbVal=document.getElementById('pb-val'); if(pbVal) pbVal.textContent='×'+G.prestigeMult.toFixed(2);
@@ -3542,29 +3598,15 @@ function tick() {
   lastTick=now;
   let income=getIncome();
   G.playTime = (G.playTime||0) + dt;
-  if (income>0) {
-    G.money+=income*dt; G.totalEarned+=income*dt;
-    if (G.money>G.maxMoney) G.maxMoney=G.money;
-  }
 
-  // Inactivité : on accumule les revenus générés pendant l'inactivité
+  // Inactivité : si le joueur est inactif, il ne reçoit que 5% de ses revenus
   const idleMs = now - lastInteractionTime;
-  if (idleMs >= INACTIVITY_DELAY) {
-    // Accumule les revenus passifs générés pendant ce tick d'inactivité
-    inactivityAccumulated += income * dt;
+  const isInactive = idleMs >= INACTIVITY_DELAY;
+  const effectiveIncome = isInactive ? income * INACTIVITY_BONUS_RATE : income;
 
-    // Toutes les 5 minutes d'inactivité → donner 5% de ce qui a été généré
-    const timeSinceLastBonus = now - lastInactivityBonus;
-    if (timeSinceLastBonus >= INACTIVITY_DELAY && inactivityAccumulated > 0) {
-      const bonus = inactivityAccumulated * INACTIVITY_BONUS_RATE;
-      G.money += bonus;
-      G.totalEarned += bonus;
-      if (G.money > G.maxMoney) G.maxMoney = G.money;
-      lastInactivityBonus = now;
-      inactivityAccumulated = 0;
-      showBigInactivityToast(bonus);
-      updateUI();
-    }
+  if (effectiveIncome>0) {
+    G.money+=effectiveIncome*dt; G.totalEarned+=effectiveIncome*dt;
+    if (G.money>G.maxMoney) G.maxMoney=G.money;
   }
 
   cryptoTick++;
@@ -3590,7 +3632,7 @@ function showBigInactivityToast(bonus) {
   `;
   div.innerHTML = `
     <div style="font-size:30px;margin-bottom:8px">💤</div>
-    <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Bonus Inactivité</div>
+    <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Inactivité</div>
     <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--gold-light);margin-bottom:4px">+${fmt(bonus)}</div>
     <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">5% des revenus générés pendant votre absence</div>
   `;
