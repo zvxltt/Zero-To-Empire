@@ -90,7 +90,7 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 #click-floats{position:absolute;top:-30px;left:50%;pointer-events:none;width:200px;height:80px;transform:translateX(-50%);}
 .float-anim{position:absolute;font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--gold-light);animation:floatUp 1s ease-out forwards;white-space:nowrap;}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) translateX(-50%);}100%{opacity:0;transform:translateY(-65px) translateX(-50%);}}
-#btn-label{font-size:9px;color:var(--text3);margin-top:8px;text-align:center;letter-spacing:1.5px;text-transform:uppercase;}
+#btn-label{font-size:8px;color:var(--text3);margin-top:8px;text-align:center;letter-spacing:0.5px;text-transform:uppercase;max-width:170px;overflow:hidden;word-break:break-word;padding:0 6px;line-height:1.3;}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .stat-card{background:var(--bg2);border:1px solid rgba(212,175,55,0.45);border-radius:10px;padding:10px 12px;position:relative;overflow:hidden;}
 .stat-card::before{content:’’;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.45),transparent);}
@@ -106,33 +106,6 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 #offline-notice .oi-icon{font-size:16px;}
 #offline-notice .oi-text{font-size:11px;color:var(--gold-light);}
 #offline-notice .oi-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;margin-left:auto;}
-
-/* INACTIVITY WARNING BANNER */
-#inactivity-banner{
-  position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:500;
-  background:linear-gradient(135deg,rgba(20,10,5,0.97),rgba(30,15,5,0.97));
-  border:1px solid rgba(224,92,92,0.6);border-radius:12px;
-  padding:10px 14px;display:none;align-items:center;gap:10px;
-  max-width:340px;width:calc(100% - 28px);
-  box-shadow:0 4px 24px rgba(224,92,92,0.25);
-  animation:bannerPulse 2s ease-in-out infinite;
-}
-#inactivity-banner.show{display:flex;}
-@keyframes bannerPulse{
-  0%,100%{box-shadow:0 4px 24px rgba(224,92,92,0.2);}
-  50%{box-shadow:0 4px 32px rgba(224,92,92,0.45);}
-}
-#inactivity-banner .ib-icon{font-size:20px;flex-shrink:0;}
-#inactivity-banner .ib-text{flex:1;min-width:0;}
-#inactivity-banner .ib-title{font-size:11px;font-weight:700;color:var(--danger);letter-spacing:1px;text-transform:uppercase;}
-#inactivity-banner .ib-sub{font-family:var(--font-mono);font-size:9px;color:var(--text2);margin-top:2px;}
-#inactivity-banner .ib-pct{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--danger);flex-shrink:0;}
-#inactive-mode-indicator{
-  position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;
-  font-size:8px;font-weight:700;border-radius:4px;padding:2px 5px;
-  letter-spacing:0.5px;display:none;
-}
-#inactive-mode-indicator.show{display:block;}
 
 /* TIER HEADERS */
 .tier-header{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin:12px 0 7px;display:flex;align-items:center;gap:8px;}
@@ -466,11 +439,10 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
           <div id="main-btn" onclick="handleClick(event)">
             <div id="click-floats"></div>
             <svg id="btn-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
-            <div id="inactive-mode-indicator">5%</div>
           </div>
         </div>
         <div id="btn-label">Stade 1 — Pièce de monnaie</div>
-        <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--font-mono)" id="hotkey-hint">Touche : ESPACE</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--font-mono)">Touche : ESPACE</div>
       </div>
       <!-- Améliorations collapsible in Home -->
       <div id="home-amelios-section">
@@ -490,13 +462,28 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
   <!-- ENTREPRISES -->
 
   <div class="tab-panel" id="tab-biz">
-    <div class="qty-row" style="margin-bottom:10px">
-      <button class="qty-btn active" id="qty1" onclick="setQty(1)">×1</button>
-      <button class="qty-btn" id="qty2" onclick="setQty(2)">×2</button>
-      <button class="qty-btn" id="qty5" onclick="setQty(5)">×5</button>
-      <button class="qty-btn" id="qty10" onclick="setQty(10)">×10</button>
+    <div class="club-tabs" style="margin-bottom:10px">
+      <button class="club-tab active" onclick="switchBizTab('entreprises',this)">Entreprises</button>
+      <button class="club-tab" onclick="switchBizTab('amelios',this)">Améliorations</button>
+      <button class="club-tab" onclick="switchBizTab('bizness',this)">Bizness 💎</button>
     </div>
-    <div id="biz-list"></div>
+    <div class="club-subpanel active" id="bizsub-entreprises">
+      <div class="qty-row" style="margin-bottom:10px">
+        <button class="qty-btn active" id="qty1" onclick="setQty(1)">×1</button>
+        <button class="qty-btn" id="qty2" onclick="setQty(2)">×2</button>
+        <button class="qty-btn" id="qty5" onclick="setQty(5)">×5</button>
+        <button class="qty-btn" id="qty10" onclick="setQty(10)">×10</button>
+      </div>
+      <div id="biz-list"></div>
+    </div>
+    <div class="club-subpanel" id="bizsub-amelios">
+      <div id="upg-tabs"></div>
+      <div class="upgrades-grid" id="upgrades-list"></div>
+    </div>
+    <div class="club-subpanel" id="bizsub-bizness">
+      <div class="section-title" style="margin-bottom:8px">Bizness <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">— achats en Milliards €</span></div>
+      <div id="bizness-list"></div>
+    </div>
   </div>
 
   <div class="tab-panel" id="tab-football">
@@ -596,11 +583,7 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
 <!-- Général -->
 
 <div id="settings-general" class="club-subpanel active">
-  <div class="settings-group">
-    <h3>Touche d'interaction</h3>
-    <p style="font-size:11px;color:var(--text2);margin-bottom:8px">Choisissez la touche pour cliquer</p>
-    <div class="key-selector" id="key-selector"></div>
-  </div>
+
   <div class="settings-group">
     <h3>Prestige (Soft Reset)</h3>
     <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:9px">Recommencez en échange d'un multiplicateur permanent <span style="color:var(--gold)">+25% par prestige</span>. Nécessite 10 Milliards €.</p>
@@ -896,6 +879,64 @@ const BUSINESSES = [
   {id:'armement',   name:'Conglomérat défense',       icon:'🛡️', tier:6, baseCost:5e15,        baseIncome:4e10,     desc:'Défense'},
   {id:'empire',     name:'Empire Mondial',            icon:'👑', tier:6, baseCost:1e18,        baseIncome:2e12,     desc:'Empire'},
 ];
+
+
+// ══════════════════════════════════════════════
+// BIZNESS — Investissements en Milliards
+// ══════════════════════════════════════════════
+const BIZNESS = [
+  {id:'bz1',  name:'Île Privée',           icon:'🌴', costBi:1,    incPerBi:50000,   desc:'Résidence exclusive'},
+  {id:'bz2',  name:'Stade de Foot',        icon:'🏟️', costBi:5,    incPerBi:220000,  desc:'Infrastructure sportive'},
+  {id:'bz3',  name:'Chaîne Hôtelière',     icon:'🏨', costBi:15,   incPerBi:600000,  desc:'Réseau 5 étoiles mondial'},
+  {id:'bz4',  name:'Compagnie Aérienne',   icon:'✈️', costBi:50,   incPerBi:1800000, desc:'Transport aérien privé'},
+  {id:'bz5',  name:'Studio Hollywood',     icon:'🎭', costBi:120,  incPerBi:4000000, desc:'Cinéma & streaming'},
+  {id:'bz6',  name:'Labo Pharmaceutique',  icon:'🔬', costBi:300,  incPerBi:9000000, desc:'Brevets médicaux'},
+  {id:'bz7',  name:'Réseau Télécom',       icon:'📡', costBi:800,  incPerBi:22000000,desc:'Infrastructure 6G mondiale'},
+  {id:'bz8',  name:'Fonds Souverain',      icon:'💎', costBi:2000, incPerBi:50000000,desc:'Investissements stratégiques'},
+  {id:'bz9',  name:'Agence Spatiale',      icon:'🚀', costBi:5000, incPerBi:120000000,desc:'Exploration & tourisme spatial'},
+  {id:'bz10', name:'Corporation Mondiale', icon:'👑', costBi:15000,incPerBi:350000000,desc:'Monopole planétaire'},
+];
+
+function getBiznessIncome(biz) {
+  if (!G.bizness || !G.bizness[biz.id]) return 0;
+  return biz.incPerBi * biz.costBi * G.bizness[biz.id] * G.prestigeMult;
+}
+function buyBizness(id) {
+  const biz = BIZNESS.find(b=>b.id===id);
+  if (!biz) return;
+  if (!G.bizness) G.bizness = {};
+  const cost = biz.costBi * 1e9;
+  if (G.money < cost) { showToast('— Fonds insuffisants !'); return; }
+  G.money -= cost;
+  G.bizness[id] = (G.bizness[id]||0) + 1;
+  showToast('✓ ' + biz.name + ' acquis !');
+  flashMilestone();
+  if (currentBizTab === 'bizness') renderBiznessList();
+  updateUI();
+}
+function renderBiznessList() {
+  const list = document.getElementById('bizness-list');
+  if (!list) return;
+  if (!G.bizness) G.bizness = {};
+  list.innerHTML = BIZNESS.map(biz => {
+    const owned = G.bizness[biz.id] || 0;
+    const cost = biz.costBi * 1e9;
+    const income = getBiznessIncome(biz);
+    const canBuy = G.money >= cost;
+    return '<div class="biz-card' + (owned > 0 ? ' owned' : '') + '">' +
+      '<div class="biz-icon">' + getIcon(biz.icon,'20px') + '</div>' +
+      '<div class="biz-info">' +
+        '<div class="name">' + biz.name + '</div>' +
+        '<div class="details">' + (owned > 0 ? fmt(income) + '/s · ×' + owned : biz.desc) + '</div>' +
+      '</div>' +
+      '<div class="biz-right">' +
+        (owned > 0 ? '<div class="biz-owned-badge">' + owned + '×</div>' : '') +
+        '<div class="biz-cost">' + biz.costBi + ' Md</div>' +
+        '<button class="buy-btn ' + (canBuy ? 'can-buy' : 'cant-buy') + '" onclick="buyBizness(\'' + biz.id + '\')">Acheter</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
 
 const TIER_LABELS = {
   1:'Tier 1 — Micro-services',
@@ -1416,7 +1457,11 @@ function makeLeagueTeams(clubName, clubOverall) {
 // CONSTANTS
 // ══════════════════════════════════════════════
 const CLUB_UNLOCK_THRESHOLD = 1000;
-const PRESTIGE_THRESHOLD = 1e10;
+const MAX_SQUAD_SIZE = 25;
+function getPrestigeThreshold() {
+  // Each prestige is 5x harder: 10Md, 50Md, 250Md, 1.25Bi...
+  return 1e10 * Math.pow(5, G.prestigeLevel);
+}
 const MILESTONE_COUNTS = [5,10,25,50,100,200,500];
 const KEY_OPTIONS = [
   {key:' ', label:'Espace'}, {key:'e', label:'E'},
@@ -1455,6 +1500,7 @@ function defaultState() {
       },
     },
     crypto:{ holdings:{}, prices:{}, history:{} },
+    bizness:{},
     hotkey:' ',
     adminUsed:false,
   };
@@ -1488,6 +1534,7 @@ function loadGame() {
       merged.crypto.prices = merged.crypto.prices||{};
       merged.crypto.history = merged.crypto.history||{};
       merged.upgrades = merged.upgrades||{};
+      merged.bizness = merged.bizness||{};
       merged.incMult = merged.incMult||1;
       return merged;
     }
@@ -1716,7 +1763,8 @@ function upgradeSponsor() {
 
 function getIncome() {
   const biz = BUSINESSES.reduce((s,b) => s + getBizIncome(b), 0);
-  return biz + getClubIncome() + (G._revBonus || 0) * G.prestigeMult;
+  const biznessInc = BIZNESS.reduce((s,b) => s + getBiznessIncome(b), 0);
+  return biz + getClubIncome() + (G._revBonus || 0) * G.prestigeMult + biznessInc;
 }
 
 function getClickValue() {
@@ -1733,62 +1781,10 @@ function getClubOverall() {
 }
 
 // ══════════════════════════════════════════════
-// INACTIVITY SYSTEM
-// ══════════════════════════════════════════════
-const INACTIVITY_THRESHOLD = 5 * 60 * 1000; // 5 minutes en ms
-const INACTIVITY_INCOME_MULT = 0.05;         // 5% des revenus si inactif
-let lastInteractionTime = Date.now();
-let inactivityWarningShown = false;
-let isInactiveMode = false;
-
-function recordInteraction() {
-  const wasInactive = isInactiveMode;
-  lastInteractionTime = Date.now();
-  inactivityWarningShown = false;
-  isInactiveMode = false;
-  // Masquer la bannière
-  const banner = document.getElementById('inactivity-banner');
-  if (banner) banner.classList.remove('show');
-  const indicator = document.getElementById('inactive-mode-indicator');
-  if (indicator) indicator.classList.remove('show');
-  // Message de retour si on était inactif
-  if (wasInactive) {
-    showToast('✓ Revenus complets rétablis — 100% actif !');
-  }
-}
-
-function checkInactivity() {
-  const elapsed = Date.now() - lastInteractionTime;
-  const banner = document.getElementById('inactivity-banner');
-  const indicator = document.getElementById('inactive-mode-indicator');
-  const subText = document.getElementById('ib-sub-text');
-
-  if (elapsed >= INACTIVITY_THRESHOLD) {
-    // Mode inactif
-    if (!isInactiveMode) {
-      isInactiveMode = true;
-    }
-    if (banner) banner.classList.add('show');
-    if (indicator) indicator.classList.add('show');
-    // Mettre à jour le texte du sous-message avec le temps écoulé
-    const minutes = Math.floor(elapsed / 60000);
-    if (subText) subText.textContent = `Inactif depuis ${minutes} min — Cliquez le bouton pour 100%`;
-  } else if (elapsed >= INACTIVITY_THRESHOLD * 0.8 && !inactivityWarningShown) {
-    // Avertissement à 4 minutes (80% du seuil)
-    inactivityWarningShown = true;
-    showToast('⚠️ Attention — Revenus réduits à 5% dans 1 min sans clic !');
-  } else {
-    isInactiveMode = false;
-    if (banner) banner.classList.remove('show');
-    if (indicator) indicator.classList.remove('show');
-  }
-}
-
-// ══════════════════════════════════════════════
 // CLICK
 // ══════════════════════════════════════════════
 function handleClick(e) {
-  recordInteraction();
+  lastClickTime = Date.now();
   const cv = getClickValue();
   G.money += cv; G.totalEarned += cv; G.clicks++;
   if (G.money > G.maxMoney) G.maxMoney = G.money;
@@ -1964,9 +1960,12 @@ function simulateMatch() {
   const winProb = 40 + diff*1.5 + moralFactor;
   let result, prize, myGoals, oppGoals;
 
-  // Prize scales with overall + bilan wins
+  // Prize scales with rank tier
   const totalW = c.bilan.w || 0;
-  const basePrize = Math.floor(200000 + myOvr * 8000 + totalW * 5000);
+  const rkStateMatch = getRankedState();
+  const MATCH_PRIZE_RANK = [500,2000,8000,30000,150000,800000,4000000,20000000,100000000,500000000,2000000000,10000000000];
+  const rankPrize = MATCH_PRIZE_RANK[Math.min(rkStateMatch.tierIdx, MATCH_PRIZE_RANK.length-1)];
+  const basePrize = Math.floor(rankPrize * (0.8 + myOvr / 200 + totalW * 0.02));
 
   if (rnd < winProb) {
     result='win';
@@ -2102,18 +2101,26 @@ function playSeasonMatchday() {
       myOppName = opp.name;
       G.club.lastLeagueMatch = {result, myGoals: myGoalsF, oppGoals: myGoalsA, oppName: opp.name, oppOvr: opp.ovr?.toFixed(0)||'?', oppBadge:'⚽'};
 
+      const rkIdx = Math.min((getRankedState().tierIdx||0), 11);
+      const SM_WIN  = [2000,8000,30000,120000,600000,3000000,15000000,75000000,350000000,1500000000,6000000000,25000000000];
+      const SM_DRAW = [500, 2000,7000, 25000, 120000,600000, 3000000, 15000000, 70000000, 300000000, 1200000000,5000000000];
+      const SM_LOSE = [100, 500, 1500, 5000, 25000, 120000, 600000, 3000000, 15000000, 60000000, 250000000,1000000000];
       if (result === 'win') {
         G.club.bilan.w++; G.club.bilan.gf += myGoalsF; G.club.bilan.ga += myGoalsA;
         G.club.moral = Math.min(100, (G.club.moral||50) + 5);
         G.club.prestige = (G.club.prestige||0) + 1;
-        const prize = Math.floor(100000 + getClubOverall()*5000);
-        G.money += prize; G.club.bilan.totalRevenue += prize;
+        const sezonPrize = Math.floor(SM_WIN[rkIdx] * (0.8 + Math.random()*0.6));
+        G.money += sezonPrize; G.club.bilan.totalRevenue = (G.club.bilan.totalRevenue||0) + sezonPrize;
       } else if (result === 'draw') {
         G.club.bilan.d++; G.club.bilan.gf += myGoalsF; G.club.bilan.ga += myGoalsA;
         G.club.moral = Math.max(0, (G.club.moral||50) - 2);
+        const drawPrize = SM_DRAW[rkIdx];
+        G.money += drawPrize; G.club.bilan.totalRevenue = (G.club.bilan.totalRevenue||0) + drawPrize;
       } else {
         G.club.bilan.l++; G.club.bilan.gf += myGoalsF; G.club.bilan.ga += myGoalsA;
         G.club.moral = Math.max(0, (G.club.moral||50) - 8);
+        const losePrize = SM_LOSE[rkIdx];
+        G.money += losePrize; G.club.bilan.totalRevenue = (G.club.bilan.totalRevenue||0) + losePrize;
       }
     }
   });
@@ -2187,6 +2194,7 @@ function switchBizTab(name, btn) {
   if (btn) btn.classList.add('active');
   if (name==='entreprises') renderBizList();
   if (name==='amelios') renderUpgrades();
+  if (name==='bizness') renderBiznessList();
 }
 
 function toggleHomeAmelios() {
@@ -2204,7 +2212,7 @@ function switchSettingsTab(name, btn) {
   const panel = document.getElementById('settings-'+name);
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
-  if (name==='general') renderKeySelector();
+  // settings tab switched
 }
 
 function switchClubTab(name, btn) {
@@ -2301,7 +2309,7 @@ function drawChart(id, history, color) {
 // PRESTIGE / RESET
 // ══════════════════════════════════════════════
 function doPrestige() {
-  if (G.money < PRESTIGE_THRESHOLD) return;
+  if (G.money < getPrestigeThreshold()) return;
   const nextLevel = G.prestigeLevel+1;
   const nextMult = 1+nextLevel*0.25;
   showConfirm(
@@ -2578,44 +2586,56 @@ function renderClubRankedFull() {
     ${!isMax?`<div style="font-size:9px;color:var(--text3);margin-top:4px">Gagnez le championnat <strong style="color:${tier.color}">${getRankCorrespondingChampName(r.tierIdx)}</strong> pour progresser</div>`:''}
   </div>`;
   
-  // ── CHAMPIONSHIPS LIST ──
-  html += `<div class="section-title" style="margin-top:4px">Championnats</div>`;
-  CHAMPIONSHIP_TIERS.forEach(ct => {
-    const r_cu = r.champUnlocked || {};
-    const moneyOk = G.money >= ct.minMoney || r_cu[ct.id];
-    const rankOk = !ct.rankRequired || (() => {
-      const reqIdx = RANKED_TIERS.findIndex(t=>t.id===ct.rankRequired);
-      return r.tierIdx >= reqIdx;
+  // ── SINGLE ACTIVE CHAMPIONSHIP ──
+  // Auto-unlock tracking
+  CHAMPIONSHIP_TIERS.forEach(ct2 => {
+    if (!r.champUnlocked) r.champUnlocked = {};
+    const rankOkAU = !ct2.rankRequired || (() => {
+      const reqIdx2 = RANKED_TIERS.findIndex(t=>t.id===ct2.rankRequired);
+      return r.tierIdx >= reqIdx2;
     })();
-    const locked = !moneyOk || !rankOk;
-    // Auto-unlock tracking
-    if (G.money >= ct.minMoney && !r_cu[ct.id] && rankOk) { if (!r.champUnlocked) r.champUnlocked={}; r.champUnlocked[ct.id]=true; }
-    const reqTierName = ct.rankRequired ? RANKED_TIERS.find(t=>t.id===ct.rankRequired)?.name : null;
-    const champIdx = CHAMPIONSHIP_TIERS.indexOf(ct);
-    const isRankChamp = isChampCorrespondingToRank(ct.id, r.tierIdx);
-
-    html += `<div style="background:var(--bg2);border:1px solid ${isRankChamp&&!locked?'rgba(212,175,55,0.4)':locked?'rgba(255,255,255,0.04)':'var(--border)'};border-radius:10px;padding:12px;margin-bottom:7px;${locked?'opacity:.5':''}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div>
-          <div style="font-size:13px;font-weight:800;color:${locked?'var(--text3)':'var(--text1)'}">${ct.name}</div>
-          ${isRankChamp&&!locked?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--gold);margin-top:2px">⭐ Championnat de votre rang</div>`:''}
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">1er: ${fmt(ct.prize[0])}</div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">2e: ${fmt(ct.prize[1])}</div>
-        </div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
-        ${ct.teams.slice(0,4).map(t=>`<span style="font-size:9px;background:var(--bg3);border-radius:4px;padding:2px 7px;font-family:var(--font-mono);color:var(--text2)">${t.name}</span>`).join('')}
-        ${ct.teams.length>4?`<span style="font-size:9px;color:var(--text3);padding:2px 5px">+${ct.teams.length-4}…</span>`:''}
-      </div>
-      ${(!moneyOk&&!(r_cu[ct.id]))?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--danger);margin-bottom:6px">💰 ${fmt(ct.minMoney)} requis</div>`:''}
-      ${moneyOk&&!rankOk?`<div style="font-family:var(--font-mono);font-size:9px;color:var(--danger);margin-bottom:6px">🏅 Rang requis : ${reqTierName}</div>`:''}
-      <button onclick="startChampionship('${ct.id}')" ${locked||c.players.length<11||(c.season&&c.activeChampsId)?'disabled':''} style="width:100%;padding:8px;border-radius:7px;border:1px solid ${locked?'var(--bg4)':isRankChamp?'var(--gold)':'var(--mint)'};background:transparent;color:${locked?'var(--text3)':isRankChamp?'var(--gold)':'var(--mint)'};font-size:11px;font-weight:700;cursor:${locked||(c.season&&c.activeChampsId)?'not-allowed':'pointer'};font-family:var(--font-head)">
-        ${locked?'🔒 Verrouillé':c.players.length<11?'11 joueurs min.':(c.season&&c.activeChampsId)?'⏸ Un champ. en pause':'★ Lancer le Championnat'}
-      </button>
-    </div>`;
+    if (G.money >= ct2.minMoney && !r.champUnlocked[ct2.id] && rankOkAU) r.champUnlocked[ct2.id] = true;
   });
+  // Find best available championship
+  let bestChamp = CHAMPIONSHIP_TIERS[0];
+  for (let ci = CHAMPIONSHIP_TIERS.length - 1; ci >= 0; ci--) {
+    const ctc = CHAMPIONSHIP_TIERS[ci];
+    const moneyOkC = G.money >= ctc.minMoney || (r.champUnlocked && r.champUnlocked[ctc.id]);
+    const rankOkC = !ctc.rankRequired || (() => {
+      const reqIdx3 = RANKED_TIERS.findIndex(t=>t.id===ctc.rankRequired);
+      return r.tierIdx >= reqIdx3;
+    })();
+    if (moneyOkC && rankOkC) { bestChamp = ctc; break; }
+  }
+  html += '<div class="section-title" style="margin-top:4px">Championnat</div>';
+  {
+    const ct = bestChamp;
+    const isRankChamp = isChampCorrespondingToRank(ct.id, r.tierIdx);
+    const borderCol = isRankChamp ? 'rgba(212,175,55,0.4)' : 'var(--border)';
+    const btnCol = isRankChamp ? 'var(--gold)' : 'var(--mint)';
+    const rankBadge = isRankChamp ? '<div style="font-family:var(--font-mono);font-size:9px;color:var(--gold);margin-top:2px">⭐ Championnat de votre rang</div>' : '';
+    const teamsHtml = ct.teams.slice(0,4).map(t => '<span style="font-size:9px;background:var(--bg3);border-radius:4px;padding:2px 7px;font-family:var(--font-mono);color:var(--text2)">' + t.name + '</span>').join('');
+    const moreHtml = ct.teams.length > 4 ? '<span style="font-size:9px;color:var(--text3);padding:2px 5px">+' + (ct.teams.length-4) + '…</span>' : '';
+    const disabled = (c.players.length < 11 || (c.season && c.activeChampsId)) ? 'disabled' : '';
+    const cursor = (c.season && c.activeChampsId) ? 'not-allowed' : 'pointer';
+    const btnLabel = c.players.length < 11 ? '11 joueurs min.' : (c.season && c.activeChampsId) ? '⏸ Championnat en cours' : '★ Lancer le Championnat';
+    html += '<div style="background:var(--bg2);border:1px solid ' + borderCol + ';border-radius:10px;padding:12px;margin-bottom:7px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:800;color:var(--text1)">' + ct.name + '</div>' +
+          rankBadge +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">1er: ' + fmt(ct.prize[0]) + '</div>' +
+          '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">2e: ' + fmt(ct.prize[1]) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">' + teamsHtml + moreHtml + '</div>' +
+      '<button onclick="startChampionship(\'' + ct.id + '\')" ' + disabled + ' style="width:100%;padding:8px;border-radius:7px;border:1px solid ' + btnCol + ';background:transparent;color:' + btnCol + ';font-size:11px;font-weight:700;cursor:' + cursor + ';font-family:var(--font-head)">' +
+        btnLabel +
+      '</button>' +
+    '</div>';
+  }
 
   panel.innerHTML = html;
 }
@@ -2791,7 +2811,7 @@ function renderClubOverview() {
     <div class="section-title">Plan Financier</div>
     <div class="finance-grid">
       <div class="fin-card income"><div class="f-label">Revenus club / sec</div><div class="f-amount">${fmt(incomePerSec)}/s</div></div>
-      <div class="fin-card expense"><div class="f-label">Masse salariale</div><div class="f-amount">${fmt(c.players.reduce((s,p)=>s+p.salary,0)/86400)}/s</div></div>
+
       <div class="fin-card income"><div class="f-label">Revenu matchs total</div><div class="f-amount">${fmt(c.bilan?.totalRevenue||0)}</div></div>
       <div class="fin-card neutral full"><div class="f-label">Bonus moral (${c.moral||50}/100)</div><div class="f-amount" style="color:${getMoralLabel(c.moral||50).col}">${getMoralLabel(c.moral||50).txt} — ×${(1+((c.moral||50)/100)*0.5).toFixed(2)}</div></div>
     </div>
@@ -2800,7 +2820,7 @@ function renderClubOverview() {
     </div>`:''}
     <div style="display:flex;gap:6px;margin-top:6px">
       <button onclick="boostMoral()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(107,124,147,0.3);background:transparent;color:var(--mint);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">★ Booster moral</button>
-      <button onclick="upgradeSponsor()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(212,175,55,0.3);background:transparent;color:var(--gold);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">★ Sponsor (${fmt(([500000,5000000,50000000,500000000,5000000000,25000000000,100000000000,5e11][c.sponsorLevel||0])||500000)})</button>
+      <button onclick="upgradeSponsor()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(212,175,55,0.3);background:transparent;color:var(--gold);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">${(c.sponsorLevel||0)>=8?'★ Sponsor MAX':'★ Sponsor ('+fmt([500000,5000000,50000000,500000000,5000000000,25000000000,100000000000,5e11][(c.sponsorLevel||0)]||500000)+')'}</button>
     </div>
     <div class="section-title">Améliorations du club</div>
     <div class="upgrade-list">
@@ -2825,15 +2845,15 @@ function renderClubSquad() {
   if (!panel) return;
   const c = G.club;
   panel.innerHTML = `
-    <div class="section-title">Effectif (${c.players.length}/25)</div>
+    <div class="section-title">Effectif (${c.players.length}/${MAX_SQUAD_SIZE})</div>
     <div class="players-section">
       ${c.players.length===0
         ?'<p style="text-align:center;padding:12px;font-size:12px;color:var(--text3)">Aucun joueur — allez dans Transferts !</p>'
-        :c.players.map(p=>`
+        :c.players.slice().sort((a,b)=>b.rat-a.rat).map(p=>`
           <div class="player-row">
             <div>
               <div class="p-name">${p.nat||''} ${p.name}</div>
-              <div class="p-meta">${p.pos} · ${fmt(p.salary)}/mois · Val: ${fmt(p.value)}</div>
+              <div class="p-meta">${p.pos} · Note: ${p.rat} · Val: ${fmt(p.value)}</div>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
               <span class="p-rating ${p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare'}">${p.rat}</span>
@@ -2914,7 +2934,7 @@ function renderClubTransfers() {
       html += `<div class="player-row">
         <div>
           <div class="p-name">${p.nat||''} ${p.name}</div>
-          <div class="p-meta">${p.pos} · ${fmt(p.salary)}/mois · Val: ${fmt(p.value)}</div>
+          <div class="p-meta">${p.pos} · Val: ${fmt(p.value)}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="p-rating ${ratingClass}">${p.rat}</span>
@@ -3302,10 +3322,11 @@ function updateUI() {
   const ptH = Math.floor(pt/3600), ptM = Math.floor((pt%3600)/60), ptS = Math.floor(pt%60);
   const ptEl = document.getElementById('s-playtime');
   if (ptEl) ptEl.textContent = ptH>0 ? `${ptH}h ${ptM}m` : ptM>0 ? `${ptM}m ${ptS}s` : `${ptS}s`;
-  const pni=document.getElementById('prestige-next-info'); if(pni) pni.textContent=`Prochain prestige → ×${(1+(G.prestigeLevel+1)*0.25).toFixed(2)}`;
+  const _pthresh2 = getPrestigeThreshold(); const pni=document.getElementById('prestige-next-info'); if(pni) pni.textContent=`Prochain prestige Nv.${G.prestigeLevel+1} → ×${(1+(G.prestigeLevel+1)*0.25).toFixed(2)} (nécessite ${fmt(_pthresh2)})`;
   const pb=document.getElementById('prestige-btn');
-  pb.disabled=G.money<PRESTIGE_THRESHOLD;
-  pb.textContent=G.money<PRESTIGE_THRESHOLD?`★ Prestige (nécessite ${fmt(PRESTIGE_THRESHOLD)})`:'★ Effectuer un Prestige';
+  const _pt = getPrestigeThreshold();
+  pb.disabled=G.money<_pt;
+  pb.textContent=G.money<_pt?`★ Prestige Nv.${G.prestigeLevel+1} — ${fmt(_pt)} requis`:'★ Effectuer un Prestige';
   updateButtonVisual();
   updateFootballTab();
   updateCryptoPortfolio();
@@ -3364,10 +3385,11 @@ function finishOnboarding() {
 }
 
 function renderAll() {
+  G.hotkey = ' ';
   renderBizList();
   renderUpgrades();
   if (homeAmeliosOpen) renderUpgradesHome();
-  renderKeySelector();
+  renderBiznessList();
   if (G.clubUnlocked) renderClubAll();
   if (currentTab==='bourse') renderCryptoList();
   updateUI();
@@ -3384,7 +3406,8 @@ function switchTab(name, btn) {
   currentTab=name;
   if (name==='biz') {
     if (currentBizTab==='entreprises') renderBizList();
-    else renderUpgrades();
+    else if (currentBizTab==='amelios') renderUpgrades();
+    else if (currentBizTab==='bizness') renderBiznessList();
   }
   if (name==='football'&&G.clubUnlocked) renderClubAll();
   if (name==='bourse') { initCryptoPrices(); renderCryptoList(); updateCryptoPortfolio(); }
@@ -3412,17 +3435,19 @@ function flashMilestone() {
 // GAME LOOP
 // ══════════════════════════════════════════════
 let cryptoTick=0;
-let inactivityCheckTick=0;
 function tick() {
   const now=Date.now(), dt=(now-lastTick)/1000;
   lastTick=now;
-  const income=getIncome();
+  let income=getIncome();
+  // Inactivity: -5% per minute idle (max -50%)
+  const idleSec = (now - lastClickTime) / 1000;
+  if (idleSec > 60) {
+    const idleMin = Math.floor(idleSec / 60);
+    income *= Math.max(0.5, 1 - idleMin * 0.05);
+  }
   G.playTime = (G.playTime||0) + dt;
   if (income>0) {
-    // Appliquer le multiplicateur d'inactivité si nécessaire
-    const incomeMult = isInactiveMode ? INACTIVITY_INCOME_MULT : 1;
-    const earned = income * dt * incomeMult;
-    G.money += earned; G.totalEarned += earned;
+    G.money+=income*dt; G.totalEarned+=income*dt;
     if (G.money>G.maxMoney) G.maxMoney=G.money;
   }
   cryptoTick++;
@@ -3431,13 +3456,9 @@ function tick() {
     cryptoTick=0;
     if (currentTab==='bourse') { renderCryptoList(); updateCryptoPortfolio(); }
   }
-  inactivityCheckTick++;
-  if (inactivityCheckTick>=10) { // every 1s
-    checkInactivity();
-    inactivityCheckTick=0;
-  }
 }
 
+let lastClickTime = Date.now();
 // Keyboard hotkey — requires key release between each click
 let hotkeyPressed = false;
 document.addEventListener('keydown', e=>{
@@ -3446,7 +3467,6 @@ document.addEventListener('keydown', e=>{
   if (key===G.hotkey && !hotkeyPressed) {
     hotkeyPressed = true;
     e.preventDefault();
-    recordInteraction();
     handleClick(null);
   }
 });
@@ -3613,16 +3633,6 @@ function cnpSell() {
 </script>
 
 <!-- CRYPTO NUMPAD OVERLAY -->
-
-<!-- INACTIVITY WARNING BANNER -->
-<div id="inactivity-banner">
-  <div class="ib-icon">⚠️</div>
-  <div class="ib-text">
-    <div class="ib-title">Mode Inactif</div>
-      <div class="ib-sub" id="ib-sub-text">Cliquez le bouton pour recevoir 100% de vos revenus</div>
-  </div>
-  <div class="ib-pct">5%</div>
-</div>
 
 <div id="crypto-numpad-overlay" onclick="cnpClickOutside(event)">
   <div id="crypto-numpad-box">
