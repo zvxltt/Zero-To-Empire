@@ -116,6 +116,7 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 .tier4 .tier-badge{background:rgba(224,92,92,0.1);color:var(--danger);}
 .tier5 .tier-badge{background:rgba(180,100,255,0.15);color:#c87aff;}
 .tier6 .tier-badge{background:linear-gradient(90deg,rgba(212,175,55,0.2),rgba(180,100,255,0.2));color:#ffcc66;}
+.tier7 .tier-badge{background:linear-gradient(90deg,rgba(255,100,100,0.25),rgba(212,175,55,0.25));color:#ff8866;}
 .tier-header::after{content:’’;flex:1;height:1px;background:var(--border);}
 
 /* BIZ CARDS */
@@ -715,6 +716,7 @@ const SVG_ICONS = {
   '🗺️': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>`,
   '📈': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
   '🌍': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  '🔮': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12H2M22 12h-2M6.34 6.34l-1.41-1.41M19.07 19.07l-1.41-1.41M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><circle cx="12" cy="12" r="3" fill="rgba(212,175,55,0.2)"/></svg>`,
   '🌐': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
   '📱': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
   '🔐': `<svg viewBox="0 0 24 24" fill="none" stroke="#6B7C93" stroke-width="1.6"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
@@ -840,38 +842,41 @@ function getIcon(emoji, size='18px') {
 // DATA — BUSINESSES (expanded)
 // ══════════════════════════════════════════════
 const BUSINESSES = [
-  // Tier 1 — Micro
-  {id:'journal',    name:'Vente de journaux',         icon:'📰', tier:1, baseCost:10,          baseIncome:0.3,      desc:'Micro-service'},
-  {id:'lavage',     name:'Lavage de voitures',        icon:'🚗', tier:1, baseCost:100,         baseIncome:1.5,      desc:'Micro-service'},
-  {id:'coiffeur',   name:'Salon de coiffure',         icon:'✂️', tier:1, baseCost:350,         baseIncome:4,        desc:'Artisanat'},
-  {id:'food',       name:'Food truck',                icon:'🍔', tier:1, baseCost:1200,        baseIncome:12,       desc:'Restauration'},
+  // Tier 1 — Micro-services
+  {id:'journal',    name:'Vente de journaux',         icon:'📰', tier:1, baseCost:10,          baseIncome:0.3},
+  {id:'lavage',     name:'Lavage de voitures',        icon:'🚗', tier:1, baseCost:100,         baseIncome:1.5},
+  {id:'coiffeur',   name:'Salon de coiffure',         icon:'✂️', tier:1, baseCost:350,         baseIncome:4},
+  {id:'food',       name:'Food truck',                icon:'🍔', tier:1, baseCost:1200,        baseIncome:12},
   // Tier 2 — Commerce
-  {id:'boulangerie',name:'Boulangerie',               icon:'🥖', tier:2, baseCost:8000,        baseIncome:60,       desc:'Commerce local'},
-  {id:'boutique',   name:'Boutique mode',             icon:'👗', tier:2, baseCost:35000,       baseIncome:250,      desc:'Commerce'},
-  {id:'supermarche',name:'Supermarché',               icon:'🛒', tier:2, baseCost:180000,      baseIncome:1200,     desc:'Commerce'},
-  {id:'hotel',      name:'Hôtel 3 étoiles',           icon:'🏨', tier:2, baseCost:600000,      baseIncome:4000,     desc:'Hôtellerie'},
+  {id:'boulangerie',name:'Boulangerie',               icon:'🥖', tier:2, baseCost:8000,        baseIncome:60},
+  {id:'boutique',   name:'Boutique mode',             icon:'👗', tier:2, baseCost:35000,       baseIncome:250},
+  {id:'supermarche',name:'Supermarché',               icon:'🛒', tier:2, baseCost:180000,      baseIncome:1200},
+  {id:'hotel',      name:'Hôtel 3 étoiles',           icon:'🏨', tier:2, baseCost:600000,      baseIncome:4000},
   // Tier 3 — Industrie
-  {id:'pharma',     name:'Pharmacie',                 icon:'💊', tier:3, baseCost:2500000,     baseIncome:15000,    desc:'Santé'},
-  {id:'usine',      name:'Usine manufacturière',      icon:'🏭', tier:3, baseCost:8000000,     baseIncome:50000,    desc:'Industrie'},
-  {id:'logistique', name:'Réseau logistique',         icon:'🚚', tier:3, baseCost:30000000,    baseIncome:180000,   desc:'Transport'},
-  {id:'energie',    name:'Centrale solaire',          icon:'☀️', tier:3, baseCost:100000000,   baseIncome:600000,   desc:'Énergie'},
+  {id:'pharma',     name:'Pharmacie',                 icon:'💊', tier:3, baseCost:2500000,     baseIncome:15000},
+  {id:'usine',      name:'Usine manufacturière',      icon:'🏭', tier:3, baseCost:8000000,     baseIncome:50000},
+  {id:'logistique', name:'Réseau logistique',         icon:'🚚', tier:3, baseCost:30000000,    baseIncome:180000},
+  {id:'energie',    name:'Centrale solaire',          icon:'☀️', tier:3, baseCost:100000000,   baseIncome:600000},
   // Tier 4 — Finance & Tech
-  {id:'immo',       name:'Agence immobilière',        icon:'🏗️', tier:4, baseCost:400000000,   baseIncome:2500000,  desc:'Immobilier'},
-  {id:'banque',     name:'Banque d\'investissement',  icon:'🏦', tier:4, baseCost:1500000000,  baseIncome:10000000, desc:'Finance'},
-  {id:'ia',         name:'Startup IA',                icon:'🤖', tier:4, baseCost:6000000000,  baseIncome:40000000, desc:'Tech & IA'},
-  {id:'media',      name:'Réseau médias global',      icon:'📡', tier:4, baseCost:20000000000, baseIncome:130000000,desc:'Médias'},
+  {id:'immo',       name:'Agence immobilière',        icon:'🏗️', tier:4, baseCost:400000000,   baseIncome:2500000},
+  {id:'banque',     name:'Banque d\'investissement',  icon:'🏦', tier:4, baseCost:1500000000,  baseIncome:10000000},
+  {id:'ia',         name:'Startup IA',                icon:'🤖', tier:4, baseCost:6000000000,  baseIncome:40000000},
+  {id:'media',      name:'Réseau médias global',      icon:'📡', tier:4, baseCost:20000000000, baseIncome:130000000},
   // Tier 5 — Méga-Corp
-  {id:'spatial',    name:'Entreprise spatiale',       icon:'🚀', tier:5, baseCost:80000000000,  baseIncome:500000000,  desc:'Spatial'},
-  {id:'bz5',        name:'Studio Hollywood',          icon:'🎭', tier:5, baseCost:120000000000, baseIncome:480000000,  desc:'Cinéma & streaming',           isBizness:true, costBi:120,   incPerBi:4000000},
-  {id:'pharmagiant',name:'BigPharma mondiale',        icon:'🧬', tier:5, baseCost:300000000000, baseIncome:2000000000, desc:'Pharma'},
-  {id:'bz7',        name:'Réseau Télécom',            icon:'📡', tier:5, baseCost:800000000000, baseIncome:17600000000,desc:'Infrastructure 6G mondiale',    isBizness:true, costBi:800,   incPerBi:22000000},
+  {id:'spatial',    name:'Entreprise spatiale',       icon:'🚀', tier:5, baseCost:80000000000,  baseIncome:500000000},
+  {id:'bz5',        name:'Studio Hollywood',          icon:'🎭', tier:5, baseCost:120000000000, baseIncome:480000000,  isBizness:true, costBi:120,   incPerBi:2500000},
+  {id:'pharmagiant',name:'BigPharma mondiale',        icon:'🧬', tier:5, baseCost:300000000000, baseIncome:2000000000},
+  {id:'bz7',        name:'Réseau Télécom',            icon:'📡', tier:5, baseCost:800000000000, baseIncome:5000000000, isBizness:true, costBi:800,   incPerBi:8000000},
   // Tier 6 — Empire
-  {id:'techgiant',  name:'GAFAM rival',               icon:'💻', tier:6, baseCost:1e15,         baseIncome:8e9,       desc:'Tech'},
-  {id:'bz8',        name:'Fonds Souverain',           icon:'💎', tier:6, baseCost:2e15,         baseIncome:1e11,      desc:'Investissements stratégiques', isBizness:true, costBi:2000,  incPerBi:50000000},
-  {id:'bz9',        name:'Agence Spatiale Privée',    icon:'🚀', tier:6, baseCost:5e15,         baseIncome:6e11,      desc:'Exploration & tourisme spatial',isBizness:true, costBi:5000,  incPerBi:120000000},
-  {id:'armement',   name:'Conglomérat défense',       icon:'🛡️', tier:6, baseCost:5e15,         baseIncome:4e10,      desc:'Défense'},
-  {id:'bz10',       name:'Corporation Mondiale',      icon:'👑', tier:6, baseCost:15e15,        baseIncome:5.25e12,   desc:'Monopole planétaire',          isBizness:true, costBi:15000, incPerBi:350000000},
-  {id:'empire',     name:'Empire Mondial',            icon:'👑', tier:6, baseCost:1e18,         baseIncome:2e12,      desc:'Empire'},
+  {id:'techgiant',  name:'GAFAM rival',               icon:'💻', tier:6, baseCost:1e15,         baseIncome:8e9},
+  {id:'bz8',        name:'Fonds Souverain',           icon:'💎', tier:6, baseCost:2e15,         baseIncome:1e11,       isBizness:true, costBi:2000,  incPerBi:18000000},
+  {id:'armement',   name:'Conglomérat défense',       icon:'🛡️', tier:6, baseCost:5e15,         baseIncome:4e10},
+  {id:'bz9',        name:'Agence Spatiale Privée',    icon:'🚀', tier:6, baseCost:8e15,         baseIncome:6e11,       isBizness:true, costBi:5000,  incPerBi:45000000},
+  // Tier 7 — Domination Absolue
+  {id:'bz10',       name:'Corporation Mondiale',      icon:'👑', tier:7, baseCost:15e15,        baseIncome:5e12,       isBizness:true, costBi:15000, incPerBi:120000000},
+  {id:'empire',     name:'Empire Mondial',            icon:'👑', tier:7, baseCost:1e18,         baseIncome:2e12},
+  {id:'quantumcorp',name:'Quantum Corp',              icon:'🔮', tier:7, baseCost:5e18,         baseIncome:1.5e13},
+  {id:'omniplex',   name:'Omniplex Global',           icon:'🌍', tier:7, baseCost:2e19,         baseIncome:8e13},
 ];
 
 
@@ -928,9 +933,10 @@ const TIER_LABELS = {
   3:'Tier 3 — Industrie',
   4:'Tier 4 — Finance & Tech',
   5:'Tier 5 — Méga-Corp',
-  6:'Tier 6 — Empire Mondial'
+  6:'Tier 6 — Empire Mondial',
+  7:'Tier 7 — Domination Absolue'
 };
-const TIER_COLORS = {1:'tier1',2:'tier2',3:'tier3',4:'tier4',5:'tier5',6:'tier6'};
+const TIER_COLORS = {1:'tier1',2:'tier2',3:'tier3',4:'tier4',5:'tier5',6:'tier6',7:'tier7'};
 
 // ══════════════════════════════════════════════
 // UPGRADES — système de niveaux
@@ -2414,7 +2420,7 @@ function renderBizList() {
 
     if (biz.isBizness) {
       const unitIncome = biz.incPerBi * biz.costBi * G.prestigeMult;
-      const incomeLabel = owned > 0 ? fmt(income) + '/s · ×' + owned : biz.desc + ' · ' + fmt(unitIncome) + '/s/unité';
+      const incomeLabel = owned > 0 ? fmt(income) + '/s' : fmt(unitIncome) + '/s/unité';
       card.setAttribute('data-bizid', biz.id);
       card.innerHTML = `
         <div class="biz-icon">${getIcon(biz.icon,'20px')}</div>
@@ -2436,12 +2442,13 @@ function renderBizList() {
     } else {
       const costLabel = buyQty > 1 ? buyQty + '× → ' + fmt(cost) : fmt(cost);
       const unitIncome = biz.baseIncome * (G.incMult || 1) * G.prestigeMult;
+      const incomeLabel = owned > 0 ? fmt(income) + '/s' : fmt(unitIncome) + '/s/unité';
       card.setAttribute('data-bizid', biz.id);
       card.innerHTML = `
         <div class="biz-icon">${getIcon(biz.icon,'20px')}</div>
         <div class="biz-info">
           <div class="name">${biz.name}</div>
-          <div class="details">${owned>0 ? fmt(income)+'/s' : biz.desc+' · '+fmt(unitIncome)+'/s/unité'}</div>
+          <div class="details">${incomeLabel}</div>
           <div class="progress-wrap">
             <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
             <span class="progress-label">${pct}%</span>
