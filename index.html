@@ -1074,14 +1074,14 @@ const PLAYERS_POOL = [
   // ── TIER 7 : Coupe du Monde (88–92) ────────
   // Manchester United Legends
   {name:'Peter Schmeichel',   pos:'GB', rat:91, salary:310000,value:5000000000,  nat:'🇩🇰', tier:7},
-  {name:'Gary Neville',       pos:'DD', rat:88, salary:240000,value:1500000000,   nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
+  {name:'Gary Neville',       pos:'DD', rat:88, salary:240000,value:1500000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
   {name:'Rio Ferdinand',      pos:'DC', rat:90, salary:280000,value:3000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
   {name:'Nemanja Vidić',      pos:'DC', rat:89, salary:260000,value:2000000000,  nat:'🇷🇸', tier:7},
-  {name:'Denis Irwin',        pos:'DG', rat:88, salary:240000,value:1500000000,   nat:'🇮🇪', tier:7},
+  {name:'Denis Irwin',        pos:'DG', rat:88, salary:240000,value:1500000000,  nat:'🇮🇪', tier:7},
   {name:'Paul Scholes',       pos:'MC', rat:91, salary:310000,value:5000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
   {name:'Roy Keane',          pos:'MD', rat:91, salary:310000,value:5000000000,  nat:'🇮🇪', tier:7},
   {name:'David Beckham',      pos:'AD', rat:89, salary:260000,value:2000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
-  {name:'Ryan Giggs',         pos:'AG', rat:90, salary:280000,value:3000000000,  nat:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', tier:7},
+  {name:'Hugo Oliveira',      pos:'AT', rat:92, salary:280000,value:3000000000,  nat:'🇵🇹', tier:7},
   {name:'Wayne Rooney',       pos:'AT', rat:90, salary:280000,value:3000000000,  nat:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:7},
   {name:'Eric Cantona',       pos:'AT', rat:91, salary:310000,value:5000000000,  nat:'🇫🇷', tier:7},
 
@@ -1227,7 +1227,7 @@ const RANK_SUBLVLS = ['Bas','Mid','Haut','Champion'];
 // ══════════════════════════════════════════════
 const CHAMPIONSHIP_TIERS = [
   {
-    id:'c1', name:'1K – 10K', minMoney:1000, maxMoney:10000,
+    id:'c1', name:'District', minMoney:1000, maxMoney:10000,
     rankRequired: null,
     prize:[20000,10000,5000,2000,1000,500,200,100,50,20],
     teams:[
@@ -1243,7 +1243,7 @@ const CHAMPIONSHIP_TIERS = [
     ]
   },
   {
-    id:'c2', name:'10K – 100K', minMoney:10000, maxMoney:100000,
+    id:'c2', name:'Régional', minMoney:10000, maxMoney:100000,
     rankRequired:'district',
     prize:[200000,100000,50000,20000,10000,5000,2000,1000,500,200],
     teams:[
@@ -1259,7 +1259,7 @@ const CHAMPIONSHIP_TIERS = [
     ]
   },
   {
-    id:'c3', name:'100K – 1M', minMoney:100000, maxMoney:1000000,
+    id:'c3', name:'National', minMoney:100000, maxMoney:1000000,
     rankRequired:'regional',
     prize:[2000000,1000000,500000,200000,100000,50000,20000,10000,5000,2000],
     teams:[
@@ -1275,7 +1275,7 @@ const CHAMPIONSHIP_TIERS = [
     ]
   },
   {
-    id:'c4', name:'1M – 100M', minMoney:1000000, maxMoney:100000000,
+    id:'c4', name:'Ligue 2', minMoney:1000000, maxMoney:100000000,
     rankRequired:'national',
     prize:[5000000,2500000,1200000,600000,300000,150000,80000,40000,20000,10000],
     teams:[
@@ -1291,87 +1291,87 @@ const CHAMPIONSHIP_TIERS = [
     ]
   },
   {
-    id:'c5', name:'100M – 1Md', minMoney:100000000, maxMoney:1000000000,
+    id:'c5', name:'Ligue 1', minMoney:100000000, maxMoney:1000000000,
     rankRequired:'ligue2',
     prize:[20000000,10000000,5000000,2500000,1200000,600000,300000,150000,80000,40000],
     teams:[
-      {name:'Toulouse FC',       ovr:71},
-      {name:'Stade Brestois',    ovr:70},
-      {name:'Montpellier HSC',   ovr:72},
+      {name:'PSG',       ovr:71},
+      {name:'OM',    ovr:70},
+      {name:'OL',   ovr:72},
       {name:'FC Nantes',         ovr:69},
-      {name:'Stade de Reims',    ovr:74},
+      {name:'RC Lens',    ovr:74},
       {name:'RC Strasbourg',     ovr:71},
-      {name:'Havre AC',          ovr:68},
+      {name:'Bordeauc',          ovr:68},
       {name:'Stade Rennais',     ovr:73},
       {name:'OGC Nice',          ovr:72},
     ]
   },
   {
-    id:'c6', name:'1Md – 100Md', minMoney:1e9, maxMoney:1e11,
+    id:'c6', name:'Ligue Europa', minMoney:1e9, maxMoney:1e11,
     rankRequired:'ligue1',
     prize:[100000000,50000000,25000000,12000000,6000000,3000000,1500000,800000,400000,200000],
     teams:[
-      {name:'PSG',               ovr:80},
-      {name:'Olympique de Marseille', ovr:79},
-      {name:'Olympique Lyonnais',ovr:80},
-      {name:'AS Monaco',         ovr:81},
-      {name:'LOSC Lille',        ovr:79},
-      {name:'RC Lens',           ovr:78},
-      {name:'Girondins Bordeaux',ovr:77},
-      {name:'FC Nantes',         ovr:76},
-      {name:'Montpellier HSC',   ovr:75},
+      {name:'Lyon',               ovr:80},
+      {name:'Aston Villa', ovr:79},
+      {name:'Midtjylland',ovr:80},
+      {name:'Betis',         ovr:81},
+      {name:'Porto',        ovr:79},
+      {name:'Brague',           ovr:78},
+      {name:'Fribourg',ovr:77},
+      {name:'Rome',         ovr:76},
+      {name:'Genk',   ovr:75},
     ]
   },
   {
-    id:'c7', name:'100Md – 1Bi', minMoney:1e11, maxMoney:1e12,
+    id:'c7', name:'Ligue Des Champions', minMoney:1e11, maxMoney:1e12,
     rankRequired:'ucl',
     prize:[500000000,250000000,125000000,60000000,30000000,15000000,7500000,3750000,1875000,937500],
     teams:[
       {name:'Arsenal FC',        ovr:82},
       {name:'Chelsea FC',        ovr:82},
-      {name:'Tottenham Hotspur', ovr:80},
+      {name:'Real Madrid', ovr:80},
       {name:'Juventus FC',       ovr:83},
       {name:'Inter Milan',       ovr:82},
       {name:'AC Milan',          ovr:81},
       {name:'Atlético Madrid',   ovr:83},
-      {name:'Borussia Dortmund', ovr:80},
+      {name:'Fc Barcelone', ovr:80},
       {name:'SSC Napoli',        ovr:82},
     ]
   },
   {
-    id:'c8', name:'1Bi – 100Bi', minMoney:1e12, maxMoney:1e14,
+    id:'c8', name:'Euro', minMoney:1e12, maxMoney:1e14,
     rankRequired:'worldcup',
     prize:[2000000000,1000000000,500000000,250000000,125000000,62500000,31250000,15625000,7812500,3906250],
     teams:[
-      {name:'Manchester City',   ovr:85},
-      {name:'Liverpool FC',      ovr:85},
-      {name:'Real Madrid',       ovr:86},
-      {name:'FC Barcelona',      ovr:86},
-      {name:'Bayern München',    ovr:85},
-      {name:'Manchester United', ovr:83},
-      {name:'Paris Saint-Germain',ovr:86},
-      {name:'Bayer Leverkusen',  ovr:84},
-      {name:'RB Leipzig',        ovr:83},
+      {name:'Norvege',   ovr:85},
+      {name:'Italie',      ovr:85},
+      {name:'Suisse',       ovr:86},
+      {name:'Belgique',      ovr:86},
+      {name:'Pologne',    ovr:85},
+      {name:'Suède', ovr:83},
+      {name:'Autriche',ovr:86},
+      {name:'Ukraine',  ovr:84},
+      {name:'Grèce',        ovr:83},
     ]
   },
   {
-    id:'c9', name:'100Bi – 1Tr', minMoney:1e14, maxMoney:1e15,
+    id:'c9', name:'Coupe du Monde', minMoney:1e14, maxMoney:1e15,
     rankRequired:'legend',
     prize:[1e10,5e9,2.5e9,1.25e9,625000000,312500000,156250000,78125000,39062500,19531250],
     teams:[
-      {name:'Ajax 1995',         ovr:91},
-      {name:'France 1998',       ovr:92},
-      {name:'Arsenal 2003-04',   ovr:93},
-      {name:'Milan 2007',        ovr:92},
-      {name:'Inter Milan 2010',  ovr:91},
-      {name:'Real Madrid 2012',  ovr:91},
-      {name:'Germany 2014',      ovr:90},
-      {name:'Atlético 2014',     ovr:89},
-      {name:'Leicester 2016',    ovr:88},
+      {name:'Allemagne',         ovr:91},
+      {name:'France',       ovr:92},
+      {name:'Bresil',   ovr:93},
+      {name:'Angleterre',        ovr:92},
+      {name:'Argentine',  ovr:91},
+      {name:'Uruguay',  ovr:91},
+      {name:'Espagne',      ovr:90},
+      {name:'Portugal',     ovr:89},
+      {name:'Maroc',    ovr:88},
     ]
   },
   {
-    id:'c10', name:'1Tr – 100Tr', minMoney:1e15, maxMoney:1e17,
+    id:'c10', name:'Coupe Intemporel', minMoney:1e15, maxMoney:1e17,
     rankRequired:'ballondor',
     prize:[5e10,2.5e10,1.25e10,6.25e9,3.125e9,1.5625e9,7.8125e8,3.90625e8,1.953125e8,9.765625e7],
     teams:[
@@ -1381,29 +1381,29 @@ const CHAMPIONSHIP_TIERS = [
       {name:'Barça 2011',        ovr:95},
       {name:'Real Madrid 2018',  ovr:94},
       {name:'Man City 2023',     ovr:93},
-      {name:'France 2022',       ovr:93},
-      {name:'PSG 2022',          ovr:92},
+      {name:'France 1998',       ovr:93},
+      {name:'PSG 2025',          ovr:92},
       {name:'Liverpool 2020',    ovr:92},
     ]
   },
   {
-    id:'c11', name:'100Tr – 1Qd', minMoney:1e17, maxMoney:1e18,
+    id:'c11', name:'Coupe des Légendes', minMoney:1e17, maxMoney:1e18,
     rankRequired:'goat',
     prize:[2e11,1e11,5e10,2.5e10,1.25e10,6.25e9,3.125e9,1.5625e9,7.8125e8,3.90625e8],
     teams:[
-      {name:'Santos 1962',       ovr:98},
+      {name:'Bordeaux 2009',       ovr:98},
       {name:'Argentina 1986',    ovr:98},
       {name:'Brazil 1970',       ovr:99},
       {name:'Netherlands 1974',  ovr:97},
-      {name:'Barça 2009 Prime',  ovr:99},
+      {name:'Barça 2009',  ovr:99},
       {name:'Real Madrid 2002',  ovr:97},
-      {name:'France 2000',       ovr:96},
+      {name:'France 2022',       ovr:96},
       {name:'Brazil 1982',       ovr:97},
       {name:'Milan 1989',        ovr:96},
     ]
   },
   {
-    id:'c12', name:'1Qd +', minMoney:1e18, maxMoney:Infinity,
+    id:'c12', name:'Ligue Universel', minMoney:1e18, maxMoney:Infinity,
     rankRequired:'goat_supreme',
     prize:[1e12,5e11,2.5e11,1.25e11,6.25e10,3.125e10,1.5625e10,7.8125e9,3.90625e9,1.953125e9],
     teams:[
@@ -1412,7 +1412,7 @@ const CHAMPIONSHIP_TIERS = [
       {name:'Légendaires United',ovr:99},
       {name:'GOATs World XI',    ovr:99},
       {name:'Cosmos 1977',       ovr:99},
-      {name:'Bordeaux 2009',     ovr:99},
+      {name:'Neptune FC',     ovr:99},
       {name:'Dream Team 1992',   ovr:99},
       {name:'Galácticos 2002',   ovr:99},
       {name:'Prime XI Éternels', ovr:99},
