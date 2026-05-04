@@ -2899,7 +2899,7 @@ function startChampionship(champId) {
   }
   // Once minMoney was reached, the championship stays accessible
   const alreadyUnlocked = r.champUnlocked[champId];
-  if (!alreadyUnlocked && G.money < champ.minMoney) { showToast(`! Fonds requis : ${fmt(champ.minMoney)}`); return; }
+  if (!alreadyUnlocked && G.money < champ.minMoney) { showBigErrorToast('Fonds insuffisants', fmt(champ.minMoney - G.money) + ' manquant'); return; }
   if (G.money >= champ.minMoney) r.champUnlocked[champId] = true;
   const myOvr = getClubOverall();
   const teams = champ.teams.map(t=>({...t,pts:0,w:0,d:0,l:0,gf:0,ga:0,played:[]}));
