@@ -1302,7 +1302,7 @@ const CHAMPIONSHIP_TIERS = [
       {name:'AS Cherbourg',      ovr:33},
       {name:'US Quevilly',       ovr:29},
       {name:'Stade Briochin',    ovr:31},
-      {name:'FC Rouen',          ovr:26},
+      {name:'FC Nangis',          ovr:26},
     ]
   },
   {
@@ -1364,7 +1364,7 @@ const CHAMPIONSHIP_TIERS = [
       {name:'FC Nantes',         ovr:69},
       {name:'RC Lens',    ovr:74},
       {name:'RC Strasbourg',     ovr:71},
-      {name:'Bordeauc',          ovr:68},
+      {name:'Bordeaux',          ovr:68},
       {name:'Stade Rennais',     ovr:73},
       {name:'OGC Nice',          ovr:72},
     ]
@@ -2787,7 +2787,7 @@ function renderClubRankedFull() {
     const isRankChamp = isChampCorrespondingToRank(ct.id, r.tierIdx);
     const borderCol = isRankChamp ? 'rgba(212,175,55,0.4)' : 'var(--border)';
     const btnCol = isRankChamp ? 'var(--gold)' : 'var(--mint)';
-    const rankBadge = isRankChamp ? '<div style="font-family:var(--font-mono);font-size:9px;color:var(--gold);margin-top:2px">⭐ Championnat de votre rang</div>' : '';
+    const rankBadge = isRankChamp ? '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">Argent requis : ' + fmt(ct.minMoney) + '</div>' : '';
     const teamsHtml = ct.teams.slice(0,4).map(t => '<span style="font-size:9px;background:var(--bg3);border-radius:4px;padding:2px 7px;font-family:var(--font-mono);color:var(--text2)">' + t.name + '</span>').join('');
     const moreHtml = ct.teams.length > 4 ? '<span style="font-size:9px;color:var(--text3);padding:2px 5px">+' + (ct.teams.length-4) + '…</span>' : '';
     const disabled = (c.players.length < 11 || (c.season && c.activeChampsId)) ? 'disabled' : '';
