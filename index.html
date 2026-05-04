@@ -81,12 +81,12 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 
 /* DASHBOARD */
 #dashboard{display:flex;flex-direction:column;gap:12px;}
-#click-zone{display:flex;flex-direction:column;align-items:center;padding:16px 0 6px;position:relative;}
-#click-outer{width:170px;height:170px;border-radius:50%;border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;position:relative;}
+#click-zone{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;position:relative;}
+#click-outer{width:148px;height:148px;border-radius:50%;border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;position:relative;}
 #click-outer::before{content:’’;position:absolute;inset:-8px;border-radius:50%;border:1px dashed rgba(212,175,55,0.15);}
-#main-btn{width:140px;height:140px;border-radius:50%;border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 35%, var(--bg3), var(--bg1));cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .07s,box-shadow .07s;user-select:none;box-shadow:0 0 30px rgba(212,175,55,0.1),inset 0 0 20px rgba(0,0,0,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+#main-btn{width:120px;height:120px;border-radius:50%;border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 35%, var(--bg3), var(--bg1));cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .07s,box-shadow .07s;user-select:none;box-shadow:0 0 30px rgba(212,175,55,0.1),inset 0 0 20px rgba(0,0,0,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 #main-btn.clicked{transform:scale(0.88) !important;}
-#main-btn svg{width:82px;height:82px;}
+#main-btn svg{width:70px;height:70px;}
 #click-floats{position:absolute;top:-30px;left:50%;pointer-events:none;width:200px;height:80px;transform:translateX(-50%);}
 .float-anim{position:absolute;font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--gold-light);animation:floatUp 1s ease-out forwards;white-space:nowrap;}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) translateX(-50%);}100%{opacity:0;transform:translateY(-65px) translateX(-50%);}}
@@ -95,12 +95,12 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 .stat-card{background:var(--bg2);border:1px solid rgba(212,175,55,0.45);border-radius:10px;padding:10px 12px;position:relative;overflow:hidden;}
 .stat-card::before{content:’’;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.45),transparent);}
 .stat-card .label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;font-weight:600;}
-.stat-card .value{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text1);}
+.stat-card .value{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--text1);}
 .stat-card .value.gold{color:var(--gold-light);}
 .stat-card .value.mint{color:var(--mint);}
-#prestige-bar{background:var(--bg2);border:1px solid rgba(212,175,55,0.45);border-radius:10px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;}
+#prestige-bar{background:var(--bg2);border:1px solid rgba(212,175,55,0.45);border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;}
 #prestige-bar .pb-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;}
-#prestige-bar .pb-val{font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--gold);}
+#prestige-bar .pb-val{font-family:var(--font-mono);font-size:16px;font-weight:500;color:var(--gold);}
 #prestige-bar .pb-desc{font-size:11px;color:var(--text2);margin-top:2px;}
 #offline-notice{background:rgba(107,124,147,0.08);border:1px solid rgba(107,124,147,0.35);border-radius:8px;padding:9px 13px;display:none;align-items:center;gap:10px;}
 #offline-notice .oi-icon{font-size:16px;}
@@ -675,6 +675,17 @@ const BIZ_ICONS = {
 // SVG ICON LIBRARY — replaces all emojis
 // ══════════════════════════════════════════════
 const SVG_ICONS = {
+  
+  '📝': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+  '🚲': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-4a1 1 0 0 0 0 2h1l3 9h-8"/><path d="M12 5l-3 12"/></svg>`,
+  '💳': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  '📲': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="2"/><polyline points="12 18 12 12 15 15"/><polyline points="12 12 9 15"/></svg>`,
+  '💡': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>`,
+  '💼': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/><path d="M2 12h20"/></svg>`,
+  '☁️': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+  '🖥️': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  '🎭': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><path d="M2 2l20 5-5 20L2 2z"/><path d="M9.5 9.5l5 5"/></svg>`,
+  '📊': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
   '📰': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>`,
   '🚗': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><path d="M5 11l1.5-4.5h11L19 11"/><rect x="3" y="11" width="18" height="7" rx="2"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/></svg>`,
   '✂️': `<svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.6"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg>`,
@@ -940,25 +951,25 @@ const TIER_COLORS = {1:'tier1',2:'tier2',3:'tier3',4:'tier4',5:'tier5',6:'tier6'
 // ══════════════════════════════════════════════
 const UPGRADES = [
   // ── 1-5 : Débuts (clics, très early) ──────────────────────────────
-  {id:'u01', name:'Stylo & Carnet',       icon:'📝', desc:'Première prise de notes commerciale',   costs:[200,400,800],       effects:['+1 €/clic','+2 €/clic','+3 €/clic'],         fn:(g)=>{const add=[1,2,5];g.cpc+=add[g._upgLvApply];}},
-  {id:'u02', name:'Boîte à outils',       icon:'🔧', desc:'Outillage de base pour travailler vite', costs:[200,800,2400],     effects:['+3 €/clic','+6 €/clic','+10 €/clic'],        fn:(g)=>{const add=[3,6,15];g.cpc+=add[g._upgLvApply];}},
-  {id:'u03', name:'Vélo de livraison',    icon:'🚲', desc:'Livraisons rapides dans le quartier',   costs:[500,2000,6000],    effects:['+6 €/clic','+12 €/clic','+20 €/clic'],       fn:(g)=>{const add=[6,12,30];g.cpc+=add[g._upgLvApply];}},
-  {id:'u04', name:'Téléphone portable',   icon:'📱', desc:'Démarchage direct des clients',         costs:[1500,6000,18000],  effects:['+15 €/clic','+30 €/clic','+60 €/clic'],      fn:(g)=>{const add=[15,30,75];g.cpc+=add[g._upgLvApply];}},
-  {id:'u05', name:'Site vitrine',         icon:'🌐', desc:'Présence en ligne basique',             costs:[4000,16000,48000], effects:['+40 €/clic','+80 €/clic','+150 €/clic'],     fn:(g)=>{const add=[40,80,200];g.cpc+=add[g._upgLvApply];}},
+  {id:'u01', name:'Stylo & Carnet',       icon:'📝', desc:'Première prise de notes commerciale',   costs:[75,300,900],       effects:['+1 €/clic','+2 €/clic','+5 €/clic'],         fn:(g)=>{const add=[1,2,5];g.cpc+=add[g._upgLvApply];}},
+  {id:'u02', name:'Boîte à outils',       icon:'🔧', desc:'Outillage de base pour travailler vite', costs:[200,800,2400],     effects:['+3 €/clic','+6 €/clic','+15 €/clic'],        fn:(g)=>{const add=[3,6,15];g.cpc+=add[g._upgLvApply];}},
+  {id:'u03', name:'Vélo de livraison',    icon:'🚲', desc:'Livraisons rapides dans le quartier',   costs:[500,2000,6000],    effects:['+6 €/clic','+12 €/clic','+30 €/clic'],       fn:(g)=>{const add=[6,12,30];g.cpc+=add[g._upgLvApply];}},
+  {id:'u04', name:'Téléphone portable',   icon:'📱', desc:'Démarchage direct des clients',         costs:[1500,6000,18000],  effects:['+15 €/clic','+30 €/clic','+75 €/clic'],      fn:(g)=>{const add=[15,30,75];g.cpc+=add[g._upgLvApply];}},
+  {id:'u05', name:'Site vitrine',         icon:'🌐', desc:'Présence en ligne basique',             costs:[4000,16000,48000], effects:['+40 €/clic','+80 €/clic','+200 €/clic'],     fn:(g)=>{const add=[40,80,200];g.cpc+=add[g._upgLvApply];}},
 
   // ── 6-10 : Petite entreprise ──────────────────────────────────────
-  {id:'u06', name:'Local commercial',     icon:'🏪', desc:'Premier local pour vendre',             costs:[12000,48000,144000],    effects:['+100 €/clic','+200 €/clic','+350 €/clic'],    fn:(g)=>{const add=[100,200,500];g.cpc+=add[g._upgLvApply];}},
-  {id:'u07', name:'Employé junior',       icon:'👤', desc:'Premier salarié = plus de productivité',costs:[30000,120000,360000],   effects:['+250 €/clic','+500 €/clic','+1k €/clic'],   fn:(g)=>{const add=[250,500,1250];g.cpc+=add[g._upgLvApply];}},
-  {id:'u08', name:'Caisse enregistreuse', icon:'💳', desc:'Flux de paiements accélérés',           costs:[80000,320000,960000],   effects:['+120 €/s','+240 €/s','+500 €/s'],             fn:(g)=>{const add=[120,240,600];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
-  {id:'u09', name:'Camionnette',          icon:'🚚', desc:'Livraisons en volume',                  costs:[200000,800000,2400000], effects:['+600 €/clic','+1.2k €/clic','+2k €/clic'],    fn:(g)=>{const add=[600,1200,3000];g.cpc+=add[g._upgLvApply];}},
-  {id:'u10', name:'Logiciel comptable',   icon:'💻', desc:'Optimisation des marges',               costs:[500000,2000000,6000000],effects:['+1k €/s','+2k €/s','+4k €/s'],               fn:(g)=>{const add=[1000,2000,5000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u06', name:'Local commercial',     icon:'🏪', desc:'Premier local pour vendre',             costs:[12000,48000,144000],    effects:['+100 €/clic','+200 €/clic','+500 €/clic'],    fn:(g)=>{const add=[100,200,500];g.cpc+=add[g._upgLvApply];}},
+  {id:'u07', name:'Employé junior',       icon:'👤', desc:'Premier salarié = plus de productivité',costs:[30000,120000,360000],   effects:['+250 €/clic','+500 €/clic','+1.2k €/clic'],   fn:(g)=>{const add=[250,500,1250];g.cpc+=add[g._upgLvApply];}},
+  {id:'u08', name:'Caisse enregistreuse', icon:'💳', desc:'Flux de paiements accélérés',           costs:[80000,320000,960000],   effects:['+120 €/s','+240 €/s','+600 €/s'],             fn:(g)=>{const add=[120,240,600];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u09', name:'Camionnette',          icon:'🚚', desc:'Livraisons en volume',                  costs:[200000,800000,2400000], effects:['+600 €/clic','+1.2k €/clic','+3k €/clic'],    fn:(g)=>{const add=[600,1200,3000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u10', name:'Logiciel comptable',   icon:'💻', desc:'Optimisation des marges',               costs:[500000,2000000,6000000],effects:['+1k €/s','+2k €/s','+5k €/s'],               fn:(g)=>{const add=[1000,2000,5000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
 
   // ── 11-15 : PME en croissance ─────────────────────────────────────
-  {id:'u11', name:'Équipe commerciale',   icon:'👥', desc:'Force de vente structurée',             costs:[1500000,6000000,18000000],    effects:['+2k €/clic','+4k €/clic','+7k €/clic'],  fn:(g)=>{const add=[2000,4000,10000];g.cpc+=add[g._upgLvApply];}},
-  {id:'u12', name:'App mobile maison',    icon:'📲', desc:'Canal de vente direct client',          costs:[4000000,16000000,48000000],   effects:['+6k €/s','+12k €/s','+15k €/s'],          fn:(g)=>{const add=[6000,12000,30000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
-  {id:'u13', name:'Entrepôt automatisé',  icon:'🏭', desc:'Stockage et préparation ultra-rapide',  costs:[10000000,40000000,120000000], effects:['+5k €/clic','+10k €/clic','+15k €/clic'], fn:(g)=>{const add=[5000,10000,25000];g.cpc+=add[g._upgLvApply];}},
-  {id:'u14', name:'Partenariat bancaire', icon:'🏦', desc:'Accès au crédit avantageux',            costs:[25000000,100000000,300000000],effects:['+20k €/s','+40k €/s','+50k €/s'],        fn:(g)=>{const add=[20000,40000,100000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
-  {id:'u15', name:'Département R&D',      icon:'🔬', desc:'Innovation produits et procédés',       costs:[60000000,240000000,720000000],effects:['+15k €/clic','+30k €/clic','+45k €/clic'],fn:(g)=>{const add=[15000,30000,75000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u11', name:'Équipe commerciale',   icon:'👥', desc:'Force de vente structurée',             costs:[1500000,6000000,18000000],    effects:['+2k €/clic','+4k €/clic','+10k €/clic'],  fn:(g)=>{const add=[2000,4000,10000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u12', name:'App mobile maison',    icon:'📲', desc:'Canal de vente direct client',          costs:[4000000,16000000,48000000],   effects:['+6k €/s','+12k €/s','+30k €/s'],          fn:(g)=>{const add=[6000,12000,30000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u13', name:'Entrepôt automatisé',  icon:'🏭', desc:'Stockage et préparation ultra-rapide',  costs:[10000000,40000000,120000000], effects:['+5k €/clic','+10k €/clic','+25k €/clic'], fn:(g)=>{const add=[5000,10000,25000];g.cpc+=add[g._upgLvApply];}},
+  {id:'u14', name:'Partenariat bancaire', icon:'🏦', desc:'Accès au crédit avantageux',            costs:[25000000,100000000,300000000],effects:['+20k €/s','+40k €/s','+100k €/s'],        fn:(g)=>{const add=[20000,40000,100000];g._revBonus=(g._revBonus||0)+add[g._upgLvApply];}},
+  {id:'u15', name:'Département R&D',      icon:'🔬', desc:'Innovation produits et procédés',       costs:[60000000,240000000,720000000],effects:['+15k €/clic','+30k €/clic','+75k €/clic'],fn:(g)=>{const add=[15000,30000,75000];g.cpc+=add[g._upgLvApply];}},
 
   // ── 16-20 : Industrie ────────────────────────────────────────────
   {id:'u16', name:'Usine 4.0',            icon:'🤖', desc:'Robots et chaînes de production',       costs:[200000000,800000000,2400000000],     effects:['+50k €/clic','+100k €/clic','+250k €/clic'], fn:(g)=>{const add=[50000,100000,250000];g.cpc+=add[g._upgLvApply];}},
@@ -2179,7 +2190,7 @@ function playSeasonMatchday() {
   if (G.club.seasonMatchday >= schedule.length) G.club.seasonPlayed = true;
 
   renderClubAll(); updateUI();
-  if (myResult) showToast(myResult==='win'?`▲ Victoire vs ${myOppName} !`:myResult==='draw'?`— Nul vs ${myOppName}`:`▼ Défaite vs ${myOppName}`);
+  // Toast résultat championnat supprimé
 }
 
 function collectSeasonPrize() {
@@ -2564,48 +2575,50 @@ function renderUpgradesInto(tabsId, listId, catVar, setCatFn) {
   }
 
   list.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <!-- Counter -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:8px">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600">Progression</div>
-        <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--gold)">${completedCount} / ${total}</div>
-      </div>
-      <!-- Progress bar -->
-      <div style="height:3px;background:var(--bg3);border-radius:2px;overflow:hidden">
-        <div style="height:100%;width:${Math.round(completedCount/total*100)}%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width .5s"></div>
-      </div>
-
+    <div style="display:flex;flex-direction:column;gap:8px">
       ${allDone ? `
-        <div style="text-align:center;padding:30px 20px">
-          <div style="font-size:32px;margin-bottom:10px">👑</div>
-          <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px">Toutes les améliorations achetées !</div>
-          <div style="font-size:11px;color:var(--text2)">Vous avez atteint le sommet absolu.</div>
+        <div style="background:var(--bg2);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:20px;text-align:center">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600">Progression</div>
+            <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--gold)">${completedCount} / ${total}</div>
+          </div>
+          <div style="height:2px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:14px">
+            <div style="height:100%;width:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px"></div>
+          </div>
+          <div style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:var(--bg3);border:1px solid rgba(212,175,55,0.45);margin-bottom:8px">${getIcon('👑','22px')}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:4px">Toutes les améliorations achetées !</div>
+          <div style="font-size:10px;color:var(--text2)">Vous avez atteint le sommet absolu.</div>
         </div>
       ` : `
-      <!-- Amélioration active -->
-      <div style="background:var(--bg2);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:center;gap:11px">
-          <div style="width:44px;height:44px;border-radius:10px;background:var(--bg3);border:1px solid rgba(212,175,55,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">${getIcon(u.icon,'22px')}</div>
+      <!-- Amélioration active avec progression intégrée -->
+      <div style="background:var(--bg2);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px">
+        <!-- Header avec progression -->
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600">Progression</div>
+          <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--gold)">${completedCount} / ${total}</div>
+        </div>
+        <div style="height:2px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${Math.round(completedCount/total*100)}%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width .5s"></div>
+        </div>
+        <!-- Séparateur -->
+        <div style="height:1px;background:rgba(212,175,55,0.12)"></div>
+        <!-- Amélioration courante -->
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:9px;background:var(--bg3);border:1px solid rgba(212,175,55,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0">${getIcon(u.icon,'22px')}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:14px;font-weight:700;color:var(--text1);margin-bottom:2px">${u.name}</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${u.desc}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:1px">${u.name}</div>
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--text3)">${u.desc}</div>
           </div>
-          <div style="font-family:var(--font-mono);font-size:10px;background:rgba(107,124,147,0.15);color:var(--mint);border-radius:4px;padding:3px 8px;flex-shrink:0">Nv.${lv}/3</div>
+          <div style="font-family:var(--font-mono);font-size:9px;background:rgba(107,124,147,0.15);color:var(--mint);border-radius:4px;padding:2px 7px;flex-shrink:0">Nv.${lv}/3</div>
         </div>
         <!-- Niveau dots -->
         <div style="display:flex;gap:4px;align-items:center">
-          ${[1,2,3].map(i=>`<div style="flex:1;height:3px;border-radius:2px;background:${lv>=i?'var(--gold)':'var(--bg4)'}"></div>`).join('')}
+          ${[1,2,3].map(i=>`<div style="flex:1;height:2px;border-radius:2px;background:${lv>=i?'var(--gold)':'var(--bg4)'}"></div>`).join('')}
         </div>
         <!-- Les 3 niveaux -->
-        <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;flex-direction:column;gap:5px">
           ${levelsHtml}
         </div>
-      </div>
-
-      <!-- Amélioration précédente / suivante — navigation info -->
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px">
-        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${activeIdx > 0 ? '← ' + UPGRADES[activeIdx-1].name + ' ✓' : ''}</div>
-        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${activeIdx < UPGRADES.length - 1 ? UPGRADES[activeIdx+1].name + ' →' : ''}</div>
       </div>
       `}
     </div>`;
@@ -3521,6 +3534,54 @@ function setHotkey(key, label) {
   showToast(`Touche d'interaction : ${label}`);
 }
 
+
+// ══════════════════════════════════════════════
+// LIVE UPGRADE BUTTON UPDATE (fix actualisation)
+// ══════════════════════════════════════════════
+function updateUpgradeButtonsLive() {
+  // Update upgrade buy buttons in real-time without full re-render
+  ['upgrades-list', 'upgrades-list-home'].forEach(listId => {
+    const list = document.getElementById(listId);
+    if (!list) return;
+    // Find all upgrade buy buttons inside the list
+    const btns = list.querySelectorAll('button[onclick*="buyUpgrade"]');
+    btns.forEach(btn => {
+      const onclick = btn.getAttribute('onclick') || '';
+      const match = onclick.match(/buyUpgrade\('([^']+)'\)/);
+      if (!match) return;
+      const id = match[1];
+      const u = UPGRADES.find(x => x.id === id);
+      if (!u) return;
+      const lv = getUpgLevel(id);
+      if (lv >= 3) return;
+      const cost = getUpgCost(u, lv + 1);
+      const canAfford = G.money >= cost;
+      const wasDisabled = btn.disabled;
+      btn.disabled = !canAfford;
+      if (canAfford !== !wasDisabled) {
+        btn.style.borderColor = canAfford ? 'var(--mint)' : '#2d3e50';
+        btn.style.background = canAfford ? 'rgba(107,124,147,0.15)' : 'transparent';
+        btn.style.color = canAfford ? 'var(--mint)' : '#4a5f72';
+        btn.style.cursor = canAfford ? 'pointer' : 'not-allowed';
+        btn.textContent = canAfford ? 'Acheter' : 'Verrouillé';
+      }
+    });
+    // Also update cost display spans inside the list
+    const costDivs = list.querySelectorAll('[data-upgid]');
+    costDivs.forEach(div => {
+      const id = div.getAttribute('data-upgid');
+      const u = UPGRADES.find(x => x.id === id);
+      if (!u) return;
+      const lv = getUpgLevel(id);
+      if (lv >= 3) return;
+      const cost = getUpgCost(u, lv + 1);
+      const canAfford = G.money >= cost;
+      const costEl = div.querySelector('.upg-cost-live');
+      if (costEl) costEl.style.color = canAfford ? 'var(--gold-light)' : 'var(--text2)';
+    });
+  });
+}
+
 // ══════════════════════════════════════════════
 // LIVE BIZ BUTTON UPDATE
 // ══════════════════════════════════════════════
@@ -3608,6 +3669,7 @@ function updateUI() {
   updateFootballTab();
   updateCryptoPortfolio();
   updateBizButtons();
+  updateUpgradeButtonsLive();
 }
 
 function updateFootballTab() {
