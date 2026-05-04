@@ -2073,7 +2073,7 @@ function playSeasonMatchday() {
   const rkState = getRankedState();
   const SEASON_COST_BY_RANK = [100,500,2000,8000,40000,200000,1000000,5000000,25000000,120000000,500000000,2500000000];
   const cost = SEASON_COST_BY_RANK[Math.min(rkState.tierIdx, SEASON_COST_BY_RANK.length-1)];
-  if (G.money < cost) { showToast(`— Coûts : ${fmt(cost)}`); return; }
+  if (G.money < cost) { showBigErrorToast('Fonds insuffisants', fmt(cost - G.money) + ' manquant'); return; }
   G.money -= cost;
 
   const teams = G.club.season;
@@ -3717,8 +3717,13 @@ function updateFootballTab() {
     document.getElementById('football-progress-text').textContent=`Progression : ${pct.toFixed(1)}% — ${fmt(G.money)} / ${fmt(CLUB_UNLOCK_THRESHOLD)}`;
     const buyBtn=document.getElementById('fb-unlock-btn');
     if (buyBtn) {
-      buyBtn.disabled = G.money < CLUB_UNLOCK_THRESHOLD;
-      buyBtn.className = G.money >= CLUB_UNLOCK_THRESHOLD ? 'buy-btn can-buy' : 'buy-btn cant-buy';
+      if (G.money >= CLUB_UNLOCK_THRESHOLD) {
+        // Déblocage automatique dès que le seuil est atteint
+        buyFootballMode();
+        return;
+      }
+      buyBtn.disabled = true;
+      buyBtn.className = 'buy-btn cant-buy';
     }
   }
 }
