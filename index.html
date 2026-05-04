@@ -1962,7 +1962,7 @@ function buyPlayer(idx) {
   const p = PLAYERS_POOL[idx];
   if (G.club.players.find(x=>x.name===p.name)) { showToast('Joueur déjà dans l\'équipe !'); return; }
   if (G.club.players.length >= MAX_SQUAD_SIZE) { showToast('! Effectif complet (25 joueurs max) !'); return; }
-  if (G.money < p.value) { showToast('— Budget insuffisant !'); return; }
+  if (G.money < p.value) { showBigErrorToast('Budget insuffisant', fmt(p.value - G.money) + ' manquant'); return; }
   G.money -= p.value;
   G.club.players.push({...p});
   showToast('✓ '+p.name+' recruté pour '+fmt(p.value));
@@ -1982,7 +1982,7 @@ function sellPlayer(name) {
 function buyClubUpgrade(id) {
   const u = CLUB_UPGRADES_DEF.find(x=>x.id===id);
   if (!u||G.club.upgrades[id]) return;
-  if (G.money < u.cost) { showToast('— Fonds insuffisants !'); return; }
+  if (G.money < u.cost) { showBigErrorToast('Fonds insuffisants', fmt(u.cost - G.money) + ' manquant'); return; }
   G.money -= u.cost;
   G.club.upgrades[id] = true;
   if (u.type==='stadium') G.club.stadiumBonus = (G.club.stadiumBonus||0) + u.effect*500;
@@ -3538,6 +3538,28 @@ function setHotkey(key, label) {
 // ══════════════════════════════════════════════
 // LIVE UPGRADE BUTTON UPDATE (fix actualisation)
 // ══════════════════════════════════════════════
+
+function updateTransferMarketLive() {
+  // Met à jour les boutons d'achat du marché des transferts en temps réel
+  const listEl = document.getElementById('transfer-player-list');
+  if (!listEl) return;
+  const c = G.club;
+  const btns = listEl.querySelectorAll('button.buy-p');
+  btns.forEach(btn => {
+    const onclick = btn.getAttribute('onclick') || '';
+    const match = onclick.match(/buyPlayer\((\d+)\)/);
+    if (!match) return;
+    const idx = parseInt(match[1]);
+    const p = PLAYERS_POOL[idx];
+    if (!p) return;
+    const canBuy = G.money >= p.value && c.players.length < MAX_SQUAD_SIZE;
+    const isFull = c.players.length >= MAX_SQUAD_SIZE;
+    btn.disabled = !canBuy;
+    btn.style.opacity = canBuy ? '1' : '0.35';
+    btn.textContent = isFull ? 'Plein' : fmt(p.value);
+  });
+}
+
 function updateUpgradeButtonsLive() {
   // Update upgrade buy buttons in real-time without full re-render
   ['upgrades-list', 'upgrades-list-home'].forEach(listId => {
@@ -3670,6 +3692,7 @@ function updateUI() {
   updateCryptoPortfolio();
   updateBizButtons();
   updateUpgradeButtonsLive();
+  updateTransferMarketLive();
 }
 
 function updateFootballTab() {
@@ -3701,7 +3724,7 @@ function updateFootballTab() {
 }
 
 function buyFootballMode() {
-  if (G.money < CLUB_UNLOCK_THRESHOLD) { showToast('— Fonds insuffisants !'); return; }
+  if (G.money < CLUB_UNLOCK_THRESHOLD) { showBigErrorToast('Fonds insuffisants', fmt(CLUB_UNLOCK_THRESHOLD - G.money) + ' manquant'); return; }
   G.money -= CLUB_UNLOCK_THRESHOLD;
   G.clubUnlocked = true;
   G.club.showOnboarding = true;
@@ -3797,7 +3820,7 @@ function tick() {
 
   // Accumulate missed income during inactivity for toast display on return
   if (isInactive) {
-    inactivityAccumulated += income * (1 - INACTIVITY_BONUS_RATE) * dt;
+    inactivityAccumulated += income * INACTIVITY_BONUS_RATE * dt;
   }
 
   cryptoTick++;
@@ -3806,6 +3829,32 @@ function tick() {
     cryptoTick=0;
     if (currentTab==='bourse') { renderCryptoList(); updateCryptoPortfolio(); }
   }
+}
+
+
+function showBigErrorToast(title, subtitle) {
+  const existing = document.getElementById('big-error-toast');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'big-error-toast';
+  div.style.cssText = `
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);
+    background:rgba(14,24,32,0.97);border:2px solid #c0392b;border-radius:16px;
+    padding:20px 28px;text-align:center;z-index:9999;
+    box-shadow:0 0 40px rgba(192,57,43,0.3),0 8px 32px rgba(0,0,0,0.6);
+    animation:bigErrAnim 0.3s ease-out forwards;min-width:220px;
+  `;
+  div.innerHTML = `
+    <div style="font-size:28px;margin-bottom:8px">🚫</div>
+    <div style="font-size:14px;font-weight:800;color:#e74c3c;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">${title}</div>
+    <div style="font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text2)">${subtitle}</div>
+  `;
+  const style = document.createElement('style');
+  style.textContent = `@keyframes bigErrAnim{from{opacity:0;transform:translate(-50%,-50%) scale(0.8)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}`;
+  document.head.appendChild(style);
+  document.body.appendChild(div);
+  setTimeout(() => { div.style.transition='opacity 0.4s'; div.style.opacity='0'; setTimeout(()=>div.remove(),400); }, 2800);
+  div.addEventListener('click', () => div.remove());
 }
 
 function showBigInactivityToast(bonus) {
@@ -3825,7 +3874,7 @@ function showBigInactivityToast(bonus) {
     <div style="font-size:30px;margin-bottom:8px">💤</div>
     <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Inactivité</div>
     <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--gold-light);margin-bottom:4px">+${fmt(bonus)}</div>
-    <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">5% des revenus générés pendant votre absence</div>
+    <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Revenus reçus pendant votre absence</div>
   `;
   const style = document.createElement('style');
   style.textContent = `@keyframes inactAnim{from{opacity:0;transform:translate(-50%,-50%) scale(0.8)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}`;
