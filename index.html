@@ -4450,6 +4450,8 @@ function tick() {
     cryptoTick=0;
     if (currentTab==='bourse') { renderCryptoList(); updateCryptoPortfolio(); }
   }
+
+  updateUI();
 }
 
 
@@ -4634,7 +4636,7 @@ const FORMATION_NATIONALITES = [
   {label:'🇧🇯 Bénin', val:'🇧🇯'},
   {label:'🇧🇾 Biélorussie', val:'🇧🇾'},
   {label:'🇧🇴 Bolivie', val:'🇧🇴'},
-  {label:'🇧🇦 Bosnie', val:'🇧🇦'},
+  {label:'🇧🇦 Bosnie-Herzégovine', val:'🇧🇦'},
   {label:'🇧🇷 Brésil', val:'🇧🇷'},
   {label:'🇧🇬 Bulgarie', val:'🇧🇬'},
   {label:'🇧🇫 Burkina Faso', val:'🇧🇫'},
@@ -4730,7 +4732,7 @@ const FORMATION_NATIONALITES = [
   {label:'🇨🇿 Tchéquie', val:'🇨🇿'},
   {label:'🇹🇭 Thaïlande', val:'🇹🇭'},
   {label:'🇹🇬 Togo', val:'🇹🇬'},
-  {label:'🇹🇹 Trinité', val:'🇹🇹'},
+  {label:'🇹🇹 Trinité-et-Tobago', val:'🇹🇹'},
   {label:'🇹🇳 Tunisie', val:'🇹🇳'},
   {label:'🇹🇷 Turquie', val:'🇹🇷'},
   {label:'🇺🇦 Ukraine', val:'🇺🇦'},
@@ -4930,6 +4932,7 @@ function buyFormationUpgrade(playerIdx, upgId) {
   updateUI();
 }
 setInterval(saveGame, 15000);
+setInterval(tick, 100);
 
 // ══════════════════════════════════════════════
 // INIT
