@@ -1227,7 +1227,7 @@ const PLAYERS_POOL = [
   {name:'Xavi Hernández',     pos:'MC', rat:99, salary:1000000,value:100000000000000,nat:'🇪🇸', tier:12},
   {name:'Andrés Iniesta',     pos:'MC', rat:99, salary:1000000,value:1000000000,nat:'🇪🇸', tier:12},
   {name:'Sergio Busquets',    pos:'MD', rat:99, salary:1000000,value:100000000000000,nat:'🇪🇸', tier:12},
-  {name:'Lionel Messi',       pos:'AG', rat:99, salary:1000000,value:500000000000000,nat:'🇦🇷', tier:12},
+  {name:'Lionel Messi',       pos:'AD', rat:99, salary:1000000,value:500000000000000,nat:'🇦🇷', tier:12},
   {name:'Ronaldinho',         pos:'AG', rat:99, salary:1000000,value:400000000000000,nat:'🇧🇷', tier:12},
   {name:'Luis Suárez',        pos:'AT', rat:99, salary:1000000,value:300000000000000,nat:'🇺🇾', tier:12},
 ];
@@ -2005,7 +2005,10 @@ function sellPlayer(name) {
     const fIdx = G.club.formationPlayers.findIndex(fp=>fp.id===p.id);
     if (fIdx>=0) G.club.formationPlayers.splice(fIdx,1);
   }
-  showToast('→ '+p.name+' vendu pour '+fmt(Math.floor(p.value*0.8)));
+  // Remove from lineup if placed
+  if (G.club.lineup) {
+    Object.keys(G.club.lineup).forEach(k => { if (G.club.lineup[k]===name) delete G.club.lineup[k]; });
+  }
   renderClubAll(); updateUI();
 }
 
@@ -3203,7 +3206,7 @@ function autoFillLineup(tacticKey) {
   const lineup = {};
   const used = new Set();
 
-  // Pass 1: exact pos match
+  // Pass 1: exact pos match, best rat first
   tactic.slots.forEach(slot => {
     const match = players.find(p => p.pos===slot.pos && !used.has(p.name));
     if (match) { lineup[slot.key]=match.name; used.add(match.name); }
@@ -3224,6 +3227,91 @@ let _touchHoldTimer = null;
 let _touchDragging = false;
 let _touchDragEl = null;
 let _touchDragSlot = null;
+let _touchDragGhost = null;
+
+function _getTouchSlotAt(x, y) {
+  const slots = document.querySelectorAll('.tactic-slot[data-slot]');
+  for (const slot of slots) {
+    const r = slot.getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+      return slot.dataset.slot;
+    }
+  }
+  return null;
+}
+
+function _initTouchDrag() {
+  // Touch drag on pitch slots and bench players
+  document.addEventListener('touchstart', function(e) {
+    const target = e.target.closest('.tactic-slot.filled, .bench-player');
+    if (!target) return;
+    const touch = e.touches[0];
+    _touchDragEl = target;
+
+    _touchHoldTimer = setTimeout(() => {
+      _touchDragging = true;
+      e.preventDefault();
+
+      // Create ghost
+      _touchDragGhost = _touchDragEl.cloneNode(true);
+      _touchDragGhost.style.cssText = `position:fixed;z-index:9999;opacity:0.85;pointer-events:none;transform:translate(-50%,-50%) scale(1.1);transition:none;left:${touch.clientX}px;top:${touch.clientY}px;`;
+      document.body.appendChild(_touchDragGhost);
+
+      if (_touchDragEl.classList.contains('tactic-slot')) {
+        _lineupDragSource = {type:'slot', key:_touchDragEl.dataset.slot};
+      } else {
+        // bench-player has title="Name · pos · rat"
+        const titleAttr = _touchDragEl.getAttribute('title') || '';
+        const rawName = titleAttr.split(' · ')[0].trim();
+        _lineupDragSource = {type:'bench', name: rawName};
+      }
+      _touchDragEl.style.opacity = '0.4';
+    }, 200);
+  }, {passive: false});
+
+  document.addEventListener('touchmove', function(e) {
+    clearTimeout(_touchHoldTimer);
+    if (!_touchDragging) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (_touchDragGhost) {
+      _touchDragGhost.style.left = touch.clientX + 'px';
+      _touchDragGhost.style.top = touch.clientY + 'px';
+    }
+    // Highlight target slot
+    document.querySelectorAll('.tactic-slot').forEach(s => s.style.boxShadow = '');
+    const slotKey = _getTouchSlotAt(touch.clientX, touch.clientY);
+    if (slotKey) {
+      const slotEl = document.querySelector(`.tactic-slot[data-slot="${slotKey}"]`);
+      if (slotEl) slotEl.style.boxShadow = '0 0 12px 3px rgba(212,175,55,0.6)';
+    }
+  }, {passive: false});
+
+  document.addEventListener('touchend', function(e) {
+    clearTimeout(_touchHoldTimer);
+    if (_touchDragEl) _touchDragEl.style.opacity = '';
+    if (_touchDragGhost) { _touchDragGhost.remove(); _touchDragGhost = null; }
+    document.querySelectorAll('.tactic-slot').forEach(s => s.style.boxShadow = '');
+
+    if (!_touchDragging || !_lineupDragSource) {
+      _touchDragging = false;
+      _touchDragEl = null;
+      _lineupDragSource = null;
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+    const slotKey = _getTouchSlotAt(touch.clientX, touch.clientY);
+    if (slotKey) {
+      onSlotDrop({preventDefault:()=>{}}, slotKey);
+    } else {
+      _lineupDragSource = null;
+    }
+
+    _touchDragging = false;
+    _touchDragEl = null;
+  }, {passive: false});
+}
 
 function renderClubSquad() {
   const panel = document.getElementById('club-squad');
@@ -3260,7 +3348,8 @@ function renderClubSquad() {
     const rc = p ? (p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare') : '';
 
     if (p) {
-      const shortName = p.name.split(' ').slice(-1)[0];
+      const isMidDef = ['DC','DD','DG','MD','MC','MOC'].includes(slot.pos);
+      const shortName = isMidDef ? p.name.split(' ').slice(-1)[0] : p.name.split(' ').slice(-1)[0];
       slotsHtml += `
         <div class="tactic-slot filled" data-slot="${slot.key}" data-player="${p.name}"
           style="left:${x}px;top:${y}px"
@@ -3449,15 +3538,15 @@ function openPlayerMenu(slotKey, playerName) {
       <div style="display:flex;flex-direction:column;gap:8px">
         <button onclick="closeSlotModal();openSlotPicker('${slotKey}')"
           style="width:100%;padding:12px;border-radius:9px;border:1px solid rgba(107,124,147,0.3);background:var(--bg2);color:var(--text1);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);text-align:left">
-          🔄 Changer de joueur
+          Changer de joueur
         </button>
         <button onclick="removeFromSlot('${slotKey}');closeSlotModal()"
           style="width:100%;padding:12px;border-radius:9px;border:1px solid rgba(107,124,147,0.25);background:var(--bg2);color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);text-align:left">
-          ↩ Retirer du terrain
+          Retirer du terrain
         </button>
         <button onclick="closeSlotModal();sellPlayer('${safeName}')"
           style="width:100%;padding:12px;border-radius:9px;border:1px solid rgba(224,92,92,0.35);background:rgba(224,92,92,0.06);color:var(--danger);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);text-align:left">
-          💸 Vendre — ${fmt(Math.floor(p.value*0.8))}
+          Vendre — ${fmt(Math.floor(p.value*0.8))}
         </button>
       </div>
     </div>`;
@@ -3528,6 +3617,14 @@ function assignToSlot(slotKey, playerName) {
 function removeFromSlot(slotKey) {
   if (G.club.lineup) delete G.club.lineup[slotKey];
   document.getElementById('slot-picker-modal')?.remove();
+  renderClubSquad();
+}
+
+function setTactic(t) {
+  if (!TACTICS[t]) return;
+  G.club.tactic = t;
+  // Auto-fill lineup with best players for the new tactic
+  autoFillLineup(t);
   renderClubSquad();
 }
 
@@ -4522,36 +4619,130 @@ function renderCollection() {
 
 const FORMATION_POSTES = ['GB','DD','DC','DG','MD','MC','MOC','AG','AD','AT'];
 const FORMATION_NATIONALITES = [
-  {label:'🇫🇷 France', val:'🇫🇷'},
-  {label:'🇧🇷 Brésil', val:'🇧🇷'},
-  {label:'🇦🇷 Argentine', val:'🇦🇷'},
+  {label:'🇿🇦 Afrique du Sud', val:'🇿🇦'},
+  {label:'🇦🇱 Albanie', val:'🇦🇱'},
+  {label:'🇩🇿 Algérie', val:'🇩🇿'},
   {label:'🇩🇪 Allemagne', val:'🇩🇪'},
-  {label:'🇪🇸 Espagne', val:'🇪🇸'},
-  {label:'🇮🇹 Italie', val:'🇮🇹'},
+  {label:'🇦🇴 Angola', val:'🇦🇴'},
   {label:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre', val:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  {label:'🇵🇹 Portugal', val:'🇵🇹'},
-  {label:'🇳🇱 Pays-Bas', val:'🇳🇱'},
-  {label:'🇧🇪 Belgique', val:'🇧🇪'},
-  {label:'🇺🇾 Uruguay', val:'🇺🇾'},
-  {label:'🇨🇴 Colombie', val:'🇨🇴'},
-  {label:'🇨🇱 Chili', val:'🇨🇱'},
-  {label:'🇲🇽 Mexique', val:'🇲🇽'},
-  {label:'🇯🇵 Japon', val:'🇯🇵'},
-  {label:'🇰🇷 Corée du Sud', val:'🇰🇷'},
-  {label:'🇸🇳 Sénégal', val:'🇸🇳'},
-  {label:'🇲🇦 Maroc', val:'🇲🇦'},
-  {label:'🇳🇬 Nigeria', val:'🇳🇬'},
-  {label:'🇬🇭 Ghana', val:'🇬🇭'},
-  {label:'🇺🇦 Ukraine', val:'🇺🇦'},
-  {label:'🇷🇸 Serbie', val:'🇷🇸'},
-  {label:'🇭🇷 Croatie', val:'🇭🇷'},
-  {label:'🇵🇱 Pologne', val:'🇵🇱'},
-  {label:'🇸🇪 Suède', val:'🇸🇪'},
-  {label:'🇩🇰 Danemark', val:'🇩🇰'},
-  {label:'🇨🇿 Tchéquie', val:'🇨🇿'},
+  {label:'🇸🇦 Arabie Saoudite', val:'🇸🇦'},
+  {label:'🇦🇷 Argentine', val:'🇦🇷'},
+  {label:'🇦🇲 Arménie', val:'🇦🇲'},
+  {label:'🇦🇺 Australie', val:'🇦🇺'},
   {label:'🇦🇹 Autriche', val:'🇦🇹'},
-  {label:'🇨🇭 Suisse', val:'🇨🇭'},
+  {label:'🇦🇿 Azerbaïdjan', val:'🇦🇿'},
+  {label:'🇧🇭 Bahreïn', val:'🇧🇭'},
+  {label:'🇧🇩 Bangladesh', val:'🇧🇩'},
+  {label:'🇧🇪 Belgique', val:'🇧🇪'},
+  {label:'🇧🇯 Bénin', val:'🇧🇯'},
+  {label:'🇧🇾 Biélorussie', val:'🇧🇾'},
+  {label:'🇧🇴 Bolivie', val:'🇧🇴'},
+  {label:'🇧🇦 Bosnie-Herzégovine', val:'🇧🇦'},
+  {label:'🇧🇷 Brésil', val:'🇧🇷'},
+  {label:'🇧🇬 Bulgarie', val:'🇧🇬'},
+  {label:'🇧🇫 Burkina Faso', val:'🇧🇫'},
+  {label:'🇨🇦 Canada', val:'🇨🇦'},
+  {label:'🇨🇲 Cameroun', val:'🇨🇲'},
+  {label:'🇨🇱 Chili', val:'🇨🇱'},
+  {label:'🇨🇳 Chine', val:'🇨🇳'},
+  {label:'🇨🇴 Colombie', val:'🇨🇴'},
+  {label:'🇨🇬 Congo', val:'🇨🇬'},
+  {label:'🇨🇷 Costa Rica', val:'🇨🇷'},
+  {label:'🇨🇮 Côte d\'Ivoire', val:'🇨🇮'},
+  {label:'🇭🇷 Croatie', val:'🇭🇷'},
+  {label:'🇨🇺 Cuba', val:'🇨🇺'},
+  {label:'🇩🇰 Danemark', val:'🇩🇰'},
+  {label:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Écosse', val:'🏴󠁧󠁢󠁳󠁣󠁴󠁿'},
+  {label:'🇪🇬 Égypte', val:'🇪🇬'},
+  {label:'🇦🇪 Émirats arabes unis', val:'🇦🇪'},
+  {label:'🇪🇨 Équateur', val:'🇪🇨'},
+  {label:'🇪🇸 Espagne', val:'🇪🇸'},
   {label:'🇺🇸 États-Unis', val:'🇺🇸'},
+  {label:'🇪🇹 Éthiopie', val:'🇪🇹'},
+  {label:'🇫🇮 Finlande', val:'🇫🇮'},
+  {label:'🇫🇷 France', val:'🇫🇷'},
+  {label:'🇬🇦 Gabon', val:'🇬🇦'},
+  {label:'🇬🇲 Gambie', val:'🇬🇲'},
+  {label:'🇬🇪 Géorgie', val:'🇬🇪'},
+  {label:'🇬🇭 Ghana', val:'🇬🇭'},
+  {label:'🇬🇷 Grèce', val:'🇬🇷'},
+  {label:'🇬🇹 Guatemala', val:'🇬🇹'},
+  {label:'🇬🇳 Guinée', val:'🇬🇳'},
+  {label:'🇭🇳 Honduras', val:'🇭🇳'},
+  {label:'🇭🇺 Hongrie', val:'🇭🇺'},
+  {label:'🇮🇳 Inde', val:'🇮🇳'},
+  {label:'🇮🇩 Indonésie', val:'🇮🇩'},
+  {label:'🇮🇶 Irak', val:'🇮🇶'},
+  {label:'🇮🇷 Iran', val:'🇮🇷'},
+  {label:'🇮🇪 Irlande', val:'🇮🇪'},
+  {label:'🇮🇸 Islande', val:'🇮🇸'},
+  {label:'🇮🇹 Italie', val:'🇮🇹'},
+  {label:'🇯🇲 Jamaïque', val:'🇯🇲'},
+  {label:'🇯🇵 Japon', val:'🇯🇵'},
+  {label:'🇯🇴 Jordanie', val:'🇯🇴'},
+  {label:'🇰🇿 Kazakhstan', val:'🇰🇿'},
+  {label:'🇰🇪 Kenya', val:'🇰🇪'},
+  {label:'🇽🇰 Kosovo', val:'🇽🇰'},
+  {label:'🇰🇼 Koweït', val:'🇰🇼'},
+  {label:'🇱🇧 Liban', val:'🇱🇧'},
+  {label:'🇱🇾 Libye', val:'🇱🇾'},
+  {label:'🇱🇺 Luxembourg', val:'🇱🇺'},
+  {label:'🇲🇰 Macédoine du Nord', val:'🇲🇰'},
+  {label:'🇲🇾 Malaisie', val:'🇲🇾'},
+  {label:'🇲🇱 Mali', val:'🇲🇱'},
+  {label:'🇲🇦 Maroc', val:'🇲🇦'},
+  {label:'🇲🇽 Mexique', val:'🇲🇽'},
+  {label:'🇲🇩 Moldavie', val:'🇲🇩'},
+  {label:'🇲🇨 Monaco', val:'🇲🇨'},
+  {label:'🇲🇪 Monténégro', val:'🇲🇪'},
+  {label:'🇲🇿 Mozambique', val:'🇲🇿'},
+  {label:'🇲🇲 Myanmar', val:'🇲🇲'},
+  {label:'🇳🇵 Népal', val:'🇳🇵'},
+  {label:'🇳🇬 Nigeria', val:'🇳🇬'},
+  {label:'🇳🇴 Norvège', val:'🇳🇴'},
+  {label:'🇳🇿 Nouvelle-Zélande', val:'🇳🇿'},
+  {label:'🇴🇲 Oman', val:'🇴🇲'},
+  {label:'🇺🇬 Ouganda', val:'🇺🇬'},
+  {label:'🇺🇿 Ouzbékistan', val:'🇺🇿'},
+  {label:'🇵🇰 Pakistan', val:'🇵🇰'},
+  {label:'🇵🇸 Palestine', val:'🇵🇸'},
+  {label:'🇵🇦 Panama', val:'🇵🇦'},
+  {label:'🇵🇾 Paraguay', val:'🇵🇾'},
+  {label:'🇳🇱 Pays-Bas', val:'🇳🇱'},
+  {label:'🏴󠁧󠁢󠁷󠁬󠁳󠁿 Pays de Galles', val:'🏴󠁧󠁢󠁷󠁬󠁳󠁿'},
+  {label:'🇵🇪 Pérou', val:'🇵🇪'},
+  {label:'🇵🇭 Philippines', val:'🇵🇭'},
+  {label:'🇵🇱 Pologne', val:'🇵🇱'},
+  {label:'🇵🇹 Portugal', val:'🇵🇹'},
+  {label:'🇶🇦 Qatar', val:'🇶🇦'},
+  {label:'🇨🇩 RD Congo', val:'🇨🇩'},
+  {label:'🇷🇴 Roumanie', val:'🇷🇴'},
+  {label:'🇷🇺 Russie', val:'🇷🇺'},
+  {label:'🇸🇳 Sénégal', val:'🇸🇳'},
+  {label:'🇷🇸 Serbie', val:'🇷🇸'},
+  {label:'🇸🇱 Sierra Leone', val:'🇸🇱'},
+  {label:'🇸🇬 Singapour', val:'🇸🇬'},
+  {label:'🇸🇰 Slovaquie', val:'🇸🇰'},
+  {label:'🇸🇮 Slovénie', val:'🇸🇮'},
+  {label:'🇸🇩 Soudan', val:'🇸🇩'},
+  {label:'🇱🇰 Sri Lanka', val:'🇱🇰'},
+  {label:'🇸🇪 Suède', val:'🇸🇪'},
+  {label:'🇨🇭 Suisse', val:'🇨🇭'},
+  {label:'🇸🇾 Syrie', val:'🇸🇾'},
+  {label:'🇹🇿 Tanzanie', val:'🇹🇿'},
+  {label:'🇨🇿 Tchéquie', val:'🇨🇿'},
+  {label:'🇹🇭 Thaïlande', val:'🇹🇭'},
+  {label:'🇹🇬 Togo', val:'🇹🇬'},
+  {label:'🇹🇹 Trinité-et-Tobago', val:'🇹🇹'},
+  {label:'🇹🇳 Tunisie', val:'🇹🇳'},
+  {label:'🇹🇷 Turquie', val:'🇹🇷'},
+  {label:'🇺🇦 Ukraine', val:'🇺🇦'},
+  {label:'🇺🇾 Uruguay', val:'🇺🇾'},
+  {label:'🇻🇪 Venezuela', val:'🇻🇪'},
+  {label:'🇻🇳 Vietnam', val:'🇻🇳'},
+  {label:'🇾🇪 Yémen', val:'🇾🇪'},
+  {label:'🇿🇲 Zambie', val:'🇿🇲'},
+  {label:'🇿🇼 Zimbabwe', val:'🇿🇼'},
 ];
 
 // Coût de création d'un joueur
@@ -4737,12 +4928,10 @@ function buyFormationUpgrade(playerIdx, upgId) {
     c.players[mainIdx].upgrades = fp.upgrades;
   }
 
-  showToast(`✓ ${nextUpg.name} — ${fp.prenom} ${fp.nom} : ${fp.rat}/99`);
+  // upgrade silent
   renderClubAll();
   updateUI();
 }
-
-setInterval(()=>{ tick(); updateUI(); }, 100);
 setInterval(saveGame, 15000);
 
 // ══════════════════════════════════════════════
@@ -4751,6 +4940,7 @@ setInterval(saveGame, 15000);
 initCryptoPrices();
 checkOffline();
 renderAll();
+_initTouchDrag();
 
 // ══════════════════════════════════════════════
 // CRYPTO NUMPAD
