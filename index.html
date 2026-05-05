@@ -200,6 +200,19 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 .players-section{background:var(--bg2);border:1px solid rgba(212,175,55,0.35);border-radius:10px;padding:11px;}
 .player-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
 .player-row:last-child{border-bottom:none;}
+/* Tactical pitch */
+.tactic-slot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;z-index:10;user-select:none;}
+.tactic-slot.filled .tactic-avatar{width:38px;height:38px;border-radius:50%;background:rgba(20,40,20,0.85);border:2px solid rgba(107,124,147,0.5);display:flex;align-items:center;justify-content:center;font-size:17px;transition:border-color .2s,box-shadow .2s;}
+.tactic-slot.filled:active .tactic-avatar,.tactic-slot.filled:hover .tactic-avatar{border-color:var(--gold);box-shadow:0 0 10px rgba(212,175,55,0.4);}
+.tactic-slot.filled .tactic-avatar.elite{border-color:rgba(212,175,55,0.7);}
+.tactic-slot.filled .tactic-avatar.good{border-color:rgba(107,200,150,0.5);}
+.tactic-slot.filled .tactic-name{font-size:7.5px;font-weight:700;color:#fff;background:rgba(0,0,0,0.7);padding:1px 5px;border-radius:4px;white-space:nowrap;max-width:72px;overflow:visible;text-overflow:clip;}
+.tactic-slot.filled .tactic-rat{font-family:var(--font-mono);font-size:8px;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.5);padding:0 4px;border-radius:3px;}
+.tactic-slot.empty{width:38px;height:38px;border-radius:50%;border:2px dashed rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);transition:border-color .2s,background .2s;}
+.tactic-slot.empty:hover,.tactic-slot.empty:active{border-color:rgba(212,175,55,0.6);background:rgba(212,175,55,0.08);}
+.tactic-slot.empty .tactic-pos-label{font-size:8px;font-weight:700;color:rgba(255,255,255,0.45);}
+.bench-player{display:inline-flex;align-items:center;gap:3px;background:var(--bg2);border:1px solid rgba(107,124,147,0.25);border-radius:6px;padding:4px 7px;cursor:pointer;transition:border-color .15s,background .15s;}
+.bench-player:hover,.bench-player:active{border-color:rgba(212,175,55,0.4);background:rgba(212,175,55,0.05);}
 .p-name{font-size:12px;font-weight:600;}
 .p-meta{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px;}
 .p-flag{font-size:10px;}
@@ -1537,6 +1550,8 @@ function defaultState() {
       moral:50, sponsorLevel:0, sponsorIncome:0,
       prestige:0,
       formationPlayers:[],
+      tactic: '4-3-3',
+      lineup: {}, // slotKey -> playerName
       // Ranked system
       ranked: {
         tierId: 'inconnu',
@@ -1578,6 +1593,8 @@ function loadGame() {
       merged.club = {...base.club, ...(saved.club||{})};
       merged.club.ranked = {...base.club.ranked, ...(saved.club?.ranked||{})};
       merged.club.formationPlayers = saved.club?.formationPlayers || [];
+      merged.club.lineup = saved.club?.lineup || {};
+      merged.club.tactic = saved.club?.tactic || '4-3-3';
       merged.crypto = {...base.crypto, ...(saved.crypto||{})};
       merged.crypto.holdings = merged.crypto.holdings||{};
       merged.crypto.prices = merged.crypto.prices||{};
@@ -1967,6 +1984,12 @@ function buyPlayer(idx) {
   if (G.money < p.value) { showBigErrorToast('Budget insuffisant', fmt(p.value - G.money) + ' manquant'); return; }
   G.money -= p.value;
   G.club.players.push({...p});
+  // Try to auto-place the new player in an empty slot matching their position
+  const tactic = G.club.tactic || '4-3-3';
+  const slots = TACTICS[tactic].slots;
+  const lineup = G.club.lineup || (G.club.lineup = {});
+  const emptySlot = slots.find(s => !lineup[s.key] && s.pos === p.pos) || slots.find(s => !lineup[s.key]);
+  if (emptySlot) lineup[emptySlot.key] = p.name;
   showToast('✓ '+p.name+' recruté pour '+fmt(p.value));
   renderClubAll(); updateUI();
 }
@@ -2918,7 +2941,6 @@ function startChampionship(champId) {
   c.lastLeagueMatch = null;
   c.activeChampsId = champId;
   c.champPaused = false;
-  showToast(`★ Championnat ${champ.name} lancé !`);
   renderClubAll();
 }
 
@@ -2942,6 +2964,14 @@ function abandonChampionship() {
     G.club.seasonSchedule = null;
     G.club.activeChampsId = null;
     G.club.champPaused = false;
+    // Return to overview tab
+    currentClubTab = 'overview';
+    document.querySelectorAll('.club-subpanel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.club-tab').forEach(b=>b.classList.remove('active'));
+    const ovPanel = document.getElementById('club-overview');
+    if (ovPanel) ovPanel.classList.add('active');
+    const ovBtn = document.querySelector('.club-tab');
+    if (ovBtn) ovBtn.classList.add('active');
     renderClubAll();
   });
 }
@@ -2976,11 +3006,14 @@ function renderClubOverview() {
   const formationIncome = getFormationIncome();
   const fps = c.formationPlayers || [];
   const canCreate = fps.length < 5;
+  const squadFull = (c.players||[]).length >= MAX_SQUAD_SIZE;
 
   let formHtml = '';
 
   // Creation button
-  if (canCreate) {
+  if (squadFull) {
+    formHtml += `<div style="background:rgba(224,92,92,0.07);border:1px solid rgba(224,92,92,0.3);border-radius:8px;padding:10px 12px;font-family:var(--font-mono);font-size:10px;color:var(--danger);text-align:center;margin-bottom:8px">Effectif complet — vendez un joueur pour former un nouveau talent</div>`;
+  } else if (canCreate) {
     formHtml += `<button onclick="openFormationCreate()" style="width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(212,175,55,0.4);background:rgba(212,175,55,0.04);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);margin-bottom:8px;transition:background .2s">+ Créer un joueur (${fps.length}/5)</button>`;
   } else {
     formHtml += `<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-bottom:8px;text-align:center">5/5 joueurs créés — effectif de formation complet</div>`;
@@ -3060,27 +3093,472 @@ function renderClubOverview() {
     ${formHtml}`;
 }
 
+// ══════════════════════════════════════════════
+// TACTIQUE — TERRAIN INTERACTIF
+// ══════════════════════════════════════════════
+
+const TACTICS = {
+  '4-3-3': {
+    label:'4-3-3',
+    slots:[
+      {key:'GB',  label:'GB',  pos:'GB',  pct:[50,90]},
+      {key:'DD',  label:'DD',  pos:'DD',  pct:[82,72]},
+      {key:'DC1', label:'DC',  pos:'DC',  pct:[62,72]},
+      {key:'DC2', label:'DC',  pos:'DC',  pct:[38,72]},
+      {key:'DG',  label:'DG',  pos:'DG',  pct:[18,72]},
+      {key:'MC1', label:'MC',  pos:'MC',  pct:[70,50]},
+      {key:'MC2', label:'MD',  pos:'MD',  pct:[50,50]},
+      {key:'MC3', label:'MC',  pos:'MC',  pct:[30,50]},
+      {key:'AD',  label:'AD',  pos:'AD',  pct:[80,25]},
+      {key:'AT',  label:'AT',  pos:'AT',  pct:[50,18]},
+      {key:'AG',  label:'AG',  pos:'AG',  pct:[20,25]},
+    ]
+  },
+  '4-4-2': {
+    label:'4-4-2',
+    slots:[
+      {key:'GB',  label:'GB',  pos:'GB',  pct:[50,90]},
+      {key:'DD',  label:'DD',  pos:'DD',  pct:[82,72]},
+      {key:'DC1', label:'DC',  pos:'DC',  pct:[62,72]},
+      {key:'DC2', label:'DC',  pos:'DC',  pct:[38,72]},
+      {key:'DG',  label:'DG',  pos:'DG',  pct:[18,72]},
+      {key:'MD1', label:'MD',  pos:'MD',  pct:[80,50]},
+      {key:'MC1', label:'MC',  pos:'MC',  pct:[58,50]},
+      {key:'MC2', label:'MC',  pos:'MC',  pct:[36,50]},
+      {key:'MD2', label:'MD',  pos:'MD',  pct:[14,50]},
+      {key:'AT1', label:'AT',  pos:'AT',  pct:[62,20]},
+      {key:'AT2', label:'AT',  pos:'AT',  pct:[38,20]},
+    ]
+  },
+  '4-2-3-1': {
+    label:'4-2-3-1',
+    slots:[
+      {key:'GB',  label:'GB',  pos:'GB',  pct:[50,90]},
+      {key:'DD',  label:'DD',  pos:'DD',  pct:[82,72]},
+      {key:'DC1', label:'DC',  pos:'DC',  pct:[62,72]},
+      {key:'DC2', label:'DC',  pos:'DC',  pct:[38,72]},
+      {key:'DG',  label:'DG',  pos:'DG',  pct:[18,72]},
+      {key:'MD1', label:'MD',  pos:'MD',  pct:[62,58]},
+      {key:'MD2', label:'MD',  pos:'MD',  pct:[38,58]},
+      {key:'AD',  label:'AD',  pos:'AD',  pct:[78,35]},
+      {key:'MOC', label:'MOC', pos:'MOC', pct:[50,35]},
+      {key:'AG',  label:'AG',  pos:'AG',  pct:[22,35]},
+      {key:'AT',  label:'AT',  pos:'AT',  pct:[50,18]},
+    ]
+  },
+  '3-5-2': {
+    label:'3-5-2',
+    slots:[
+      {key:'GB',  label:'GB',  pos:'GB',  pct:[50,90]},
+      {key:'DC1', label:'DC',  pos:'DC',  pct:[70,72]},
+      {key:'DC2', label:'DC',  pos:'DC',  pct:[50,72]},
+      {key:'DC3', label:'DC',  pos:'DC',  pct:[30,72]},
+      {key:'DD',  label:'DD',  pos:'DD',  pct:[88,50]},
+      {key:'MC1', label:'MC',  pos:'MC',  pct:[68,50]},
+      {key:'MD',  label:'MD',  pos:'MD',  pct:[50,50]},
+      {key:'MC2', label:'MC',  pos:'MC',  pct:[32,50]},
+      {key:'DG',  label:'DG',  pos:'DG',  pct:[12,50]},
+      {key:'AT1', label:'AT',  pos:'AT',  pct:[62,18]},
+      {key:'AT2', label:'AT',  pos:'AT',  pct:[38,18]},
+    ]
+  },
+  '5-3-2': {
+    label:'5-3-2',
+    slots:[
+      {key:'GB',  label:'GB',  pos:'GB',  pct:[50,90]},
+      {key:'DD',  label:'DD',  pos:'DD',  pct:[88,68]},
+      {key:'DC1', label:'DC',  pos:'DC',  pct:[70,73]},
+      {key:'DC2', label:'DC',  pos:'DC',  pct:[50,73]},
+      {key:'DC3', label:'DC',  pos:'DC',  pct:[30,73]},
+      {key:'DG',  label:'DG',  pos:'DG',  pct:[12,68]},
+      {key:'MC1', label:'MC',  pos:'MC',  pct:[65,48]},
+      {key:'MC2', label:'MD',  pos:'MD',  pct:[50,48]},
+      {key:'MC3', label:'MC',  pos:'MC',  pct:[35,48]},
+      {key:'AT1', label:'AT',  pos:'AT',  pct:[62,20]},
+      {key:'AT2', label:'AT',  pos:'AT',  pct:[38,20]},
+    ]
+  },
+  '4-1-4-1': {
+    label:'4-1-4-1',
+    slots:[
+      {key:'GB',  label:'GB',  pos:'GB',  pct:[50,90]},
+      {key:'DD',  label:'DD',  pos:'DD',  pct:[82,72]},
+      {key:'DC1', label:'DC',  pos:'DC',  pct:[62,72]},
+      {key:'DC2', label:'DC',  pos:'DC',  pct:[38,72]},
+      {key:'DG',  label:'DG',  pos:'DG',  pct:[18,72]},
+      {key:'MD',  label:'MD',  pos:'MD',  pct:[50,60]},
+      {key:'AD',  label:'AD',  pos:'AD',  pct:[80,44]},
+      {key:'MC1', label:'MC',  pos:'MC',  pct:[60,44]},
+      {key:'MC2', label:'MC',  pos:'MC',  pct:[40,44]},
+      {key:'AG',  label:'AG',  pos:'AG',  pct:[20,44]},
+      {key:'AT',  label:'AT',  pos:'AT',  pct:[50,18]},
+    ]
+  },
+};
+
+// Auto-assign players to slots based on pos match, best rat first
+function autoFillLineup(tacticKey) {
+  const tactic = TACTICS[tacticKey];
+  const players = [...(G.club.players||[])].sort((a,b)=>b.rat-a.rat);
+  const lineup = {};
+  const used = new Set();
+
+  // Pass 1: exact pos match
+  tactic.slots.forEach(slot => {
+    const match = players.find(p => p.pos===slot.pos && !used.has(p.name));
+    if (match) { lineup[slot.key]=match.name; used.add(match.name); }
+  });
+
+  // Pass 2: flexible — fill remaining slots with best available
+  tactic.slots.forEach(slot => {
+    if (lineup[slot.key]) return;
+    const fallback = players.find(p => !used.has(p.name));
+    if (fallback) { lineup[slot.key]=fallback.name; used.add(fallback.name); }
+  });
+
+  G.club.lineup = lineup;
+}
+
+let _lineupDragSource = null;
+let _touchHoldTimer = null;
+let _touchDragging = false;
+let _touchDragEl = null;
+let _touchDragSlot = null;
+
 function renderClubSquad() {
   const panel = document.getElementById('club-squad');
   if (!panel) return;
   const c = G.club;
+  const tactic = c.tactic || '4-3-3';
+
+  // Auto-fill if lineup is empty and we have players
+  if ((!c.lineup || Object.keys(c.lineup).length === 0) && (c.players||[]).length > 0) {
+    autoFillLineup(tactic);
+  }
+  // Also clean stale lineup entries (sold players)
+  if (c.lineup) {
+    const names = new Set((c.players||[]).map(p=>p.name));
+    Object.keys(c.lineup).forEach(k => { if (!names.has(c.lineup[k])) delete c.lineup[k]; });
+  }
+
+  const tactics = TACTICS[tactic];
+  const lineup = c.lineup || {};
+
+  const playerMap = {};
+  (c.players||[]).forEach(p => { playerMap[p.name] = p; });
+
+  const inLineup = new Set(Object.values(lineup).filter(Boolean));
+  const bench = (c.players||[]).filter(p => !inLineup.has(p.name)).sort((a,b)=>b.rat-a.rat);
+  const pitchW = 320, pitchH = 460;
+
+  let slotsHtml = '';
+  tactics.slots.forEach(slot => {
+    const assignedName = lineup[slot.key];
+    const p = assignedName ? playerMap[assignedName] : null;
+    const x = Math.round(slot.pct[0] / 100 * pitchW);
+    const y = Math.round(slot.pct[1] / 100 * pitchH);
+    const rc = p ? (p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare') : '';
+
+    if (p) {
+      const shortName = p.name.split(' ').slice(-1)[0];
+      slotsHtml += `
+        <div class="tactic-slot filled" data-slot="${slot.key}" data-player="${p.name}"
+          style="left:${x}px;top:${y}px"
+          draggable="true"
+          ondragstart="onSlotDragStart(event,'${slot.key}')"
+          ondragover="event.preventDefault()"
+          ondrop="onSlotDrop(event,'${slot.key}')"
+          onclick="openPlayerMenu('${slot.key}','${p.name.replace(/'/g,"&apos;")}')">
+          <div class="tactic-avatar ${rc}">${p.nat||'🌍'}</div>
+          <div class="tactic-name">${p.name}</div>
+          <div class="tactic-rat">${p.rat}</div>
+        </div>`;
+    } else {
+      slotsHtml += `
+        <div class="tactic-slot empty" data-slot="${slot.key}"
+          style="left:${x}px;top:${y}px"
+          ondragover="event.preventDefault()"
+          ondrop="onSlotDrop(event,'${slot.key}')"
+          onclick="openSlotPicker('${slot.key}')">
+          <div class="tactic-pos-label">${slot.label}</div>
+        </div>`;
+    }
+  });
+
+  const filledCount = tactics.slots.filter(s => lineup[s.key] && playerMap[lineup[s.key]]).length;
+
   panel.innerHTML = `
-    <div class="section-title">Effectif (${c.players.length}/${MAX_SQUAD_SIZE})</div>
-    <div class="players-section">
-      ${c.players.length===0
-        ?'<p style="text-align:center;padding:12px;font-size:12px;color:var(--text3)">Aucun joueur — allez dans Transferts !</p>'
-        :c.players.slice().sort((a,b)=>b.rat-a.rat).map(p=>`
-          <div class="player-row">
-            <div>
-              <div class="p-name">${p.nat||''} ${p.name}</div>
-              <div class="p-meta">${p.pos} · Note: ${p.rat} · Val: ${fmt(p.value)}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px">
-              <span class="p-rating ${p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare'}">${p.rat}</span>
-              <button class="transfer-btn sell-p" onclick="sellPlayer('${p.name}')">Vendre</button>
-            </div>
-          </div>`).join('')}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="section-title" style="margin:0">Composition (${filledCount}/11)</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
+        ${Object.keys(TACTICS).map(t=>`
+          <button onclick="setTactic('${t}')" style="padding:4px 9px;border-radius:6px;border:1px solid ${t===tactic?'var(--gold)':'rgba(107,124,147,0.3)'};background:${t===tactic?'rgba(212,175,55,0.1)':'transparent'};color:${t===tactic?'var(--gold)':'var(--text3)'};font-size:9px;font-weight:700;cursor:pointer;font-family:var(--font-head)">${t}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="pitch-wrap" style="position:relative;width:${pitchW}px;height:${pitchH}px;margin:0 auto 10px;border-radius:10px;overflow:hidden;background:#1a3a1a;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+      <svg width="${pitchW}" height="${pitchH}" style="position:absolute;top:0;left:0;pointer-events:none">
+        ${Array.from({length:8},(_,i)=>`<rect x="0" y="${i*pitchH/8}" width="${pitchW}" height="${pitchH/16}" fill="rgba(255,255,255,0.025)"/>`).join('')}
+        <rect x="8" y="8" width="${pitchW-16}" height="${pitchH-16}" rx="4" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <line x1="8" y1="${pitchH/2}" x2="${pitchW-8}" y2="${pitchH/2}" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <circle cx="${pitchW/2}" cy="${pitchH/2}" r="38" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <circle cx="${pitchW/2}" cy="${pitchH/2}" r="2.5" fill="rgba(255,255,255,0.3)"/>
+        <rect x="${pitchW*0.22}" y="8" width="${pitchW*0.56}" height="${pitchH*0.18}" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <rect x="${pitchW*0.35}" y="8" width="${pitchW*0.3}" height="${pitchH*0.07}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <rect x="${pitchW*0.22}" y="${pitchH-8-pitchH*0.18}" width="${pitchW*0.56}" height="${pitchH*0.18}" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <rect x="${pitchW*0.35}" y="${pitchH-8-pitchH*0.07}" width="${pitchW*0.3}" height="${pitchH*0.07}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <circle cx="${pitchW/2}" cy="${pitchH*0.13}" r="2" fill="rgba(255,255,255,0.3)"/>
+        <circle cx="${pitchW/2}" cy="${pitchH*0.87}" r="2" fill="rgba(255,255,255,0.3)"/>
+      </svg>
+      ${slotsHtml}
+    </div>
+
+    <div class="section-title" style="margin-top:2px">Banc (${bench.length})</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 8px">
+      ${bench.length===0
+        ? `<div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);padding:6px">Tous les joueurs sont dans le 11.</div>`
+        : bench.map(p=>{
+            const rc = p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare';
+            const shortName = p.name.split(' ').slice(-1)[0];
+            return `<div class="bench-player" draggable="true"
+              ondragstart="onBenchDragStart(event,'${p.name.replace(/'/g,"&apos;")}')"
+              ondragover="event.preventDefault()"
+              onclick="openBenchPlayerPicker('${p.name.replace(/'/g,"&apos;")}')"
+              title="${p.name} · ${p.pos} · ${p.rat}">
+              <span class="p-rating ${rc}" style="font-size:9px;padding:1px 5px">${p.rat}</span>
+              <span style="font-size:9px;color:var(--text2);margin-left:3px">${p.name}</span>
+              <span style="font-size:8px;color:var(--text3);margin-left:2px">${p.pos}</span>
+            </div>`;
+          }).join('')}
+    </div>
+  `;
+}
+
+// Safe modal close helper
+function closeSlotModal() {
+  const m = document.getElementById('slot-picker-modal');
+  if (m) m.remove();
+}
+
+// Position groups for filtering substitutions
+const POS_GROUPS = {
+  GB:  ['GB'],
+  DD:  ['DD','DG','DC'],
+  DC:  ['DC','DD','DG'],
+  DG:  ['DG','DD','DC'],
+  MD:  ['MD','MC','MOC'],
+  MC:  ['MC','MD','MOC'],
+  MOC: ['MOC','MC','MD'],
+  AD:  ['AD','AG','AT','MOC'],
+  AG:  ['AG','AD','AT','MOC'],
+  AT:  ['AT','AD','AG'],
+};
+function posGroup(pos) { return POS_GROUPS[pos] || [pos]; }
+
+function openSlotPicker(slotKey) {
+  closeSlotModal();
+  const c = G.club;
+  const tactic = TACTICS[c.tactic||'4-3-3'];
+  const slotDef = tactic.slots.find(s=>s.key===slotKey);
+  const lineup = c.lineup||{};
+  const inLineup = new Set(Object.values(lineup).filter(Boolean));
+  const currentName = lineup[slotKey];
+  const slotPos = slotDef?.pos || slotDef?.label || '';
+  const allowed = posGroup(slotPos);
+
+  // Filter: same position group, not already in lineup (except current)
+  const available = (c.players||[])
+    .filter(p => allowed.includes(p.pos) && (!inLineup.has(p.name) || p.name === currentName))
+    .sort((a,b)=>b.rat-a.rat);
+
+  const playerMap = {};
+  (c.players||[]).forEach(p => { playerMap[p.name] = p; });
+
+  const modal = document.createElement('div');
+  modal.id = 'slot-picker-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:700;display:flex;align-items:flex-end;justify-content:center';
+
+  modal.innerHTML = `
+    <div style="background:var(--bg1);border:1px solid var(--border);border-top:1px solid rgba(212,175,55,0.4);border-radius:16px 16px 0 0;padding:14px 13px 28px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:1.5px">Poste : ${slotPos}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">Postes compatibles : ${allowed.join(', ')}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          ${currentName?`<button onclick="removeFromSlot('${slotKey}');closeSlotModal()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:10px;font-weight:700;cursor:pointer">Retirer</button>`:''}
+          <button onclick="closeSlotModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;padding:3px 9px;border-radius:6px">✕</button>
+        </div>
+      </div>
+      ${currentName && playerMap[currentName] ? `
+        <div style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:9px 11px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">${playerMap[currentName].nat||''}</span>
+          <div style="flex:1"><div style="font-size:11px;font-weight:700">${currentName}</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${playerMap[currentName].pos} · ${playerMap[currentName].rat}/99</div></div>
+          <span class="p-rating ${playerMap[currentName].rat>=90?'elite':playerMap[currentName].rat>=80?'good':playerMap[currentName].rat>=70?'avg':'rare'}">${playerMap[currentName].rat}</span>
+        </div>`:''}
+      <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Joueurs compatibles (${available.length})</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${available.length===0
+          ? `<div style="text-align:center;padding:20px;font-size:11px;color:var(--text3)">Aucun joueur compatible disponible</div>`
+          : available.map(p=>{
+              const rc = p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare';
+              const isCurrent = p.name===currentName;
+              const isNatural = p.pos === slotPos;
+              const safeName = p.name.replace(/'/g,"\\'");
+              return `<div onclick="assignToSlot('${slotKey}','${safeName}');closeSlotModal()"
+                style="background:${isCurrent?'rgba(212,175,55,0.08)':'var(--bg2)'};border:1px solid ${isCurrent?'rgba(212,175,55,0.4)':isNatural?'rgba(107,124,147,0.3)':'rgba(255,255,255,0.06)'};border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:9px;cursor:pointer">
+                <span style="font-size:15px">${p.nat||''}</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:11px;font-weight:700;color:${isCurrent?'var(--gold)':'var(--text1)'}">${p.name}${isCurrent?' ✓':''}</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:${isNatural?'var(--mint)':'var(--text3)'};margin-top:1px">${p.pos}${isNatural?' ← naturel':''}</div>
+                </div>
+                <span class="p-rating ${rc}" style="font-size:10px;padding:2px 6px">${p.rat}</span>
+              </div>`;
+            }).join('')}
+      </div>
     </div>`;
+
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+}
+
+function openPlayerMenu(slotKey, playerName) {
+  closeSlotModal();
+  const c = G.club;
+  const p = (c.players||[]).find(pl=>pl.name===playerName);
+  if (!p) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'slot-picker-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:700;display:flex;align-items:flex-end;justify-content:center';
+  const rc = p.rat>=90?'elite':p.rat>=80?'good':p.rat>=70?'avg':'rare';
+  const safeName = playerName.replace(/'/g,"\\'");
+
+  modal.innerHTML = `
+    <div style="background:var(--bg1);border:1px solid var(--border);border-top:1px solid rgba(212,175,55,0.4);border-radius:16px 16px 0 0;padding:14px 13px 28px;width:100%;max-width:480px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:42px;height:42px;border-radius:50%;background:var(--bg2);border:1.5px solid rgba(107,124,147,0.35);display:flex;align-items:center;justify-content:center;font-size:20px">${p.nat||'🌍'}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:var(--text1)">${p.name}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">${p.pos} · ${fmt(p.value)}</div>
+        </div>
+        <span class="p-rating ${rc}" style="font-size:14px;padding:3px 9px">${p.rat}</span>
+        <button onclick="closeSlotModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;padding:3px 9px;border-radius:6px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="closeSlotModal();openSlotPicker('${slotKey}')"
+          style="width:100%;padding:12px;border-radius:9px;border:1px solid rgba(107,124,147,0.3);background:var(--bg2);color:var(--text1);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);text-align:left">
+          🔄 Changer de joueur
+        </button>
+        <button onclick="removeFromSlot('${slotKey}');closeSlotModal()"
+          style="width:100%;padding:12px;border-radius:9px;border:1px solid rgba(107,124,147,0.25);background:var(--bg2);color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);text-align:left">
+          ↩ Retirer du terrain
+        </button>
+        <button onclick="closeSlotModal();sellPlayer('${safeName}')"
+          style="width:100%;padding:12px;border-radius:9px;border:1px solid rgba(224,92,92,0.35);background:rgba(224,92,92,0.06);color:var(--danger);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);text-align:left">
+          💸 Vendre — ${fmt(Math.floor(p.value*0.8))}
+        </button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+}
+
+function openBenchPlayerPicker(playerName) {
+  closeSlotModal();
+  const c = G.club;
+  const tactic = TACTICS[c.tactic||'4-3-3'];
+  const lineup = c.lineup||{};
+  const p = (c.players||[]).find(pl=>pl.name===playerName);
+  if (!p) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'slot-picker-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:700;display:flex;align-items:flex-end;justify-content:center';
+
+  const allowed = posGroup(p.pos);
+  const emptySlots = tactic.slots.filter(s =>
+    allowed.includes(s.pos) && (!lineup[s.key] || !(c.players||[]).find(pl=>pl.name===lineup[s.key]))
+  );
+  const safeName = playerName.replace(/'/g,"\\'");
+
+  modal.innerHTML = `
+    <div style="background:var(--bg1);border:1px solid var(--border);border-top:1px solid rgba(212,175,55,0.4);border-radius:16px 16px 0 0;padding:14px 13px 28px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--gold)">${p.nat||''} ${p.name}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">${p.pos} · ${p.rat}/99 · ${fmt(p.value)}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button onclick="closeSlotModal();sellPlayer('${safeName}')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:10px;font-weight:700;cursor:pointer">Vendre</button>
+          <button onclick="closeSlotModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;padding:3px 9px;border-radius:6px">✕</button>
+        </div>
+      </div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Postes libres compatibles (${emptySlots.length})</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${emptySlots.length===0
+          ? `<div style="text-align:center;padding:20px;font-size:11px;color:var(--text3)">Aucun poste compatible libre</div>`
+          : emptySlots.map(s=>{
+              const isNatural = s.pos === p.pos;
+              return `<div onclick="assignToSlot('${s.key}','${safeName}');closeSlotModal()"
+                style="background:var(--bg2);border:1px solid ${isNatural?'rgba(107,124,147,0.4)':'rgba(255,255,255,0.06)'};border-radius:8px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+                <span style="font-size:11px;font-weight:700;color:${isNatural?'var(--mint)':'var(--text1)'}">${s.label}</span>
+                ${isNatural?`<span style="font-family:var(--font-mono);font-size:9px;color:var(--mint)">poste naturel</span>`:''}
+              </div>`;
+            }).join('')}
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+}
+
+function assignToSlot(slotKey, playerName) {
+  if (!G.club.lineup) G.club.lineup = {};
+  // If player is already in another slot, remove them first
+  Object.keys(G.club.lineup).forEach(k => {
+    if (G.club.lineup[k] === playerName) delete G.club.lineup[k];
+  });
+  G.club.lineup[slotKey] = playerName;
+  renderClubSquad();
+}
+
+function removeFromSlot(slotKey) {
+  if (G.club.lineup) delete G.club.lineup[slotKey];
+  document.getElementById('slot-picker-modal')?.remove();
+  renderClubSquad();
+}
+
+// Drag & drop between slots
+function onSlotDragStart(event, slotKey) {
+  _lineupDragSource = {type:'slot', key:slotKey};
+  event.dataTransfer.effectAllowed = 'move';
+}
+function onBenchDragStart(event, playerName) {
+  _lineupDragSource = {type:'bench', name:playerName};
+  event.dataTransfer.effectAllowed = 'move';
+}
+function onSlotDrop(event, targetSlotKey) {
+  event.preventDefault();
+  if (!_lineupDragSource) return;
+  const lineup = G.club.lineup || (G.club.lineup = {});
+  if (_lineupDragSource.type === 'slot') {
+    const srcKey = _lineupDragSource.key;
+    if (srcKey === targetSlotKey) { _lineupDragSource=null; return; }
+    // Swap
+    const tmp = lineup[targetSlotKey];
+    lineup[targetSlotKey] = lineup[srcKey];
+    lineup[srcKey] = tmp || undefined;
+    if (!lineup[srcKey]) delete lineup[srcKey];
+  } else if (_lineupDragSource.type === 'bench') {
+    // Remove from any existing slot
+    Object.keys(lineup).forEach(k => { if(lineup[k]===_lineupDragSource.name) delete lineup[k]; });
+    lineup[targetSlotKey] = _lineupDragSource.name;
+  }
+  _lineupDragSource = null;
+  renderClubSquad();
 }
 
 const TRANSFER_TIER_LABELS = [
@@ -4202,6 +4680,7 @@ function confirmCreateFormationPlayer() {
   const c = G.club;
   if (!c.formationPlayers) c.formationPlayers = [];
   if (c.formationPlayers.length >= 5) { showToast('! Maximum 5 joueurs formés'); return; }
+  if ((c.players||[]).length >= MAX_SQUAD_SIZE) { showToast('! Effectif complet — vendez un joueur d\'abord'); return; }
 
   if (G.money < FORMATION_CREATE_COST) { showBigErrorToast('Fonds insuffisants', fmt(FORMATION_CREATE_COST - G.money) + ' manquant'); return; }
   G.money -= FORMATION_CREATE_COST;
