@@ -3223,11 +3223,11 @@ function autoFillLineup(tacticKey) {
 }
 
 let _lineupDragSource = null;
-let _touchHoldTimer = null;
 let _touchDragging = false;
 let _touchDragEl = null;
-let _touchDragSlot = null;
 let _touchDragGhost = null;
+let _touchStartX = 0;
+let _touchStartY = 0;
 
 function _getTouchSlotAt(x, y) {
   const slots = document.querySelectorAll('.tactic-slot[data-slot]');
@@ -3241,76 +3241,73 @@ function _getTouchSlotAt(x, y) {
 }
 
 function _initTouchDrag() {
-  // Touch drag on pitch slots and bench players
   document.addEventListener('touchstart', function(e) {
     const target = e.target.closest('.tactic-slot.filled, .bench-player');
     if (!target) return;
     const touch = e.touches[0];
+    _touchStartX = touch.clientX;
+    _touchStartY = touch.clientY;
     _touchDragEl = target;
+    _touchDragging = false;
+  }, {passive: true});
 
-    _touchHoldTimer = setTimeout(() => {
+  document.addEventListener('touchmove', function(e) {
+    if (!_touchDragEl) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - _touchStartX;
+    const dy = touch.clientY - _touchStartY;
+
+    // Start dragging after 6px movement
+    if (!_touchDragging && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
       _touchDragging = true;
-      e.preventDefault();
-
-      // Create ghost
-      _touchDragGhost = _touchDragEl.cloneNode(true);
-      _touchDragGhost.style.cssText = `position:fixed;z-index:9999;opacity:0.85;pointer-events:none;transform:translate(-50%,-50%) scale(1.1);transition:none;left:${touch.clientX}px;top:${touch.clientY}px;`;
-      document.body.appendChild(_touchDragGhost);
 
       if (_touchDragEl.classList.contains('tactic-slot')) {
         _lineupDragSource = {type:'slot', key:_touchDragEl.dataset.slot};
       } else {
-        // bench-player has title="Name · pos · rat"
         const titleAttr = _touchDragEl.getAttribute('title') || '';
         const rawName = titleAttr.split(' · ')[0].trim();
         _lineupDragSource = {type:'bench', name: rawName};
       }
-      _touchDragEl.style.opacity = '0.4';
-    }, 200);
-  }, {passive: false});
 
-  document.addEventListener('touchmove', function(e) {
-    clearTimeout(_touchHoldTimer);
+      _touchDragGhost = _touchDragEl.cloneNode(true);
+      _touchDragGhost.style.cssText = `position:fixed;z-index:9999;opacity:0.85;pointer-events:none;transform:translate(-50%,-50%) scale(1.12);transition:none;left:${touch.clientX}px;top:${touch.clientY}px;`;
+      document.body.appendChild(_touchDragGhost);
+      _touchDragEl.style.opacity = '0.35';
+    }
+
     if (!_touchDragging) return;
     e.preventDefault();
-    const touch = e.touches[0];
+
     if (_touchDragGhost) {
       _touchDragGhost.style.left = touch.clientX + 'px';
       _touchDragGhost.style.top = touch.clientY + 'px';
     }
+
     // Highlight target slot
-    document.querySelectorAll('.tactic-slot').forEach(s => s.style.boxShadow = '');
+    document.querySelectorAll('.tactic-slot').forEach(s => s.style.outline = '');
     const slotKey = _getTouchSlotAt(touch.clientX, touch.clientY);
     if (slotKey) {
       const slotEl = document.querySelector(`.tactic-slot[data-slot="${slotKey}"]`);
-      if (slotEl) slotEl.style.boxShadow = '0 0 12px 3px rgba(212,175,55,0.6)';
+      if (slotEl) slotEl.style.outline = '2px solid rgba(212,175,55,0.8)';
     }
   }, {passive: false});
 
   document.addEventListener('touchend', function(e) {
-    clearTimeout(_touchHoldTimer);
     if (_touchDragEl) _touchDragEl.style.opacity = '';
     if (_touchDragGhost) { _touchDragGhost.remove(); _touchDragGhost = null; }
-    document.querySelectorAll('.tactic-slot').forEach(s => s.style.boxShadow = '');
+    document.querySelectorAll('.tactic-slot').forEach(s => s.style.outline = '');
 
-    if (!_touchDragging || !_lineupDragSource) {
-      _touchDragging = false;
-      _touchDragEl = null;
-      _lineupDragSource = null;
-      return;
-    }
-
-    const touch = e.changedTouches[0];
-    const slotKey = _getTouchSlotAt(touch.clientX, touch.clientY);
-    if (slotKey) {
-      onSlotDrop({preventDefault:()=>{}}, slotKey);
-    } else {
-      _lineupDragSource = null;
+    if (_touchDragging && _lineupDragSource) {
+      const touch = e.changedTouches[0];
+      const slotKey = _getTouchSlotAt(touch.clientX, touch.clientY);
+      if (slotKey) onSlotDrop({preventDefault:()=>{}}, slotKey);
+      else _lineupDragSource = null;
     }
 
     _touchDragging = false;
     _touchDragEl = null;
-  }, {passive: false});
+    _lineupDragSource = null;
+  }, {passive: true});
 }
 
 function renderClubSquad() {
@@ -3349,7 +3346,7 @@ function renderClubSquad() {
 
     if (p) {
       const isMidDef = ['DC','DD','DG','MD','MC','MOC'].includes(slot.pos);
-      const shortName = isMidDef ? p.name.split(' ').slice(-1)[0] : p.name.split(' ').slice(-1)[0];
+      const displayName = isMidDef ? p.name.split(' ').slice(-1)[0] : p.name;
       slotsHtml += `
         <div class="tactic-slot filled" data-slot="${slot.key}" data-player="${p.name}"
           style="left:${x}px;top:${y}px"
@@ -3359,7 +3356,7 @@ function renderClubSquad() {
           ondrop="onSlotDrop(event,'${slot.key}')"
           onclick="openPlayerMenu('${slot.key}','${p.name.replace(/'/g,"&apos;")}')">
           <div class="tactic-avatar ${rc}">${p.nat||'🌍'}</div>
-          <div class="tactic-name">${p.name}</div>
+          <div class="tactic-name">${displayName}</div>
           <div class="tactic-rat">${p.rat}</div>
         </div>`;
     } else {
