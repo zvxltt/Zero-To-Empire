@@ -1302,7 +1302,7 @@ const CHAMPIONSHIP_TIERS = [
       {name:'AS Cherbourg',      ovr:33},
       {name:'US Quevilly',       ovr:29},
       {name:'Stade Briochin',    ovr:31},
-      {name:'FC Nangis',          ovr:26},
+      {name:'FC Rouen',          ovr:26},
     ]
   },
   {
@@ -1364,7 +1364,7 @@ const CHAMPIONSHIP_TIERS = [
       {name:'FC Nantes',         ovr:69},
       {name:'RC Lens',    ovr:74},
       {name:'RC Strasbourg',     ovr:71},
-      {name:'Bordeaux',          ovr:68},
+      {name:'Bordeauc',          ovr:68},
       {name:'Stade Rennais',     ovr:73},
       {name:'OGC Nice',          ovr:72},
     ]
@@ -1536,6 +1536,7 @@ function defaultState() {
       bilan:{ w:0, d:0, l:0, gf:0, ga:0, totalRevenue:0 },
       moral:50, sponsorLevel:0, sponsorIncome:0,
       prestige:0,
+      formationPlayers:[],
       // Ranked system
       ranked: {
         tierId: 'inconnu',
@@ -1576,6 +1577,7 @@ function loadGame() {
       const merged = {...base, ...saved};
       merged.club = {...base.club, ...(saved.club||{})};
       merged.club.ranked = {...base.club.ranked, ...(saved.club?.ranked||{})};
+      merged.club.formationPlayers = saved.club?.formationPlayers || [];
       merged.crypto = {...base.crypto, ...(saved.crypto||{})};
       merged.crypto.holdings = merged.crypto.holdings||{};
       merged.crypto.prices = merged.crypto.prices||{};
@@ -1821,7 +1823,7 @@ function upgradeSponsor() {
 function getIncome() {
   const biz = BUSINESSES.reduce((s,b) => s + getBizIncome(b), 0);
   const biznessInc = BIZNESS.reduce((s,b) => s + getBiznessIncome(b), 0);
-  return biz + getClubIncome() + (G._revBonus || 0) * G.prestigeMult + biznessInc;
+  return biz + getClubIncome() + (G._revBonus || 0) * G.prestigeMult + biznessInc + getFormationIncome();
 }
 
 function getClickValue() {
@@ -1975,6 +1977,11 @@ function sellPlayer(name) {
   const p = G.club.players[idx];
   G.money += Math.floor(p.value*0.8);
   G.club.players.splice(idx,1);
+  // If this was a formation player, remove from formationPlayers too
+  if (p.isFormation) {
+    const fIdx = G.club.formationPlayers.findIndex(fp=>fp.id===p.id);
+    if (fIdx>=0) G.club.formationPlayers.splice(fIdx,1);
+  }
   showToast('→ '+p.name+' vendu pour '+fmt(Math.floor(p.value*0.8)));
   renderClubAll(); updateUI();
 }
@@ -2787,7 +2794,7 @@ function renderClubRankedFull() {
     const isRankChamp = isChampCorrespondingToRank(ct.id, r.tierIdx);
     const borderCol = isRankChamp ? 'rgba(212,175,55,0.4)' : 'var(--border)';
     const btnCol = isRankChamp ? 'var(--gold)' : 'var(--mint)';
-    const rankBadge = isRankChamp ? '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px">Argent requis : ' + fmt(ct.minMoney) + '</div>' : '';
+    const rankBadge = isRankChamp ? '<div style="font-family:var(--font-mono);font-size:9px;color:var(--gold);margin-top:2px">⭐ Championnat de votre rang</div>' : '';
     const teamsHtml = ct.teams.slice(0,4).map(t => '<span style="font-size:9px;background:var(--bg3);border-radius:4px;padding:2px 7px;font-family:var(--font-mono);color:var(--text2)">' + t.name + '</span>').join('');
     const moreHtml = ct.teams.length > 4 ? '<span style="font-size:9px;color:var(--text3);padding:2px 5px">+' + (ct.teams.length-4) + '…</span>' : '';
     const disabled = (c.players.length < 11 || (c.season && c.activeChampsId)) ? 'disabled' : '';
@@ -2966,6 +2973,65 @@ function renderClubOverview() {
   const c = G.club;
   const ovr = getClubOverall();
   const incomePerSec = getClubIncome();
+  const formationIncome = getFormationIncome();
+  const fps = c.formationPlayers || [];
+  const canCreate = fps.length < 5;
+
+  let formHtml = '';
+
+  // Creation button
+  if (canCreate) {
+    formHtml += `<button onclick="openFormationCreate()" style="width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(212,175,55,0.4);background:rgba(212,175,55,0.04);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);margin-bottom:8px;transition:background .2s">+ Créer un joueur (${fps.length}/5)</button>`;
+  } else {
+    formHtml += `<div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-bottom:8px;text-align:center">5/5 joueurs créés — effectif de formation complet</div>`;
+  }
+
+  // Each formed player card
+  fps.forEach((p, idx) => {
+    const upgrades = getFormationUpgrades(idx);
+    const bought = p.upgrades || {};
+    const totalBought = Object.keys(bought).length;
+    const income = getFormationPlayerIncome(p);
+    const ratingClass = p.rat>=85?'elite':p.rat>=70?'good':p.rat>=55?'avg':'rare';
+    const nextUpg = upgrades.find(u => !bought[u.id]);
+    const isMaxed = !nextUpg;
+    const canBuy = nextUpg && G.money >= nextUpg.cost;
+
+    formHtml += `<div style="background:var(--bg3);border:1px solid ${isMaxed?'rgba(212,175,55,0.6)':'rgba(212,175,55,0.35)'};border-radius:10px;padding:11px;margin-bottom:7px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1.5px solid rgba(107,124,147,0.35);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${p.nat||'🌍'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:800">${p.prenom} ${p.nom}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:1px">${p.pos} · ${totalBought}/${upgrades.length} améliorations</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <span class="p-rating ${ratingClass}">${p.rat}</span>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--mint);margin-top:3px">+${fmt(income)}/s</div>
+        </div>
+      </div>
+      <div style="height:2px;background:var(--bg4);border-radius:2px;margin-bottom:9px;overflow:hidden">
+        <div style="height:100%;width:${Math.round(totalBought/upgrades.length*100)}%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width .5s"></div>
+      </div>
+      ${isMaxed
+        ? `<div style="text-align:center;padding:10px 0 4px;font-size:11px;font-weight:700;color:var(--gold)">Joueur au maximum !</div>`
+        : `<div style="background:var(--bg2);border:1px solid ${canBuy?'rgba(107,124,147,0.4)':'rgba(255,255,255,0.06)'};border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:10px;font-weight:700;color:var(--text1);margin-bottom:2px">${nextUpg.name}</div>
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--mint)">${nextUpg.desc}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-family:var(--font-mono);font-size:10px;color:${canBuy?'var(--gold-light)':'var(--text3)'};margin-bottom:4px">${fmt(nextUpg.cost)}</div>
+              <button onclick="buyFormationUpgrade(${idx},'${nextUpg.id}')" style="padding:5px 12px;border-radius:6px;border:1px solid ${canBuy?'var(--mint)':'#2d3e50'};background:${canBuy?'rgba(107,124,147,0.15)':'transparent'};color:${canBuy?'var(--mint)':'#4a5f72'};font-size:9px;font-weight:700;cursor:${canBuy?'pointer':'not-allowed'};font-family:var(--font-head)" ${canBuy?'':'disabled'}>${canBuy?'Améliorer':'Insuffisant'}</button>
+            </div>
+          </div>`
+      }
+    </div>`;
+  });
+
+  if (fps.length === 0) {
+    formHtml += `<div style="text-align:center;padding:18px 20px;color:var(--text3);font-size:11px;font-family:var(--font-mono)">Aucun joueur formé — créez votre premier talent !</div>`;
+  }
+
   panel.innerHTML = `
     <div class="club-header">
       <div class="club-badge-display" style="background:radial-gradient(circle,var(--bg3),var(--bg1))">${getIcon(c.badge||'⚽','28px')}</div>
@@ -2987,33 +3053,11 @@ function renderClubOverview() {
     <div class="section-title">Plan Financier</div>
     <div class="finance-grid">
       <div class="fin-card income"><div class="f-label">Revenus club / sec</div><div class="f-amount">${fmt(incomePerSec)}/s</div></div>
-
       <div class="fin-card income"><div class="f-label">Revenu matchs total</div><div class="f-amount">${fmt(c.bilan?.totalRevenue||0)}</div></div>
-      <div class="fin-card neutral full"><div class="f-label">Bonus moral (${c.moral||50}/100)</div><div class="f-amount" style="color:${getMoralLabel(c.moral||50).col}">${getMoralLabel(c.moral||50).txt} — ×${(1+((c.moral||50)/100)*0.5).toFixed(2)}</div></div>
+      ${formationIncome>0?`<div class="fin-card income full"><div class="f-label">🏫 Formation / sec</div><div class="f-amount" style="color:var(--gold)">+${fmt(formationIncome)}/s</div></div>`:''}
     </div>
-    ${c.sponsorLevel>0?`<div class="finance-grid" style="margin-top:6px">
-      <div class="fin-card income full"><div class="f-label">Sponsor actif — ${['','Local','Régional','National','International','Mondial','Premium','Méga-Tech','Légendaire'][c.sponsorLevel]||''}</div><div class="f-amount">+${fmt(c.sponsorIncome||0)}/s</div></div>
-    </div>`:''}
-    <div style="display:flex;gap:6px;margin-top:6px">
-      <button onclick="boostMoral()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(107,124,147,0.3);background:transparent;color:var(--mint);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">★ Booster moral</button>
-      <button onclick="upgradeSponsor()" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(212,175,55,0.3);background:transparent;color:var(--gold);font-size:10px;cursor:pointer;font-family:var(--font-head);font-weight:700">${(c.sponsorLevel||0)>=8?'★ Sponsor MAX':'★ Sponsor ('+fmt([500000,5000000,50000000,500000000,5000000000,25000000000,100000000000,5e11][(c.sponsorLevel||0)]||500000)+')'}</button>
-    </div>
-    <div class="section-title">Améliorations du club</div>
-    <div class="upgrade-list">
-      ${CLUB_UPGRADES_DEF.slice().sort((a,b)=>a.cost-b.cost).map(u=>`
-        <div class="upgrade-item${c.upgrades[u.id]?' done':''}">
-          <div>
-            <div class="up-name">${c.upgrades[u.id]?'✓ ':'' }${u.name}</div>
-            <div class="up-desc">${u.desc}</div>
-          </div>
-          <div style="text-align:right">
-            <div class="upgrade-cost">${c.upgrades[u.id]?'Actif':fmt(u.cost)}</div>
-            <button class="upgrade-btn" onclick="buyClubUpgrade('${u.id}')" ${c.upgrades[u.id]?'disabled':''}>
-              ${c.upgrades[u.id]?'✓':'Acheter'}
-            </button>
-          </div>
-        </div>`).join('')}
-    </div>`;
+    <div class="section-title" style="margin-top:6px">Centre de Formation</div>
+    ${formHtml}`;
 }
 
 function renderClubSquad() {
@@ -3994,6 +4038,231 @@ function renderCollection() {
   if (!el) return;
 }
 
+// ══════════════════════════════════════════════
+// CENTRE DE FORMATION
+// ══════════════════════════════════════════════
+
+const FORMATION_POSTES = ['GB','DD','DC','DG','MD','MC','MOC','AG','AD','AT'];
+const FORMATION_NATIONALITES = [
+  {label:'🇫🇷 France', val:'🇫🇷'},
+  {label:'🇧🇷 Brésil', val:'🇧🇷'},
+  {label:'🇦🇷 Argentine', val:'🇦🇷'},
+  {label:'🇩🇪 Allemagne', val:'🇩🇪'},
+  {label:'🇪🇸 Espagne', val:'🇪🇸'},
+  {label:'🇮🇹 Italie', val:'🇮🇹'},
+  {label:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre', val:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
+  {label:'🇵🇹 Portugal', val:'🇵🇹'},
+  {label:'🇳🇱 Pays-Bas', val:'🇳🇱'},
+  {label:'🇧🇪 Belgique', val:'🇧🇪'},
+  {label:'🇺🇾 Uruguay', val:'🇺🇾'},
+  {label:'🇨🇴 Colombie', val:'🇨🇴'},
+  {label:'🇨🇱 Chili', val:'🇨🇱'},
+  {label:'🇲🇽 Mexique', val:'🇲🇽'},
+  {label:'🇯🇵 Japon', val:'🇯🇵'},
+  {label:'🇰🇷 Corée du Sud', val:'🇰🇷'},
+  {label:'🇸🇳 Sénégal', val:'🇸🇳'},
+  {label:'🇲🇦 Maroc', val:'🇲🇦'},
+  {label:'🇳🇬 Nigeria', val:'🇳🇬'},
+  {label:'🇬🇭 Ghana', val:'🇬🇭'},
+  {label:'🇺🇦 Ukraine', val:'🇺🇦'},
+  {label:'🇷🇸 Serbie', val:'🇷🇸'},
+  {label:'🇭🇷 Croatie', val:'🇭🇷'},
+  {label:'🇵🇱 Pologne', val:'🇵🇱'},
+  {label:'🇸🇪 Suède', val:'🇸🇪'},
+  {label:'🇩🇰 Danemark', val:'🇩🇰'},
+  {label:'🇨🇿 Tchéquie', val:'🇨🇿'},
+  {label:'🇦🇹 Autriche', val:'🇦🇹'},
+  {label:'🇨🇭 Suisse', val:'🇨🇭'},
+  {label:'🇺🇸 États-Unis', val:'🇺🇸'},
+];
+
+// Coût de création d'un joueur
+const FORMATION_CREATE_COST = 10000;
+
+// Référence de prix marché pour calibrer les upgrades de formation.
+// On prend la valeur médiane par tier pour avoir une échelle cohérente.
+// Tier 1 ~8k, Tier 2 ~120k, Tier 3 ~10M, Tier 4 ~18M, Tier 5 ~30M,
+// Tier 6 ~55M, Tier 7 ~3B, Tier 8 ~20B, Tier 9 ~200B, Tier 10 ~1T
+// Les améliorations de formation couvrent la montée de 43→99 sur 15 paliers,
+// avec des prix calqués sur ces valeurs marché (×0.05 du prix d'un joueur du tier correspondant).
+const FORMATION_UPGRADES = [
+  {id:'u01', name:'Premiers pas',            desc:'+2 en général', ratBonus:2,  cost:1100},
+  {id:'u02', name:'Entraînement de base',    desc:'+2 en général', ratBonus:2,  cost:2000},
+  {id:'u03', name:'Routine physique',        desc:'+3 en général', ratBonus:3,  cost:3000},
+  {id:'u04', name:'Coaching individuel',     desc:'+3 en général', ratBonus:3,  cost:4000},
+  {id:'u05', name:'Stage technique',         desc:'+4 en général', ratBonus:4,  cost:5000},
+  {id:'u06', name:'Prépa physique avancée',  desc:'+3 en général', ratBonus:3,  cost:290000},
+  {id:'u07', name:'Analyse vidéo',           desc:'+4 en général', ratBonus:4,  cost:390000},
+  {id:'u08', name:'Programme élite',         desc:'+4 en général', ratBonus:4,  cost:800000},
+  {id:'u09', name:'Académie internationale', desc:'+5 en général', ratBonus:5,  cost:400000},
+  {id:'u10', name:'Suivi médical premium',   desc:'+4 en général', ratBonus:4,  cost:700000},
+  {id:'u11', name:'Prépa mentale',           desc:'+5 en général', ratBonus:5,  cost:1200000},
+  {id:'u12', name:'Entraîneur star',         desc:'+5 en général', ratBonus:5,  cost:146200000},
+  {id:'u13', name:'Centre de haute perf.',   desc:'+4 en général', ratBonus:4,  cost:150000000},
+  {id:'u14', name:'Nutrition scientifique',  desc:'+4 en général', ratBonus:4,  cost:40000000000},
+  {id:'u15', name:'Formation ultime',        desc:'+5 en général', ratBonus:5,  cost:9960000000000},
+];
+// Note max théorique : 43 + 2+2+3+3+4+3+4+4+5+4+5+5+4+4+5 = 43+57 = 100 → plafonné à 99
+
+// Vérifie que le nom complet n'existe pas déjà dans PLAYERS_POOL
+function isFormationNameValid(prenom, nom) {
+  const fullName = (prenom + ' ' + nom).trim().toLowerCase();
+  return !PLAYERS_POOL.some(p => p.name.toLowerCase() === fullName);
+}
+
+function getFormationUpgrades(playerIdx) {
+  return FORMATION_UPGRADES;
+}
+
+function checkFormationName() {
+  const prenom = (document.getElementById('fc-prenom')?.value||'').trim();
+  const nom = (document.getElementById('fc-nom')?.value||'').trim();
+  const warn = document.getElementById('fc-name-warning');
+  if (!warn) return;
+  if (prenom && nom && !isFormationNameValid(prenom, nom)) {
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+}
+
+function getFormationPlayerIncome(p) {
+  const rat = p.rat || 43;
+  // Revenu croissant exponentiellement avec la note
+  return Math.floor(Math.pow(rat - 40, 2.5) * 12 * (G.prestigeMult||1));
+}
+
+function getFormationIncome() {
+  if (!G.clubUnlocked) return 0;
+  const fps = G.club.formationPlayers || [];
+  return fps.reduce((s, p) => s + getFormationPlayerIncome(p), 0);
+}
+
+function openFormationCreate() {
+  const existing = document.getElementById('formation-create-modal');
+  if (existing) { existing.remove(); return; }
+
+  const c = G.club;
+  if ((c.formationPlayers||[]).length >= 5) { showToast('! Maximum 5 joueurs formés'); return; }
+
+  const modal = document.createElement('div');
+  modal.id = 'formation-create-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:600;display:flex;align-items:flex-end;justify-content:center;padding:0';
+
+  const posOptions = FORMATION_POSTES.map(p=>`<option value="${p}">${p}</option>`).join('');
+  const natOptions = FORMATION_NATIONALITES.map(n=>`<option value="${n.val}">${n.label}</option>`).join('');
+
+  modal.innerHTML = `
+    <div style="background:var(--bg1);border:1px solid var(--border);border-top:1px solid rgba(212,175,55,0.4);border-radius:16px 16px 0 0;padding:16px 14px 32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:2px;text-transform:uppercase">🏫 Nouveau joueur</div>
+        <button onclick="document.getElementById('formation-create-modal').remove()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;padding:3px 9px;border-radius:6px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600">Prénom</div>
+          <input id="fc-prenom" class="modal-input" placeholder="Ex: Lucas" maxlength="18" style="margin-bottom:0" oninput="checkFormationName()">
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600">Nom</div>
+          <input id="fc-nom" class="modal-input" placeholder="Ex: Dupont" maxlength="20" style="margin-bottom:0" oninput="checkFormationName()">
+        </div>
+        <div id="fc-name-warning" style="display:none;background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.35);border-radius:7px;padding:8px 10px;font-family:var(--font-mono);font-size:9px;color:var(--danger)">⚠ Ce nom existe déjà sur le marché des transferts — modifiez le prénom ou le nom.</div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600">Poste</div>
+          <select id="fc-poste" class="modal-input" style="margin-bottom:0">${posOptions}</select>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600">Nationalité</div>
+          <select id="fc-nat" class="modal-input" style="margin-bottom:0">${natOptions}</select>
+        </div>
+        <div style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:10px;font-family:var(--font-mono);font-size:10px;color:var(--text3);line-height:1.6">
+          Le joueur démarre à <span style="color:var(--gold)">43–45</span>. Améliorez-le progressivement via le centre de formation pour monter sa note et augmenter ses revenus passifs.
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;color:var(--text2)">Coût de création</div>
+          <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:${G.money>=FORMATION_CREATE_COST?'var(--gold)':'var(--danger)'}">${fmt(FORMATION_CREATE_COST)}</div>
+        </div>
+        <button onclick="confirmCreateFormationPlayer()" style="width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--gold);background:rgba(212,175,55,0.08);color:var(--gold);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px;margin-top:2px">★ Créer le joueur</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+function confirmCreateFormationPlayer() {
+  const prenom = (document.getElementById('fc-prenom')?.value||'').trim();
+  const nom = (document.getElementById('fc-nom')?.value||'').trim();
+  const pos = document.getElementById('fc-poste')?.value || 'AT';
+  const nat = document.getElementById('fc-nat')?.value || '🇫🇷';
+
+  if (!prenom || !nom) { showToast('! Entrez un prénom et un nom'); return; }
+  if (!isFormationNameValid(prenom, nom)) { showToast('! Ce nom existe déjà sur le marché des transferts'); return; }
+  const c = G.club;
+  if (!c.formationPlayers) c.formationPlayers = [];
+  if (c.formationPlayers.length >= 5) { showToast('! Maximum 5 joueurs formés'); return; }
+
+  if (G.money < FORMATION_CREATE_COST) { showBigErrorToast('Fonds insuffisants', fmt(FORMATION_CREATE_COST - G.money) + ' manquant'); return; }
+  G.money -= FORMATION_CREATE_COST;
+
+  // Note de départ aléatoire entre 43 et 45
+  const baseRat = 43 + Math.floor(Math.random() * 3);
+
+  const newPlayer = {
+    id: 'form_' + Date.now(),
+    prenom, nom,
+    name: prenom + ' ' + nom,
+    pos, nat,
+    rat: baseRat,
+    upgrades: {},
+    value: FORMATION_CREATE_COST,
+    salary: 0,
+    isFormation: true,
+  };
+
+  c.formationPlayers.push(newPlayer);
+  // Also add to main squad
+  if (!c.players) c.players = [];
+  if (c.players.length < MAX_SQUAD_SIZE) {
+    c.players.push({...newPlayer});
+  }
+
+  document.getElementById('formation-create-modal')?.remove();
+  showToast(`★ ${prenom} ${nom} créé ! Note de départ : ${baseRat}`);
+  flashMilestone();
+  renderClubAll();
+  updateUI();
+}
+
+function buyFormationUpgrade(playerIdx, upgId) {
+  const c = G.club;
+  const fp = c.formationPlayers?.[playerIdx];
+  if (!fp) return;
+  // Only allow buying upgrades in order
+  const upgrades = FORMATION_UPGRADES;
+  const bought = fp.upgrades || {};
+  // Find next upgrade to buy
+  const nextUpg = upgrades.find(u => !bought[u.id]);
+  if (!nextUpg || nextUpg.id !== upgId) { showToast('! Achetez les améliorations dans l\'ordre'); return; }
+  if (G.money < nextUpg.cost) { showBigErrorToast('Fonds insuffisants', fmt(nextUpg.cost - G.money) + ' manquant'); return; }
+  G.money -= nextUpg.cost;
+  if (!fp.upgrades) fp.upgrades = {};
+  fp.upgrades[upgId] = true;
+  fp.rat = Math.min(99, (fp.rat || 43) + nextUpg.ratBonus);
+
+  // Also update in main squad
+  const mainIdx = c.players.findIndex(p => p.id === fp.id);
+  if (mainIdx >= 0) {
+    c.players[mainIdx].rat = fp.rat;
+    c.players[mainIdx].upgrades = fp.upgrades;
+  }
+
+  showToast(`✓ ${nextUpg.name} — ${fp.prenom} ${fp.nom} : ${fp.rat}/99`);
+  renderClubAll();
+  updateUI();
+}
+
 setInterval(()=>{ tick(); updateUI(); }, 100);
 setInterval(saveGame, 15000);
 
@@ -4106,16 +4375,6 @@ function cnpSell() {
     </div>
   </div>
 </div>
-  
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Le jeu est prêt pour le mode hors-ligne !'))
-        .catch(err => console.log('Erreur de service worker', err));
-    });
-  }
-</script>
 
 </body>
 </html>
