@@ -71,6 +71,51 @@ html,body{color-scheme:dark;-webkit-text-size-adjust:100%;}
   --danger:#fb7185;--success:#a5f3fc;
   --border:rgba(249,168,212,0.25);
 }
+/* ── Thème Océan ── */
+:root.theme-ocean{
+  --gold:#38bdf8;--gold-light:#7dd3fc;--gold-dim:#0369a1;
+  --mint:#0ea5e9;--mint-dark:#0284c7;
+  --bg0:#030d18;--bg1:#061525;--bg2:#0c1f33;--bg3:#122840;--bg4:#1a334f;
+  --text1:#e0f2fe;--text2:#7dd3fc;--text3:#2563a0;
+  --danger:#f87171;--success:#34d399;
+  --border:rgba(56,189,248,0.22);
+}
+/* ── Thème Forêt ── */
+:root.theme-forest{
+  --gold:#4ade80;--gold-light:#86efac;--gold-dim:#166534;
+  --mint:#22c55e;--mint-dark:#16a34a;
+  --bg0:#020f07;--bg1:#0a1a0f;--bg2:#0d2214;--bg3:#132b1a;--bg4:#1a3522;
+  --text1:#dcfce7;--text2:#86efac;--text3:#2d6a3f;
+  --danger:#f87171;--success:#34d399;
+  --border:rgba(74,222,128,0.2);
+}
+/* ── Thème Coucher de Soleil ── */
+:root.theme-sunset{
+  --gold:#fb923c;--gold-light:#fbbf24;--gold-dim:#9a3412;
+  --mint:#f97316;--mint-dark:#ea580c;
+  --bg0:#100805;--bg1:#1a0d08;--bg2:#22100c;--bg3:#2c1510;--bg4:#361a14;
+  --text1:#fff7ed;--text2:#fcd34d;--text3:#7c3d14;
+  --danger:#f43f5e;--success:#fbbf24;
+  --border:rgba(251,146,60,0.25);
+}
+/* ── Thème Néon ── */
+:root.theme-neon{
+  --gold:#e879f9;--gold-light:#f0abfc;--gold-dim:#7e22ce;
+  --mint:#22d3ee;--mint-dark:#06b6d4;
+  --bg0:#04040d;--bg1:#080814;--bg2:#0d0d1e;--bg3:#121226;--bg4:#17172e;
+  --text1:#fae8ff;--text2:#c084fc;--text3:#5b21b6;
+  --danger:#f43f5e;--success:#22d3ee;
+  --border:rgba(232,121,249,0.25);
+}
+/* ── Thème Rouge ── */
+:root.theme-rouge{
+  --gold:#f43f5e;--gold-light:#fda4af;--gold-dim:#881337;
+  --mint:#e11d48;--mint-dark:#be123c;
+  --bg0:#0d0205;--bg1:#140808;--bg2:#1c0b0b;--bg3:#240e0e;--bg4:#2c1212;
+  --text1:#fff1f2;--text2:#fda4af;--text3:#6b1d2a;
+  --danger:#fb923c;--success:#34d399;
+  --border:rgba(244,63,94,0.22);
+}
 /* Theme switcher UI */
 .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
 .theme-swatch{border-radius:10px;padding:10px 6px;border:2px solid transparent;cursor:pointer;text-align:center;transition:border .15s,transform .1s;position:relative;}
@@ -462,7 +507,15 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 /* SVG Icons */
 .svg-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .biz-icon .svg-icon,.upg-icon .svg-icon,.crypto-icon .svg-icon{width:20px;height:20px;}
-/* Theme-aware overrides for elements with hardcoded gradients */
+/* ── Thème Cosmos ── */
+:root.theme-cosmos{
+  --gold:#818cf8;--gold-light:#c7d2fe;--gold-dim:#3730a3;
+  --mint:#6366f1;--mint-dark:#4f46e5;
+  --bg0:#02020e;--bg1:#05051a;--bg2:#080826;--bg3:#0c0c32;--bg4:#10103e;
+  --text1:#eef2ff;--text2:#a5b4fc;--text3:#3730a3;
+  --danger:#f87171;--success:#34d399;
+  --border:rgba(129,140,248,0.22);
+} for elements with hardcoded gradients */
 :root.theme-girly #main-btn,
 :root.theme-pastel #main-btn {
   border-color: var(--gold) !important;
@@ -645,7 +698,6 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
 <div class="club-tabs" style="margin-bottom:12px">
   <button class="club-tab active" onclick="switchSettingsTab('general',this)">Général</button>
   <button class="club-tab" onclick="switchSettingsTab('theme',this)">Thème</button>
-  <button class="club-tab" onclick="switchSettingsTab('stats',this)">Stats</button>
   <button class="club-tab" onclick="switchSettingsTab('admin',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="11" height="11" style="margin-right:3px;vertical-align:middle"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Admin</button>
 </div>
 
@@ -674,58 +726,8 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
     <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:4px">Efface toute progression. Action irréversible.</p>
     <button class="action-btn danger" onclick="hardReset()">✗ Hard Reset — Tout effacer</button>
   </div>
-</div>
-
-<!-- Stats -->
-
-<div id="settings-theme" class="club-subpanel">
   <div class="settings-group">
-    <h3>Thème de l'interface</h3>
-    <p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5">Personnalise les couleurs du jeu à ton goût.</p>
-    <div class="theme-grid">
-
-      <!-- Défaut -->
-      <div class="theme-swatch active" id="swatch-default" onclick="applyTheme('default')">
-        <div class="sw-preview" style="background:#161d25">
-          <div class="sw-dot" style="background:var(--gold)"></div>
-          <div class="sw-dot" style="background:#6B7C93"></div>
-          <div class="sw-dot" style="background:#e8cc5a"></div>
-        </div>
-        <div class="sw-label">Défaut</div>
-        <span class="sw-check">✓</span>
-      </div>
-
-      <!-- Girly -->
-      <div class="theme-swatch" id="swatch-girly" onclick="applyTheme('girly')">
-        <div class="sw-preview" style="background:#2c1636">
-          <div class="sw-dot" style="background:#e8609a"></div>
-          <div class="sw-dot" style="background:#c084fc"></div>
-          <div class="sw-dot" style="background:#f48fbf"></div>
-        </div>
-        <div class="sw-label">Girly</div>
-        <span class="sw-check">✓</span>
-      </div>
-
-      <!-- Pastel -->
-      <div class="theme-swatch" id="swatch-pastel" onclick="applyTheme('pastel')">
-        <div class="sw-preview" style="background:#232840">
-          <div class="sw-dot" style="background:#f9a8d4"></div>
-          <div class="sw-dot" style="background:#a5f3fc"></div>
-          <div class="sw-dot" style="background:#fce7f3"></div>
-        </div>
-        <div class="sw-label">Pastel</div>
-        <span class="sw-check">✓</span>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- Stats -->
-
-<div id="settings-stats" class="club-subpanel">
-  <div class="settings-group">
-    <h3>Statistiques de session</h3>
+    <h3>Statistiques</h3>
     <div class="setting-row"><span class="s-key">Clics totaux</span><span class="s-val" id="s-clicks">0</span></div>
     <div class="setting-row"><span class="s-key">Niveau prestige</span><span class="s-val" id="s-prest">0</span></div>
     <div class="setting-row"><span class="s-key">Rang le plus élevé atteint</span><span class="s-val" id="s-maxrank">Inconnu — Bas</span></div>
@@ -734,6 +736,115 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
     <div class="setting-row"><span class="s-key">Revenus cumulés</span><span class="s-val" id="s-total">0 €</span></div>
     <div class="setting-row"><span class="s-key">Temps de jeu</span><span class="s-val" id="s-playtime">0h 0m</span></div>
   </div>
+</div>
+
+<!-- Stats (hidden, kept for JS compat) -->
+<div id="settings-stats" class="club-subpanel" style="display:none!important"></div>
+
+<!-- Thème -->
+
+<div id="settings-theme" class="club-subpanel">
+  <div class="settings-group">
+    <h3>Thème de l'interface</h3>
+    <p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5">Personnalise les couleurs du jeu à ton goût.</p>
+    <div class="theme-grid">
+
+      <div class="theme-swatch active" id="swatch-default" onclick="applyTheme('default')">
+        <div class="sw-preview" style="background:#0f151b">
+          <div class="sw-dot" style="background:#D4AF37"></div>
+          <div class="sw-dot" style="background:#6B7C93"></div>
+          <div class="sw-dot" style="background:#e8cc5a"></div>
+        </div>
+        <div class="sw-label">Défaut</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-girly" onclick="applyTheme('girly')">
+        <div class="sw-preview" style="background:#22102a">
+          <div class="sw-dot" style="background:#d4688a"></div>
+          <div class="sw-dot" style="background:#a855c8"></div>
+          <div class="sw-dot" style="background:#e8a0bb"></div>
+        </div>
+        <div class="sw-label">Girly</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-pastel" onclick="applyTheme('pastel')">
+        <div class="sw-preview" style="background:#1a1f35">
+          <div class="sw-dot" style="background:#f9a8d4"></div>
+          <div class="sw-dot" style="background:#a5f3fc"></div>
+          <div class="sw-dot" style="background:#fce7f3"></div>
+        </div>
+        <div class="sw-label">Pastel</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-ocean" onclick="applyTheme('ocean')">
+        <div class="sw-preview" style="background:#061525">
+          <div class="sw-dot" style="background:#38bdf8"></div>
+          <div class="sw-dot" style="background:#0ea5e9"></div>
+          <div class="sw-dot" style="background:#7dd3fc"></div>
+        </div>
+        <div class="sw-label">Océan</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-forest" onclick="applyTheme('forest')">
+        <div class="sw-preview" style="background:#0a1a0f">
+          <div class="sw-dot" style="background:#4ade80"></div>
+          <div class="sw-dot" style="background:#22c55e"></div>
+          <div class="sw-dot" style="background:#86efac"></div>
+        </div>
+        <div class="sw-label">Forêt</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-sunset" onclick="applyTheme('sunset')">
+        <div class="sw-preview" style="background:#1a0d08">
+          <div class="sw-dot" style="background:#fb923c"></div>
+          <div class="sw-dot" style="background:#f97316"></div>
+          <div class="sw-dot" style="background:#fbbf24"></div>
+        </div>
+        <div class="sw-label">Coucher</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-neon" onclick="applyTheme('neon')">
+        <div class="sw-preview" style="background:#080814">
+          <div class="sw-dot" style="background:#e879f9"></div>
+          <div class="sw-dot" style="background:#a855f7"></div>
+          <div class="sw-dot" style="background:#22d3ee"></div>
+        </div>
+        <div class="sw-label">Néon</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-rouge" onclick="applyTheme('rouge')">
+        <div class="sw-preview" style="background:#140808">
+          <div class="sw-dot" style="background:#f43f5e"></div>
+          <div class="sw-dot" style="background:#e11d48"></div>
+          <div class="sw-dot" style="background:#fda4af"></div>
+        </div>
+        <div class="sw-label">Rouge</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+      <div class="theme-swatch" id="swatch-cosmos" onclick="applyTheme('cosmos')">
+        <div class="sw-preview" style="background:#05051a">
+          <div class="sw-dot" style="background:#818cf8"></div>
+          <div class="sw-dot" style="background:#6366f1"></div>
+          <div class="sw-dot" style="background:#c7d2fe"></div>
+        </div>
+        <div class="sw-label">Cosmos</div>
+        <span class="sw-check">✓</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Stats old (hidden) -->
+<div style="display:none">
 </div>
 
 <!-- Admin Code -->
@@ -1077,21 +1188,21 @@ function getIcon(emoji, size='18px') {
 // DATA — BUSINESSES (expanded)
 // ══════════════════════════════════════════════
 const BUSINESSES = [
-  // Tier 1 — Micro-services  (ratio 0.40%/s → ROI ~4min10s)
-  {id:'journal',    name:'Vente de journaux',         icon:'📰', tier:1, baseCost:10,          baseIncome:0.040},
-  {id:'lavage',     name:'Lavage de voitures',        icon:'🚗', tier:1, baseCost:100,         baseIncome:0.40},
-  {id:'coiffeur',   name:'Salon de coiffure',         icon:'✂️', tier:1, baseCost:350,         baseIncome:1.40},
-  {id:'food',       name:'Food truck',                icon:'🍔', tier:1, baseCost:1200,        baseIncome:4.80},
-  // Tier 2 — Commerce  (ratio 0.45%/s → ROI ~3min42s)
-  {id:'boulangerie',name:'Boulangerie',               icon:'🥖', tier:2, baseCost:8000,        baseIncome:36},
-  {id:'boutique',   name:'Boutique mode',             icon:'👗', tier:2, baseCost:35000,       baseIncome:157.5},
-  {id:'supermarche',name:'Supermarché',               icon:'🛒', tier:2, baseCost:180000,      baseIncome:810},
-  {id:'hotel',      name:'Hôtel 3 étoiles',           icon:'🏨', tier:2, baseCost:600000,      baseIncome:2700},
-  // Tier 3 — Industrie  (ratio 0.50%/s → ROI ~3min20s)
-  {id:'pharma',     name:'Pharmacie',                 icon:'💊', tier:3, baseCost:2500000,     baseIncome:12500},
-  {id:'usine',      name:'Usine manufacturière',      icon:'🏭', tier:3, baseCost:8000000,     baseIncome:40000},
-  {id:'logistique', name:'Réseau logistique',         icon:'🚚', tier:3, baseCost:30000000,    baseIncome:150000},
-  {id:'energie',    name:'Centrale solaire',          icon:'☀️', tier:3, baseCost:100000000,   baseIncome:500000},
+  // Tier 1 — Micro-services  (ratio 3%/s → ROI ~33s)
+  {id:'journal',    name:'Vente de journaux',         icon:'📰', tier:1, baseCost:10,          baseIncome:0.30},
+  {id:'lavage',     name:'Lavage de voitures',        icon:'🚗', tier:1, baseCost:100,         baseIncome:3.00},
+  {id:'coiffeur',   name:'Salon de coiffure',         icon:'✂️', tier:1, baseCost:350,         baseIncome:10.5},
+  {id:'food',       name:'Food truck',                icon:'🍔', tier:1, baseCost:1200,        baseIncome:36},
+  // Tier 2 — Commerce  (ratio 4%/s → ROI ~25s)
+  {id:'boulangerie',name:'Boulangerie',               icon:'🥖', tier:2, baseCost:8000,        baseIncome:320},
+  {id:'boutique',   name:'Boutique mode',             icon:'👗', tier:2, baseCost:35000,       baseIncome:1400},
+  {id:'supermarche',name:'Supermarché',               icon:'🛒', tier:2, baseCost:180000,      baseIncome:7200},
+  {id:'hotel',      name:'Hôtel 3 étoiles',           icon:'🏨', tier:2, baseCost:600000,      baseIncome:24000},
+  // Tier 3 — Industrie  (ratio 5%/s → ROI ~20s)
+  {id:'pharma',     name:'Pharmacie',                 icon:'💊', tier:3, baseCost:2500000,     baseIncome:125000},
+  {id:'usine',      name:'Usine manufacturière',      icon:'🏭', tier:3, baseCost:8000000,     baseIncome:400000},
+  {id:'logistique', name:'Réseau logistique',         icon:'🚚', tier:3, baseCost:30000000,    baseIncome:1500000},
+  {id:'energie',    name:'Centrale solaire',          icon:'☀️', tier:3, baseCost:100000000,   baseIncome:5000000},
   // Tier 4 — Finance & Tech  (ratio 3%/s → ROI ~33s)
   {id:'immo',       name:'Agence immobilière',        icon:'🏗️', tier:4, baseCost:4e8,         baseIncome:1.2e7},
   {id:'banque',     name:'Banque d\'investissement',  icon:'🏦', tier:4, baseCost:1.5e9,       baseIncome:4.5e7},
@@ -2634,19 +2745,20 @@ function switchSettingsTab(name, btn) {
   if (name === 'theme') refreshThemeSwatches();
 }
 
+const ALL_THEMES = ['default','girly','pastel','ocean','forest','sunset','neon','rouge','cosmos'];
+
 function applyTheme(name) {
-  document.documentElement.classList.remove('theme-girly','theme-pastel');
+  ALL_THEMES.forEach(t => document.documentElement.classList.remove('theme-'+t));
   if (name !== 'default') document.documentElement.classList.add('theme-'+name);
   localStorage.setItem('zte70_theme', name);
   refreshThemeSwatches();
-  // Re-render anything that has inline SVG icons so they pick up new CSS var colors
   if (currentTab === 'biz') renderBizList();
   if (currentTab === 'biz') renderUpgrades();
 }
 
 function refreshThemeSwatches() {
   const saved = localStorage.getItem('zte70_theme') || 'default';
-  ['default','girly','pastel'].forEach(t => {
+  ALL_THEMES.forEach(t => {
     const el = document.getElementById('swatch-'+t);
     if (el) el.classList.toggle('active', t === saved);
   });
@@ -4298,7 +4410,7 @@ const BTN_STAGES = {
     svg:`<defs>
       <radialGradient id="s1cg" cx="36%" cy="30%" r="65%">
         <stop offset="0%"   stop-color="#fff5b0"/>
-        <stop offset="30%"  stop-color="var(--gold)"/>
+        <stop offset="30%"  stop-color="#D4AF37"/>
         <stop offset="65%"  stop-color="#7a5010"/>
         <stop offset="100%" stop-color="#2e1a00"/>
       </radialGradient>
@@ -4375,7 +4487,7 @@ const BTN_STAGES = {
       </linearGradient>
       <linearGradient id="s3chip" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%"   stop-color="#f0d060"/>
-        <stop offset="50%"  stop-color="var(--gold)"/>
+        <stop offset="50%"  stop-color="#D4AF37"/>
         <stop offset="100%" stop-color="#6a4008"/>
       </linearGradient>
       <linearGradient id="s3shine" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -4388,7 +4500,7 @@ const BTN_STAGES = {
       </filter>
     </defs>
     <!-- corps carte -->
-    <rect x="4" y="12" width="56" height="40" rx="5" fill="url(#s3bg)" stroke="var(--gold)" stroke-width="1.2" filter="url(#s3glow)"/>
+    <rect x="4" y="12" width="56" height="40" rx="5" fill="url(#s3bg)" stroke="#D4AF37" stroke-width="1.2" filter="url(#s3glow)"/>
     <!-- reflet surface -->
     <rect x="4" y="12" width="56" height="40" rx="5" fill="url(#s3shine)"/>
     <!-- bande magnétique -->
@@ -4399,14 +4511,14 @@ const BTN_STAGES = {
     <line x1="9"  y1="41"   x2="22" y2="41"   stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>
     <line x1="15.5" y1="35" x2="15.5" y2="45" stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>
     <!-- logo contactless -->
-    <path d="M30 37 Q33 37 33 40 Q33 43 30 43" fill="none" stroke="color-mix(in srgb, var(--gold) 50%, transparent)" stroke-width="1"/>
-    <path d="M28 35 Q35 35 35 40 Q35 45 28 45" fill="none" stroke="color-mix(in srgb, var(--gold) 30%, transparent)" stroke-width="0.8"/>
+    <path d="M30 37 Q33 37 33 40 Q33 43 30 43" fill="none" stroke="rgba(212,175,55,0.50)" stroke-width="1"/>
+    <path d="M28 35 Q35 35 35 40 Q35 45 28 45" fill="none" stroke="rgba(212,175,55,0.30)" stroke-width="0.8"/>
     <!-- label -->
-    <text x="32" y="21" text-anchor="middle" font-size="5.5" font-family="monospace" fill="var(--gold)" letter-spacing="3.5" opacity="0.9">EMPIRE BLACK</text>
+    <text x="32" y="21" text-anchor="middle" font-size="5.5" font-family="monospace" fill="#D4AF37" letter-spacing="3.5" opacity="0.9">EMPIRE BLACK</text>
     <!-- numéro carte -->
-    <text x="9"  y="50" font-size="5" font-family="monospace" fill="color-mix(in srgb, var(--gold) 35%, transparent)" letter-spacing="1.5">•••• •••• •••• 7777</text>
+    <text x="9"  y="50" font-size="5" font-family="monospace" fill="rgba(212,175,55,0.35)" letter-spacing="1.5">•••• •••• •••• 7777</text>
     <!-- étoile haut droite -->
-    <text x="53" y="19" font-size="8" fill="color-mix(in srgb, var(--gold) 40%, transparent)" text-anchor="middle">★</text>`
+    <text x="53" y="19" font-size="8" fill="rgba(212,175,55,0.40)" text-anchor="middle">★</text>`
   },
 
   /* ─── STADE 4 : RÉSEAU CRYPTO ─── nœuds connectés, esthétique blockchain */
@@ -4414,8 +4526,8 @@ const BTN_STAGES = {
     label:'Stade 4 — Réseau Crypto',
     svg:`<defs>
       <radialGradient id="s4ng" cx="50%" cy="50%" r="55%">
-        <stop offset="0%"   stop-color="color-mix(in srgb, var(--gold) 14%, transparent)"/>
-        <stop offset="100%" stop-color="color-mix(in srgb, var(--gold) 1%, transparent)"/>
+        <stop offset="0%"   stop-color="rgba(212,175,55,0.14)"/>
+        <stop offset="100%" stop-color="rgba(212,175,55,0.01)"/>
       </radialGradient>
       <filter id="s4glow">
         <feGaussianBlur stdDeviation="2.5" result="b"/>
@@ -4429,9 +4541,9 @@ const BTN_STAGES = {
     <!-- fond radial -->
     <circle cx="32" cy="32" r="28" fill="url(#s4ng)"/>
     <!-- cercle extérieur -->
-    <circle cx="32" cy="32" r="27" fill="none" stroke="color-mix(in srgb, var(--gold) 22%, transparent)" stroke-width="1" stroke-dasharray="3,4"/>
+    <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(212,175,55,0.22)" stroke-width="1" stroke-dasharray="3,4"/>
     <!-- arêtes réseau (liens entre nœuds) -->
-    <g stroke="color-mix(in srgb, var(--gold) 25%, transparent)" stroke-width="0.8">
+    <g stroke="rgba(212,175,55,0.25)" stroke-width="0.8">
       <line x1="32" y1="10" x2="50" y2="22"/>
       <line x1="32" y1="10" x2="14" y2="22"/>
       <line x1="50" y1="22" x2="54" y2="42"/>
@@ -4449,17 +4561,17 @@ const BTN_STAGES = {
     </g>
     <!-- nœuds périphériques -->
     <g filter="url(#s4nodeglow)">
-      <circle cx="32" cy="10" r="2.8" fill="var(--gold)" opacity="0.9"/>
-      <circle cx="50" cy="22" r="2.2" fill="var(--gold)" opacity="0.7"/>
-      <circle cx="14" cy="22" r="2.2" fill="var(--gold)" opacity="0.7"/>
-      <circle cx="54" cy="42" r="2"   fill="var(--gold)" opacity="0.6"/>
-      <circle cx="10" cy="42" r="2"   fill="var(--gold)" opacity="0.6"/>
-      <circle cx="40" cy="54" r="2.2" fill="var(--gold)" opacity="0.7"/>
-      <circle cx="24" cy="54" r="2.2" fill="var(--gold)" opacity="0.7"/>
+      <circle cx="32" cy="10" r="2.8" fill="#D4AF37" opacity="0.9"/>
+      <circle cx="50" cy="22" r="2.2" fill="#D4AF37" opacity="0.7"/>
+      <circle cx="14" cy="22" r="2.2" fill="#D4AF37" opacity="0.7"/>
+      <circle cx="54" cy="42" r="2"   fill="#D4AF37" opacity="0.6"/>
+      <circle cx="10" cy="42" r="2"   fill="#D4AF37" opacity="0.6"/>
+      <circle cx="40" cy="54" r="2.2" fill="#D4AF37" opacity="0.7"/>
+      <circle cx="24" cy="54" r="2.2" fill="#D4AF37" opacity="0.7"/>
     </g>
     <!-- nœud central -->
-    <circle cx="32" cy="32" r="8" fill="color-mix(in srgb, var(--gold) 12%, transparent)" stroke="var(--gold)" stroke-width="1.2" filter="url(#s4glow)"/>
-    <circle cx="32" cy="32" r="5" fill="color-mix(in srgb, var(--gold) 18%, transparent)"/>
+    <circle cx="32" cy="32" r="8" fill="rgba(212,175,55,0.12)" stroke="#D4AF37" stroke-width="1.2" filter="url(#s4glow)"/>
+    <circle cx="32" cy="32" r="5" fill="rgba(212,175,55,0.18)"/>
     <text x="32" y="35.5" text-anchor="middle" font-size="8" font-family="monospace" fill="#e8c96d" font-weight="bold">₿</text>`
   },
 
@@ -4468,9 +4580,9 @@ const BTN_STAGES = {
     label:'Stade 5 — Empire Mondial',
     svg:`<defs>
       <radialGradient id="s5bg" cx="50%" cy="45%" r="60%">
-        <stop offset="0%"   stop-color="color-mix(in srgb, var(--gold) 18%, transparent)"/>
-        <stop offset="60%"  stop-color="color-mix(in srgb, var(--gold) 5%, transparent)"/>
-        <stop offset="100%" stop-color="color-mix(in srgb, var(--gold) 0%, transparent)"/>
+        <stop offset="0%"   stop-color="rgba(212,175,55,0.18)"/>
+        <stop offset="60%"  stop-color="rgba(212,175,55,0.05)"/>
+        <stop offset="100%" stop-color="rgba(212,175,55,0.00)"/>
       </radialGradient>
       <filter id="s5glow">
         <feGaussianBlur stdDeviation="3" result="b"/>
@@ -4484,7 +4596,7 @@ const BTN_STAGES = {
     <!-- fond rayonnant -->
     <circle cx="32" cy="32" r="28" fill="url(#s5bg)"/>
     <!-- rayons solaires (8) -->
-    <g stroke="color-mix(in srgb, var(--gold) 18%, transparent)" stroke-width="0.7">
+    <g stroke="rgba(212,175,55,0.18)" stroke-width="0.7">
       <line x1="32" y1="4"  x2="32" y2="14"/>
       <line x1="32" y1="50" x2="32" y2="60"/>
       <line x1="4"  y1="32" x2="14" y2="32"/>
@@ -4495,11 +4607,11 @@ const BTN_STAGES = {
       <line x1="52.5" y1="52.5" x2="45.5" y2="45.5"/>
     </g>
     <!-- cercles concentriques -->
-    <circle cx="32" cy="32" r="27" fill="none" stroke="color-mix(in srgb, var(--gold) 20%, transparent)" stroke-width="0.8"/>
-    <circle cx="32" cy="32" r="22" fill="none" stroke="color-mix(in srgb, var(--gold) 12%, transparent)" stroke-width="0.6" stroke-dasharray="2,3"/>
-    <circle cx="32" cy="32" r="14" fill="none" stroke="color-mix(in srgb, var(--gold) 10%, transparent)" stroke-width="0.5"/>
+    <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(212,175,55,0.20)" stroke-width="0.8"/>
+    <circle cx="32" cy="32" r="22" fill="none" stroke="rgba(212,175,55,0.12)" stroke-width="0.6" stroke-dasharray="2,3"/>
+    <circle cx="32" cy="32" r="14" fill="none" stroke="rgba(212,175,55,0.10)" stroke-width="0.5"/>
     <!-- couronne -->
-    <g filter="url(#s5crnglow)" fill="var(--gold)" opacity="0.92">
+    <g filter="url(#s5crnglow)" fill="#D4AF37" opacity="0.92">
       <!-- base couronne -->
       <rect x="20" y="34" width="24" height="5" rx="1"/>
       <!-- pointes couronne -->
@@ -4512,7 +4624,7 @@ const BTN_STAGES = {
       <circle cx="42" cy="25" r="1.5" fill="#ffe87a"/>
     </g>
     <!-- label bas -->
-    <text x="32" y="47" text-anchor="middle" font-size="5" font-family="monospace" fill="color-mix(in srgb, var(--gold) 50%, transparent)" letter-spacing="3" font-weight="700">EMPIRE</text>`
+    <text x="32" y="47" text-anchor="middle" font-size="5" font-family="monospace" fill="rgba(212,175,55,0.50)" letter-spacing="3" font-weight="700">EMPIRE</text>`
   }
 };
 
