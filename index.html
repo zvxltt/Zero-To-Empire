@@ -611,55 +611,130 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
       <div class="needed">1 000 €</div>
       <div class="progress-big"><div class="progress-big-fill" id="fb-prog-fill" style="width:0%"></div></div>
       <div id="football-progress-text" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:7px">Progression : 0%</div>
-      <button id="fb-unlock-btn" class="buy-btn cant-buy" onclick="buyFootballMode()" style="width:80%;max-width:240px;margin:14px auto 0;display:block;padding:11px;font-size:12px;border-radius:8px">Débloquer le Mode Football</button>
+      <button id="fb-unlock-btn" class="buy-btn cant-buy" onclick="buyFootballMode()" style="width:80%;max-width:240px;margin:14px auto 0;display:block;padding:11px;font-size:12px;border-radius:8px">🏟️ Débloquer le Mode Football</button>
     </div>
 
 <!-- ONBOARDING SCREEN -->
 
 <div id="football-onboarding" style="display:none;padding:16px;">
-  <div style="text-align:center;margin-bottom:18px">
-    <div style="font-size:40px;margin-bottom:10px">🏟️</div>
-    <div style="font-size:17px;font-weight:800;color:var(--gold);margin-bottom:6px">Mode Football débloqué !</div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.6">Personnalisez votre club avant de commencer.</div>
+
+  <!-- ETAPE 1 : Choix du mode -->
+  <div id="ob-step-mode">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:40px;margin-bottom:10px">🏟️</div>
+      <div style="font-size:17px;font-weight:800;color:var(--gold);margin-bottom:6px">Mode Football débloqué !</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6">Choisissez votre expérience de jeu</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+      <!-- Mode Gestion de Club -->
+      <div onclick="selectFootballMode('club')" id="mode-card-club" style="background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .2s,background .2s">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div style="width:44px;height:44px;border-radius:10px;background:color-mix(in srgb, var(--gold) 12%, transparent);border:1.5px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏢</div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--gold)">Gestion de Club</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Devenez directeur sportif</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:10px;color:var(--text2)">🔄 Gérez votre effectif & transferts</div>
+          <div style="font-size:10px;color:var(--text2)">⚽ Championnats du District au Divin</div>
+          <div style="font-size:10px;color:var(--text2)">💰 Revenus passifs croissants</div>
+          <div style="font-size:10px;color:var(--text2)">🏗️ Améliorez votre stade & infrastructure</div>
+        </div>
+      </div>
+      <!-- Mode Carrière -->
+      <div onclick="selectFootballMode('carriere')" id="mode-card-carriere" style="background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .2s,background .2s">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div style="width:44px;height:44px;border-radius:10px;background:rgba(107,124,147,0.12);border:1.5px solid var(--mint-dark);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⭐</div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--mint)">Mode Carrière</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Devenez une légende vivante</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:10px;color:var(--text2)">👤 Créez votre joueur & choisissez un club</div>
+          <div style="font-size:10px;color:var(--text2)">📈 Progressez saison après saison</div>
+          <div style="font-size:10px;color:var(--text2)">🏆 Trophées, récompenses individuelles</div>
+          <div style="font-size:10px;color:var(--text2)">🔄 Demandes de transfert & mercato</div>
+          <div style="font-size:10px;color:var(--text2)">📊 Stats de saison détaillées</div>
+        </div>
+      </div>
+    </div>
+    <div id="ob-mode-error" style="display:none;font-size:10px;color:var(--danger);text-align:center;margin-bottom:8px">Sélectionnez un mode pour continuer.</div>
+    <button onclick="goToObStep2()" style="width:100%;padding:13px;border-radius:10px;border:1px solid var(--gold);background:color-mix(in srgb, var(--gold) 10%, transparent);color:var(--gold);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">Continuer →</button>
   </div>
 
-  <!-- Personnalisation -->
-
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
-    <div class="section-title">Votre Club</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Nom du club</div>
-    <input class="modal-input" id="ob-club-name" placeholder="Ex: Paris Empire FC" maxlength="24" value="Empire FC">
-    <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Nationalité</div>
-    <input class="modal-input" id="ob-club-nat" placeholder="Ex: France" maxlength="20" value="France">
-    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Écusson</div>
-    <div class="badge-selector" id="ob-badge-selector"></div>
-  </div>
-
-  <!-- Explication du mode -->
-
-  <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 30%, transparent);border-radius:12px;padding:14px;margin-bottom:14px">
-    <div class="section-title">Ce qui vous attend</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:16px;flex-shrink:0">🔄</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Recrutez des joueurs</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Marché des transferts — du gardien à l'attaquant</div></div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:16px;flex-shrink:0">⚽</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Jouez des championnats</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">12 ligues progressives, du district au Divin</div></div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:16px;flex-shrink:0">🏅</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Montez en Ranked</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Progressez de District → Légende → Divin</div></div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:16px;flex-shrink:0">💰</span>
-        <div><div style="font-size:11px;font-weight:700;color:var(--text1)">Générez des revenus</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Les victoires rapportent de l'argent passif en continu</div></div>
-      </div>
+  <!-- ETAPE 2a : Config Club Manager -->
+  <div id="ob-step-club" style="display:none">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:32px;margin-bottom:8px">🏢</div>
+      <div style="font-size:15px;font-weight:800;color:var(--gold)">Personnalisez votre club</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div class="section-title">Votre Club</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Nom du club</div>
+      <input class="modal-input" id="ob-club-name" placeholder="Ex: Paris Empire FC" maxlength="24" value="Empire FC">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Nationalité</div>
+      <input class="modal-input" id="ob-club-nat" placeholder="Ex: France" maxlength="20" value="France">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Écusson</div>
+      <div class="badge-selector" id="ob-badge-selector"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('ob-step-club').style.display='none';document.getElementById('ob-step-mode').style.display='block'" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">← Retour</button>
+      <button onclick="finishOnboarding()" style="flex:2;padding:13px;border-radius:10px;border:1px solid var(--gold);background:color-mix(in srgb, var(--gold) 10%, transparent);color:var(--gold);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">★ Lancer mon Club !</button>
     </div>
   </div>
 
-<button onclick="finishOnboarding()" style="width:100%;padding:13px;border-radius:10px;border:1px solid var(--gold);background:color-mix(in srgb, var(--gold) 10%, transparent);color:var(--gold);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">★ Lancer mon Club !</button>
+  <!-- ETAPE 2b : Config Carrière -->
+  <div id="ob-step-carriere" style="display:none">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:32px;margin-bottom:8px">⭐</div>
+      <div style="font-size:15px;font-weight:800;color:var(--mint)">Créez votre joueur</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div class="section-title">Identité</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Prénom</div>
+          <input class="modal-input" id="car-prenom" placeholder="Lucas" maxlength="14" style="margin-bottom:0">
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Nom</div>
+          <input class="modal-input" id="car-nom" placeholder="Dupont" maxlength="16" style="margin-bottom:0">
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Poste</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="car-pos-select">
+          <button onclick="selectCareerPos('GB')" id="carpos-GB" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">GB</button>
+          <button onclick="selectCareerPos('DD')" id="carpos-DD" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">DD</button>
+          <button onclick="selectCareerPos('DC')" id="carpos-DC" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">DC</button>
+          <button onclick="selectCareerPos('DG')" id="carpos-DG" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">DG</button>
+          <button onclick="selectCareerPos('MD')" id="carpos-MD" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">MD</button>
+          <button onclick="selectCareerPos('MC')" id="carpos-MC" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">MC</button>
+          <button onclick="selectCareerPos('MOC')" id="carpos-MOC" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">MOC</button>
+          <button onclick="selectCareerPos('AG')" id="carpos-AG" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">AG</button>
+          <button onclick="selectCareerPos('AD')" id="carpos-AD" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">AD</button>
+          <button onclick="selectCareerPos('AT')" id="carpos-AT" style="padding:5px 10px;border-radius:6px;border:1px solid var(--mint);background:color-mix(in srgb, var(--mint) 15%, transparent);color:var(--mint);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">AT</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Nationalité</div>
+        <select id="car-nat" class="modal-input" style="margin-bottom:0">
+          <option value="🇫🇷">🇫🇷 France</option><option value="🇧🇷">🇧🇷 Brésil</option><option value="🇦🇷">🇦🇷 Argentine</option><option value="🇩🇪">🇩🇪 Allemagne</option><option value="🇪🇸">🇪🇸 Espagne</option><option value="🇮🇹">🇮🇹 Italie</option><option value="🏴󠁧󠁢󠁥󠁮󠁧󠁿">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</option><option value="🇵🇹">🇵🇹 Portugal</option><option value="🇳🇱">🇳🇱 Pays-Bas</option><option value="🇧🇪">🇧🇪 Belgique</option><option value="🇺🇾">🇺🇾 Uruguay</option><option value="🇸🇳">🇸🇳 Sénégal</option><option value="🇲🇦">🇲🇦 Maroc</option><option value="🇯🇵">🇯🇵 Japon</option><option value="🇺🇸">🇺🇸 États-Unis</option>
+        </select>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div class="section-title">Choisir un club de départ</div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;font-family:var(--font-mono)">Votre club initial définit la ligue de départ et le niveau de difficulté.</div>
+      <div id="car-club-list" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('ob-step-carriere').style.display='none';document.getElementById('ob-step-mode').style.display='block'" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">← Retour</button>
+      <button onclick="finishCarriereOnboarding()" style="flex:2;padding:13px;border-radius:10px;border:1px solid var(--mint);background:rgba(107,124,147,0.10);color:var(--mint);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">⭐ Lancer ma Carrière !</button>
+    </div>
+  </div>
 
 </div>
 <div id="club-panel" style="display:none">
@@ -673,6 +748,22 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
   <div id="club-squad" class="club-subpanel"></div>
   <div id="club-transfers" class="club-subpanel"></div>
   <div id="club-ranked" class="club-subpanel"></div>
+</div>
+
+<!-- CARRIÈRE PANEL -->
+<div id="carriere-panel" style="display:none;flex-direction:column;gap:9px">
+  <div class="club-tabs">
+    <button class="club-tab active" id="ctab-profil-btn" onclick="switchCarriereTab('profil',this)">Profil</button>
+    <button class="club-tab" id="ctab-saison-btn" onclick="switchCarriereTab('saison',this)">Saison</button>
+    <button class="club-tab" id="ctab-stats-btn" onclick="switchCarriereTab('stats',this)">Stats</button>
+    <button class="club-tab" id="ctab-trophees-btn" onclick="switchCarriereTab('trophees',this)">Trophées</button>
+    <button class="club-tab" id="ctab-mercato-btn" onclick="switchCarriereTab('mercato',this)">Mercato</button>
+  </div>
+  <div id="car-profil" class="club-subpanel active"></div>
+  <div id="car-saison" class="club-subpanel"></div>
+  <div id="car-stats" class="club-subpanel"></div>
+  <div id="car-trophees" class="club-subpanel"></div>
+  <div id="car-mercato" class="club-subpanel"></div>
 </div>
 
   </div>
@@ -852,7 +943,7 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
 <div id="settings-admin" class="club-subpanel">
   <!-- Écran de code PIN -->
   <div id="admin-lock" class="admin-panel">
-    <h3> Accès Développeur</h3>
+    <h3>🔐 Accès Développeur</h3>
     <div class="admin-display" id="admin-display">_ _ _ _</div>
     <div class="numpad">
       <button class="numpad-btn" onclick="adminInput('1')">1</button>
@@ -1812,15 +1903,15 @@ const CHAMPIONSHIP_TIERS = [
     rankRequired:'icone',
     prize:[2e11,1e11,5e10,2.5e10,1.25e10,6.25e9,3.125e9,1.5625e9,7.8125e8,3.90625e8],
     teams:[
-      {name:'Bordeaux 2009',       ovr:96},
-      {name:'Argentina 1986',    ovr:95},
-      {name:'Brazil 1970',       ovr:96},
-      {name:'Netherlands 1974',  ovr:96},
-      {name:'Barça 2009',  ovr:97},
-      {name:'Real Madrid 2002',  ovr:96},
-      {name:'France 2022',       ovr:95},
-      {name:'Brazil 1982',       ovr:96},
-      {name:'Milan 1989',        ovr:95},
+      {name:'Bordeaux 2009',       ovr:98},
+      {name:'Argentina 1986',    ovr:98},
+      {name:'Brazil 1970',       ovr:99},
+      {name:'Netherlands 1974',  ovr:97},
+      {name:'Barça 2009',  ovr:99},
+      {name:'Real Madrid 2002',  ovr:97},
+      {name:'France 2022',       ovr:96},
+      {name:'Brazil 1982',       ovr:97},
+      {name:'Milan 1989',        ovr:96},
     ]
   },
   {
@@ -1828,15 +1919,15 @@ const CHAMPIONSHIP_TIERS = [
     rankRequired:'legende',
     prize:[1e12,5e11,2.5e11,1.25e11,6.25e10,3.125e10,1.5625e10,7.8125e9,3.90625e9,1.953125e9],
     teams:[
-      {name:'All Time XI',       ovr:97},
-      {name:'Immortels FC',      ovr:97},
-      {name:'Légendaires United',ovr:98},
-      {name:'GOATs World XI',    ovr:96},
-      {name:'Cosmos 1977',       ovr:97},
-      {name:'Neptune FC',     ovr:97},
+      {name:'All Time XI',       ovr:99},
+      {name:'Immortels FC',      ovr:99},
+      {name:'Légendaires United',ovr:99},
+      {name:'GOATs World XI',    ovr:99},
+      {name:'Cosmos 1977',       ovr:99},
+      {name:'Neptune FC',     ovr:99},
       {name:'Dream Team 1992',   ovr:99},
-      {name:'Galácticos 2002',   ovr:98},
-      {name:'Prime XI Éternels', ovr:97},
+      {name:'Galácticos 2002',   ovr:99},
+      {name:'Prime XI Éternels', ovr:99},
     ]
   },
 ];
@@ -1939,6 +2030,8 @@ function loadGame() {
       merged.club.ranked = {...base.club.ranked, ...(saved.club?.ranked||{})};
       merged.club.formationPlayers = saved.club?.formationPlayers || [];
       merged.club.lineup = saved.club?.lineup || {};
+      merged.club.footballMode = saved.club?.footballMode || null;
+      merged.club.carriere = saved.club?.carriere || null;
       merged.club.tactic = saved.club?.tactic || '4-3-3';
       merged.crypto = {...base.crypto, ...(saved.crypto||{})};
       merged.crypto.holdings = merged.crypto.holdings||{};
@@ -3179,6 +3272,10 @@ function setUpgCatHome(cat) { currentUpgCatHome=cat; renderUpgradesHome(); }
 
 function renderClubAll() {
   if (!G.clubUnlocked) return;
+  if (G.club.footballMode === 'carriere') {
+    renderCarriereAll();
+    return;
+  }
   updateClubTabsVisibility();
   renderClubOverview();
   renderClubSquad();
@@ -3604,7 +3701,128 @@ function renderClubOverview() {
       ${formationIncome>0?`<div class="fin-card income full"><div class="f-label">🏫 Formation / sec</div><div class="f-amount" style="color:var(--gold)">+${fmt(formationIncome)}/s</div></div>`:''}
     </div>
     <div class="section-title" style="margin-top:6px">Centre de Formation</div>
-    ${formHtml}`;
+    ${formHtml}
+    <div style="background:var(--bg2);border:1px solid rgba(224,92,92,0.3);border-radius:12px;padding:14px;margin-top:4px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--danger);font-weight:700;margin-bottom:6px">Direction du club</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.6">Vous pouvez démissionner de votre poste de manager à tout moment. Choisissez ensuite de recommencer ou de débuter une carrière joueur.</div>
+      <button onclick="showManagerRetirement()" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--danger);background:rgba(224,92,92,0.06);color:var(--danger);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">🚪 Démissionner</button>
+    </div>
+  `;
+}
+
+function showManagerRetirement() {
+  const c = G.club;
+  const totalW = c.bilan?.w || 0;
+  const totalD = c.bilan?.d || 0;
+  const totalL = c.bilan?.l || 0;
+  const totalMatches = totalW + totalD + totalL;
+  const ovr = getClubOverall();
+
+  const existing = document.getElementById('manager-retire-modal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'manager-retire-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:700;display:flex;align-items:flex-end;justify-content:center;padding:0;overflow:hidden';
+  modal.innerHTML = `
+    <div style="background:var(--bg1);border:1px solid var(--border);border-top-left-radius:16px;border-top-right-radius:16px;padding:20px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto">
+      <div style="font-size:13px;font-weight:800;color:var(--danger);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;text-align:center">Démission</div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:40px;margin-bottom:8px">🚪</div>
+        <div style="font-size:16px;font-weight:800;color:var(--text1)">${c.name}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">${c.nat}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:14px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);font-weight:700;margin-bottom:8px">Bilan en tant que manager</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--success)">${totalW}</div>
+            <div style="font-size:9px;color:var(--text3)">Victoires</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--gold)">${totalD}</div>
+            <div style="font-size:9px;color:var(--text3)">Nuls</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--danger)">${totalL}</div>
+            <div style="font-size:9px;color:var(--text3)">Défaites</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text1)">${totalMatches}</div>
+            <div style="font-size:9px;color:var(--text3)">Matchs</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--mint)">${ovr || '--'}</div>
+            <div style="font-size:9px;color:var(--text3)">OVR actuel</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:14px">Que souhaitez-vous faire ensuite ?</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="managerRetireNewClub()" style="width:100%;padding:11px;border-radius:9px;border:1.5px solid var(--gold);background:color-mix(in srgb, var(--gold) 10%, transparent);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-head)">🏢 Gérer un nouveau club</button>
+        <button onclick="managerRetireToCareer()" style="width:100%;padding:11px;border-radius:9px;border:1.5px solid var(--mint);background:color-mix(in srgb, var(--mint) 10%, transparent);color:var(--mint);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-head)">⭐ Débuter une carrière joueur</button>
+        <button onclick="document.getElementById('manager-retire-modal').remove()" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-head)">← Annuler</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function managerRetireNewClub() {
+  const m = document.getElementById('manager-retire-modal');
+  if (m) m.remove();
+  // Reset club mode, keep money
+  G.club.showOnboarding = true;
+  G.club.footballMode = null;
+  G.club.players = [];
+  G.club.formationPlayers = [];
+  G.club.bilan = {w:0,d:0,l:0,totalRevenue:0};
+  G.club.overallBonus = 0;
+  window._selectedFootballMode = 'club';
+  showToast('🏢 Nouveau départ en tant que manager !');
+  flashMilestone();
+  updateFootballTab();
+  switchTab('football');
+  setTimeout(() => {
+    const modeStep = document.getElementById('ob-step-mode');
+    const clubStep = document.getElementById('ob-step-club');
+    if (modeStep && clubStep) {
+      modeStep.style.display = 'none';
+      clubStep.style.display = 'block';
+      initOnboardingBadges();
+      selectFootballMode('club');
+    }
+  }, 200);
+  saveGame();
+}
+
+function managerRetireToCareer() {
+  const m = document.getElementById('manager-retire-modal');
+  if (m) m.remove();
+  G.club.showOnboarding = true;
+  G.club.footballMode = null;
+  G.club.players = [];
+  G.club.formationPlayers = [];
+  G.club.bilan = {w:0,d:0,l:0,totalRevenue:0};
+  G.club.overallBonus = 0;
+  G.club.carriere = null;
+  window._selectedFootballMode = 'carriere';
+  showToast('⭐ Nouvelle carrière joueur !');
+  flashMilestone();
+  updateFootballTab();
+  switchTab('football');
+  setTimeout(() => {
+    const modeStep = document.getElementById('ob-step-mode');
+    const carriereStep = document.getElementById('ob-step-carriere');
+    if (modeStep && carriereStep) {
+      modeStep.style.display = 'none';
+      carriereStep.style.display = 'block';
+      renderCareerClubList();
+      selectCareerPos('AT');
+      selectFootballMode('carriere');
+    }
+  }, 200);
+  saveGame();
 }
 
 // ══════════════════════════════════════════════
@@ -5449,7 +5667,1188 @@ function buyFormationUpgrade(playerIdx, upgId) {
   renderClubAll();
   updateUI();
 }
-setInterval(saveGame, 15000);
+
+// ══════════════════════════════════════════════
+// MODE CARRIÈRE — DATA & LOGIC
+// ══════════════════════════════════════════════
+
+const CAREER_CLUBS = [
+  // Ligue 1 (France)
+  {id:'psg',    name:'Paris Saint-Germain',  league:'Ligue 1',        country:'🇫🇷', tier:5, ovr:88, wage:80000},
+  {id:'om',     name:'Olympique de Marseille',league:'Ligue 1',       country:'🇫🇷', tier:5, ovr:82, wage:55000},
+  {id:'ol',     name:'Olympique Lyonnais',   league:'Ligue 1',        country:'🇫🇷', tier:5, ovr:81, wage:52000},
+  {id:'mona',   name:'AS Monaco',            league:'Ligue 1',        country:'🇫🇷', tier:4, ovr:80, wage:50000},
+  {id:'lens',   name:'RC Lens',              league:'Ligue 1',        country:'🇫🇷', tier:4, ovr:78, wage:38000},
+  {id:'renn',   name:'Stade Rennais',        league:'Ligue 1',        country:'🇫🇷', tier:4, ovr:77, wage:36000},
+  {id:'lill',   name:'LOSC Lille',           league:'Ligue 1',        country:'🇫🇷', tier:4, ovr:78, wage:38000},
+  {id:'nice',   name:'OGC Nice',             league:'Ligue 1',        country:'🇫🇷', tier:4, ovr:76, wage:35000},
+  {id:'stras',  name:'RC Strasbourg',        league:'Ligue 1',        country:'🇫🇷', tier:3, ovr:73, wage:28000},
+  {id:'nant',   name:'FC Nantes',            league:'Ligue 1',        country:'🇫🇷', tier:3, ovr:72, wage:26000},
+  {id:'brest',  name:'Stade Brestois',       league:'Ligue 1',        country:'🇫🇷', tier:3, ovr:71, wage:24000},
+  {id:'toul',   name:'Toulouse FC',          league:'Ligue 1',        country:'🇫🇷', tier:3, ovr:70, wage:22000},
+  // Premier League (Angleterre)
+  {id:'mancity',name:'Manchester City',      league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:5, ovr:92, wage:120000},
+  {id:'arsenal',name:'Arsenal FC',           league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:5, ovr:89, wage:100000},
+  {id:'chelsea',name:'Chelsea FC',           league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:5, ovr:87, wage:95000},
+  {id:'livp',   name:'Liverpool FC',         league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:5, ovr:90, wage:110000},
+  {id:'mufc',   name:'Manchester United',    league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:5, ovr:85, wage:90000},
+  {id:'spurs',  name:'Tottenham Hotspur',    league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4, ovr:83, wage:75000},
+  {id:'newc',   name:'Newcastle United',     league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4, ovr:82, wage:70000},
+  {id:'avilla', name:'Aston Villa',          league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:4, ovr:80, wage:60000},
+  {id:'wham',   name:'West Ham United',      league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:3, ovr:75, wage:45000},
+  {id:'everton',name:'Everton FC',           league:'Premier League', country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:3, ovr:72, wage:38000},
+  // La Liga (Espagne)
+  {id:'real',   name:'Real Madrid',          league:'La Liga',        country:'🇪🇸', tier:5, ovr:93, wage:130000},
+  {id:'barca',  name:'FC Barcelone',         league:'La Liga',        country:'🇪🇸', tier:5, ovr:88, wage:105000},
+  {id:'atleti', name:'Atlético Madrid',      league:'La Liga',        country:'🇪🇸', tier:5, ovr:87, wage:98000},
+  {id:'sevilla',name:'Sevilla FC',           league:'La Liga',        country:'🇪🇸', tier:4, ovr:81, wage:60000},
+  {id:'betis',  name:'Real Betis',           league:'La Liga',        country:'🇪🇸', tier:4, ovr:79, wage:55000},
+  {id:'sociedad',name:'Real Sociedad',       league:'La Liga',        country:'🇪🇸', tier:4, ovr:80, wage:58000},
+  {id:'bilbao', name:'Athletic Bilbao',      league:'La Liga',        country:'🇪🇸', tier:4, ovr:78, wage:50000},
+  {id:'villa',  name:'Villarreal CF',        league:'La Liga',        country:'🇪🇸', tier:4, ovr:79, wage:52000},
+  {id:'celta',  name:'Celta Vigo',           league:'La Liga',        country:'🇪🇸', tier:3, ovr:72, wage:30000},
+  {id:'getafe', name:'Getafe CF',            league:'La Liga',        country:'🇪🇸', tier:3, ovr:70, wage:25000},
+  // Serie A (Italie)
+  {id:'inter',  name:'Inter Milan',          league:'Serie A',        country:'🇮🇹', tier:5, ovr:89, wage:100000},
+  {id:'milan',  name:'AC Milan',             league:'Serie A',        country:'🇮🇹', tier:5, ovr:87, wage:95000},
+  {id:'juve',   name:'Juventus FC',          league:'Serie A',        country:'🇮🇹', tier:5, ovr:86, wage:90000},
+  {id:'napoli', name:'SSC Napoli',           league:'Serie A',        country:'🇮🇹', tier:4, ovr:83, wage:70000},
+  {id:'roma',   name:'AS Roma',              league:'Serie A',        country:'🇮🇹', tier:4, ovr:82, wage:68000},
+  {id:'lazio',  name:'SS Lazio',             league:'Serie A',        country:'🇮🇹', tier:4, ovr:80, wage:60000},
+  {id:'atalanta',name:'Atalanta BC',         league:'Serie A',        country:'🇮🇹', tier:4, ovr:82, wage:65000},
+  {id:'fiorent',name:'Fiorentina',           league:'Serie A',        country:'🇮🇹', tier:3, ovr:75, wage:40000},
+  {id:'torino', name:'Torino FC',            league:'Serie A',        country:'🇮🇹', tier:3, ovr:72, wage:32000},
+  {id:'bologna',name:'Bologna FC',           league:'Serie A',        country:'🇮🇹', tier:3, ovr:73, wage:34000},
+  // Bundesliga (Allemagne)
+  {id:'bayern', name:'Bayern Munich',        league:'Bundesliga',     country:'🇩🇪', tier:5, ovr:91, wage:115000},
+  {id:'bvb',    name:'Borussia Dortmund',    league:'Bundesliga',     country:'🇩🇪', tier:5, ovr:86, wage:88000},
+  {id:'leip',   name:'RB Leipzig',           league:'Bundesliga',     country:'🇩🇪', tier:4, ovr:83, wage:72000},
+  {id:'bayer',  name:'Bayer Leverkusen',     league:'Bundesliga',     country:'🇩🇪', tier:4, ovr:83, wage:72000},
+  {id:'mgbach', name:'B. Mönchengladbach',   league:'Bundesliga',     country:'🇩🇪', tier:4, ovr:78, wage:50000},
+  {id:'eintracht',name:'Eintracht Frankfurt',league:'Bundesliga',     country:'🇩🇪', tier:4, ovr:79, wage:52000},
+  {id:'schalke',name:'FC Schalke 04',        league:'Bundesliga',     country:'🇩🇪', tier:3, ovr:72, wage:30000},
+  {id:'freiburg',name:'SC Freiburg',         league:'Bundesliga',     country:'🇩🇪', tier:3, ovr:74, wage:35000},
+  // Eredivisie (Pays-Bas)
+  {id:'ajax',   name:'AFC Ajax',             league:'Eredivisie',     country:'🇳🇱', tier:4, ovr:82, wage:65000},
+  {id:'psv',    name:'PSV Eindhoven',        league:'Eredivisie',     country:'🇳🇱', tier:4, ovr:81, wage:62000},
+  {id:'feyenoord',name:'Feyenoord',          league:'Eredivisie',     country:'🇳🇱', tier:3, ovr:76, wage:42000},
+  // Liga Portugal
+  {id:'benfica',name:'SL Benfica',           league:'Liga Portugal',  country:'🇵🇹', tier:4, ovr:82, wage:63000},
+  {id:'porto',  name:'FC Porto',             league:'Liga Portugal',  country:'🇵🇹', tier:4, ovr:81, wage:60000},
+  {id:'sporting',name:'Sporting CP',         league:'Liga Portugal',  country:'🇵🇹', tier:4, ovr:80, wage:58000},
+  // Ligue 2 / Divisions inférieures
+  {id:'sm_caen',name:'SM Caen',              league:'Ligue 2',        country:'🇫🇷', tier:2, ovr:65, wage:8000},
+  {id:'gre',    name:'Grenoble Foot 38',     league:'Ligue 2',        country:'🇫🇷', tier:2, ovr:62, wage:7000},
+  {id:'rod',    name:'Rodez AF',             league:'Ligue 2',        country:'🇫🇷', tier:2, ovr:61, wage:6500},
+  {id:'valen',  name:'Valenciennes FC',      league:'Ligue 2',        country:'🇫🇷', tier:2, ovr:60, wage:6000},
+  {id:'pau',    name:'Pau FC',               league:'Ligue 2',        country:'🇫🇷', tier:2, ovr:59, wage:5500},
+  {id:'dunkerque',name:'FC Dunkerque',       league:'Ligue 2',        country:'🇫🇷', tier:2, ovr:58, wage:5000},
+  // National
+  {id:'bastia', name:'SC Bastia',            league:'National',       country:'🇫🇷', tier:1, ovr:55, wage:3500},
+  {id:'quevilly',name:'US Quevilly',         league:'National',       country:'🇫🇷', tier:1, ovr:50, wage:2500},
+  {id:'boulogne',name:'US Boulogne',         league:'National',       country:'🇫🇷', tier:1, ovr:48, wage:2000},
+  // Major League Soccer
+  {id:'lafc',   name:'LA FC',                league:'MLS',            country:'🇺🇸', tier:3, ovr:74, wage:35000},
+  {id:'nycfc',  name:'NYC FC',               league:'MLS',            country:'🇺🇸', tier:3, ovr:72, wage:32000},
+  {id:'atlatlanta',name:'Atlanta United',    league:'MLS',            country:'🇺🇸', tier:3, ovr:73, wage:33000},
+  // Saudi Pro League
+  {id:'alhilal',name:'Al-Hilal',             league:'Saudi Pro',      country:'🇸🇦', tier:4, ovr:84, wage:200000},
+  {id:'alnassr',name:'Al-Nassr',             league:'Saudi Pro',      country:'🇸🇦', tier:4, ovr:82, wage:180000},
+  {id:'alittihad',name:'Al-Ittihad',         league:'Saudi Pro',      country:'🇸🇦', tier:4, ovr:80, wage:160000},
+  // J-League
+  {id:'urawa',  name:'Urawa Red Diamonds',   league:'J-League',       country:'🇯🇵', tier:3, ovr:72, wage:25000},
+  {id:'gamba',  name:'Gamba Osaka',          league:'J-League',       country:'🇯🇵', tier:3, ovr:70, wage:22000},
+];
+
+// Récompenses individuelles par saison
+const CAREER_AWARDS = [
+  {id:'balonor',  name:'Ballon d\'Or',         icon:'🌟', desc:'Meilleur joueur du monde', threshold:95},
+  {id:'goldboot', name:'Soulier d\'Or',         icon:'👟', desc:'Meilleur buteur européen', threshold:80},
+  {id:'topmvp',   name:'MVP de la saison',      icon:'🏅', desc:'Meilleur joueur de la ligue', threshold:75},
+  {id:'bestx11',  name:'Team of the Season',    icon:'⭐', desc:'Présent dans l\'équipe type', threshold:65},
+  {id:'youngplay',name:'Jeune espoir',           icon:'🌱', desc:'Meilleur jeune de la saison', threshold:55},
+  {id:'fairplay', name:'Prix Fair-Play',         icon:'🤝', desc:'Exemplarité sur le terrain', threshold:50},
+];
+
+// Trophées collectifs
+const CAREER_TROPHIES = [
+  {id:'tr_champ',  name:'Champion',             icon:'🥇', desc:'Remporté la ligue'},
+  {id:'tr_2nd',    name:'Vice-Champion',         icon:'🥈', desc:'Terminé 2ème de la ligue'},
+  {id:'tr_ucl',    name:'Ligue des Champions',   icon:'🏆', desc:'Vainqueur de la C1'},
+  {id:'tr_uel',    name:'Ligue Europa',          icon:'🥉', desc:'Vainqueur de la C3'},
+  {id:'tr_cup',    name:'Coupe Nationale',        icon:'🏅', desc:'Vainqueur de la coupe'},
+  {id:'tr_super',  name:'Super Coupe',           icon:'🌟', desc:'Vainqueur de la super coupe'},
+  {id:'tr_league10',name:'10 Titres en Ligue',   icon:'💎', desc:'10 championnats remportés'},
+];
+
+let currentCarriereTab = 'profil';
+
+function selectFootballMode(mode) {
+  window._selectedFootballMode = mode;
+  document.getElementById('mode-card-club').style.borderColor = mode==='club' ? 'var(--gold)' : 'var(--border)';
+  document.getElementById('mode-card-carriere').style.borderColor = mode==='carriere' ? 'var(--mint)' : 'var(--border)';
+  document.getElementById('mode-card-club').style.background = mode==='club' ? 'color-mix(in srgb, var(--gold) 5%, transparent)' : 'var(--bg2)';
+  document.getElementById('mode-card-carriere').style.background = mode==='carriere' ? 'rgba(107,124,147,0.06)' : 'var(--bg2)';
+}
+
+function goToObStep2() {
+  const mode = window._selectedFootballMode;
+  if (!mode) { document.getElementById('ob-mode-error').style.display='block'; return; }
+  document.getElementById('ob-mode-error').style.display='none';
+  document.getElementById('ob-step-mode').style.display='none';
+  if (mode === 'club') {
+    document.getElementById('ob-step-club').style.display='block';
+    initOnboardingBadges();
+  } else {
+    document.getElementById('ob-step-carriere').style.display='block';
+    renderCareerClubList();
+    // Visually highlight default position
+    selectCareerPos(_selectedCareerPos);
+  }
+}
+
+let _selectedCareerPos = 'AT';
+function selectCareerPos(pos) {
+  _selectedCareerPos = pos;
+  document.querySelectorAll('[id^="carpos-"]').forEach(b => {
+    const isActive = b.id === 'carpos-' + pos;
+    b.style.background = isActive ? 'color-mix(in srgb, var(--mint) 15%, transparent)' : 'transparent';
+    b.style.borderColor = isActive ? 'var(--mint)' : 'var(--border)';
+    b.style.color = isActive ? 'var(--mint)' : 'var(--text3)';
+  });
+}
+
+let _selectedCareerClubId = null;
+function renderCareerClubList() {
+  const container = document.getElementById('car-club-list');
+  if (!container) return;
+  const grouped = {};
+  CAREER_CLUBS.forEach(c => {
+    if (!grouped[c.league]) grouped[c.league] = [];
+    grouped[c.league].push(c);
+  });
+  let html = '';
+  Object.keys(grouped).forEach(league => {
+    html += `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin:8px 0 4px;padding:0 4px">${league}</div>`;
+    grouped[league].forEach(club => {
+      const stars = '★'.repeat(club.tier) + '☆'.repeat(5-club.tier);
+      const isSelected = _selectedCareerClubId === club.id;
+      html += `<div onclick="selectCareerClub('${club.id}')" id="cclub-${club.id}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1.5px solid ${isSelected?'var(--mint)':'var(--border)'};background:${isSelected?'rgba(107,124,147,0.08)':'transparent'};cursor:pointer;transition:all .15s;margin-bottom:3px">
+        <div style="font-size:16px">${club.country}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:700;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${club.name}</div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">OVR ${club.ovr} · ${fmt(club.wage)}/mois</div>
+        </div>
+        <div style="font-size:9px;color:var(--gold);letter-spacing:0.5px">${stars}</div>
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function selectCareerClub(id) {
+  _selectedCareerClubId = id;
+  document.querySelectorAll('[id^="cclub-"]').forEach(el => {
+    const isActive = el.id === 'cclub-' + id;
+    el.style.borderColor = isActive ? 'var(--mint)' : 'var(--border)';
+    el.style.background = isActive ? 'rgba(107,124,147,0.08)' : 'transparent';
+  });
+}
+
+function finishCarriereOnboarding() {
+  const prenom = (document.getElementById('car-prenom')?.value||'').trim();
+  const nom = (document.getElementById('car-nom')?.value||'').trim();
+  const nat = document.getElementById('car-nat')?.value || '🇫🇷';
+  if (!prenom || !nom) { showToast('! Entrez un prénom et un nom'); return; }
+  if (!_selectedCareerPos) { showToast('! Choisissez un poste'); return; }
+  if (!_selectedCareerClubId) { showToast('! Choisissez un club de départ'); return; }
+  const club = CAREER_CLUBS.find(c=>c.id===_selectedCareerClubId);
+  if (!club) { showToast('! Club invalide'); return; }
+
+  G.clubUnlocked = true;
+  G.club.showOnboarding = false;
+  G.club.footballMode = 'carriere';
+  G.club.carriere = defaultCarriereState(prenom, nom, nat, _selectedCareerPos, club);
+
+  flashMilestone();
+  showToast(`⭐ Carrière lancée — Bienvenue à ${club.name} !`);
+  updateFootballTab();
+  renderCarriereAll();
+}
+
+function defaultCarriereState(prenom, nom, nat, pos, club) {
+  return {
+    prenom, nom, nat, pos,
+    name: prenom + ' ' + nom,
+    age: 17,
+    saison: 1,
+    rating: 60,
+    clubId: club.id,
+    clubName: club.name,
+    clubLeague: club.league,
+    clubOvr: club.ovr,
+    wage: club.wage,
+    // Stats de saison en cours
+    seasonGoals: 0,
+    seasonAssists: 0,
+    seasonApps: 0,
+    seasonRating: 0,
+    seasonRatingCount: 0,
+    seasonWins: 0,
+    seasonDraws: 0,
+    seasonLosses: 0,
+    // Historique des saisons
+    history: [],
+    // Trophées & récompenses
+    trophies: [],
+    awards: [],
+    // Mercato
+    transferOffers: [],
+    transferCooldown: 0, // saisons avant prochaine demande
+    contractEnd: 3, // saison de fin de contrat
+    // Stats cumulatives
+    totalGoals: 0,
+    totalAssists: 0,
+    totalApps: 0,
+    totalWins: 0,
+    // Etat saison
+    seasonFinished: false,
+    seasonMatchday: 0,
+    seasonMatches: [],
+    leagueTable: [],
+  };
+}
+
+function renderCarriereAll() {
+  renderCarriereProfil();
+  if (currentCarriereTab === 'saison') renderCarriereSaison();
+  if (currentCarriereTab === 'stats') renderCarriereStats();
+  if (currentCarriereTab === 'trophees') renderCarriereTrophees();
+  if (currentCarriereTab === 'mercato') renderCarriereMercato();
+}
+
+function switchCarriereTab(name, btn) {
+  currentCarriereTab = name;
+  document.querySelectorAll('#carriere-panel .club-subpanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#carriere-panel .club-tab').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('car-' + name);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  renderCarriereAll();
+}
+
+function getRatingColor(r) {
+  if (r >= 85) return 'var(--gold)';
+  if (r >= 75) return 'var(--mint)';
+  if (r >= 65) return 'var(--text2)';
+  return 'var(--text3)';
+}
+
+function renderCarriereProfil() {
+  const panel = document.getElementById('car-profil');
+  if (!panel) return;
+  const car = G.club.carriere;
+  if (!car) return;
+  const club = CAREER_CLUBS.find(c=>c.id===car.clubId) || {name:car.clubName, country:'⚽', tier:1};
+  const avgRat = car.seasonRatingCount > 0 ? (car.seasonRating / car.seasonRatingCount).toFixed(1) : '–';
+
+  panel.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:12px;padding:14px;margin-bottom:9px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="width:54px;height:54px;border-radius:50%;background:var(--bg3);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:26px">${car.nat}</div>
+        <div style="flex:1">
+          <div style="font-size:18px;font-weight:800;color:var(--text1)">${car.name}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${car.pos} · ${car.age} ans · Saison ${car.saison}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--mint);margin-top:2px">${club.country} ${car.clubName} · ${car.clubLeague}</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--font-mono);font-size:32px;font-weight:700;color:${getRatingColor(car.rating)}">${car.rating}</div>
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Note globale</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <div style="background:var(--bg3);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--gold)">${car.seasonGoals}</div>
+          <div style="font-size:9px;color:var(--text3)">Buts</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--mint)">${car.seasonAssists}</div>
+          <div style="font-size:9px;color:var(--text3)">Passes D.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text2)">${avgRat}</div>
+          <div style="font-size:9px;color:var(--text3)">Moy. Note</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:9px">
+      <div class="section-title">Contrat</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text1)">${car.clubName}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">Salaire : ${fmt(car.wage)}/mois</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:${car.contractEnd - car.saison <= 1 ? 'var(--danger)':'var(--text3)'}">Fin de contrat : Saison ${car.contractEnd}</div>
+        </div>
+        <div style="font-size:28px">${club.country}</div>
+      </div>
+      ${car.contractEnd - car.saison <= 1 ? `<div style="margin-top:8px;background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.3);border-radius:6px;padding:7px 10px;font-size:10px;color:var(--danger)">⚠ Contrat se termine bientôt — négociez votre avenir dans l'onglet Mercato !</div>` : ''}
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px">
+      <div class="section-title">Progression</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text2)">Note actuelle</div>
+        <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${car.rating}%;background:linear-gradient(90deg,var(--mint-dark),var(--gold));border-radius:2px;transition:width .5s"></div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:${getRatingColor(car.rating)}">${car.rating}</div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Buts totaux : ${car.totalGoals} · Passes D. : ${car.totalAssists} · Matchs : ${car.totalApps}</div>
+    </div>
+  `;
+}
+
+function generateSeasonMatches(car) {
+  // Génère 34 matchs de championnat pour la saison
+  const club = CAREER_CLUBS.find(c=>c.id===car.clubId);
+  const rivals = CAREER_CLUBS.filter(c=>c.league===car.clubLeague && c.id!==car.clubId).slice(0,9);
+  if (rivals.length < 3) {
+    // Fallback: use generic opponents
+    for(let i=rivals.length;i<9;i++) rivals.push({id:'rival'+i,name:'Rival FC '+(i+1),ovr:car.clubOvr+Math.floor(Math.random()*20-10),country:'⚽'});
+  }
+  const matches = [];
+  rivals.forEach(r => {
+    matches.push({opp:r.name, oppOvr:r.ovr, home:true,  played:false});
+    matches.push({opp:r.name, oppOvr:r.ovr, home:false, played:false});
+  });
+  // Extra matches pour avoir 30 au total
+  while(matches.length < 30) {
+    const r = rivals[matches.length % rivals.length];
+    matches.push({opp:r.name, oppOvr:r.ovr+Math.floor(Math.random()*6-3), home:Math.random()>.5, played:false});
+  }
+  // Shuffle
+  for(let i=matches.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[matches[i],matches[j]]=[matches[j],matches[i]];}
+  car.seasonMatches = matches;
+  car.seasonMatchday = 0;
+  // Build league table
+  const allTeams = [{name:car.clubName, ovr:car.clubOvr, pts:0,w:0,d:0,l:0,gf:0,ga:0,isPlayer:true}];
+  rivals.forEach(r => allTeams.push({name:r.name,ovr:r.ovr,pts:0,w:0,d:0,l:0,gf:0,ga:0}));
+  car.leagueTable = allTeams;
+}
+
+function renderCarriereSaison() {
+  const panel = document.getElementById('car-saison');
+  if (!panel) return;
+  const car = G.club.carriere;
+  if (!car) return;
+
+  if (!car.seasonMatches || car.seasonMatches.length === 0) {
+    // New season, not started
+    panel.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:12px;padding:16px;text-align:center;margin-bottom:10px">
+        <div style="font-size:36px;margin-bottom:8px">⚽</div>
+        <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px">Saison ${car.saison}</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:14px">Prêt à vivre une nouvelle saison avec ${car.clubName} ?</div>
+        <button onclick="startCarriereSaison()" style="width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--gold);background:color-mix(in srgb, var(--gold) 10%, transparent);color:var(--gold);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">▶ Lancer la Saison ${car.saison}</button>
+      </div>`;
+    return;
+  }
+
+  const played = car.seasonMatches.filter(m=>m.played);
+  const remaining = car.seasonMatches.filter(m=>!m.played);
+  const lastMatch = played[played.length-1];
+  const isFinished = car.seasonFinished || remaining.length === 0;
+
+  // League table sorted
+  const sortedTable = (car.leagueTable||[]).slice().sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));
+  const myPos = sortedTable.findIndex(t=>t.isPlayer) + 1;
+
+  let html = `
+    <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 30%, transparent);border-radius:10px;padding:11px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold)">Saison ${car.saison} — ${car.clubLeague}</div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">J${played.length}/${car.seasonMatches.length}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px">
+        <div style="background:var(--bg3);border-radius:6px;padding:6px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--success)">${car.seasonWins}</div><div style="font-size:8px;color:var(--text3)">V</div></div>
+        <div style="background:var(--bg3);border-radius:6px;padding:6px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--gold)">${car.seasonDraws}</div><div style="font-size:8px;color:var(--text3)">N</div></div>
+        <div style="background:var(--bg3);border-radius:6px;padding:6px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--danger)">${car.seasonLosses}</div><div style="font-size:8px;color:var(--text3)">D</div></div>
+        <div style="background:var(--bg3);border-radius:6px;padding:6px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--mint)">${myPos}${myPos===1?'er':myPos===2?'ème':'ème'}</div><div style="font-size:8px;color:var(--text3)">Classé</div></div>
+      </div>
+      ${lastMatch ? `<div style="background:var(--bg3);border-radius:7px;padding:8px;font-family:var(--font-mono);font-size:10px;color:var(--text2)">
+        Dernier match : <span style="color:var(--text1)">${lastMatch.opp}</span> —
+        <span style="color:${lastMatch.result==='win'?'var(--success)':lastMatch.result==='draw'?'var(--gold)':'var(--danger)'}">${lastMatch.result==='win'?'Victoire':lastMatch.result==='draw'?'Nul':'Défaite'}</span>
+        ${lastMatch.score} · Note: <span style="color:var(--gold)">${lastMatch.playerRating}/10</span>
+      </div>` : ''}
+    </div>`;
+
+  if (!isFinished) {
+    const next = remaining[0];
+    html += `
+      <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--mint) 30%, transparent);border-radius:10px;padding:12px;margin-bottom:8px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-weight:700">Prochain match</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="text-align:center;flex:1"><div style="font-size:12px;font-weight:700;color:var(--text1)">${car.clubName}</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">${car.clubOvr}</div></div>
+          <div style="font-size:11px;color:var(--text3);padding:0 8px">${next.home?'(Dom)':'(Ext)'}</div>
+          <div style="text-align:center;flex:1"><div style="font-size:12px;font-weight:700;color:var(--text1)">${next.opp}</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--mint)">${next.oppOvr}</div></div>
+        </div>
+        <button onclick="playCarriereMatch()" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--mint);background:transparent;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">▶ Jouer ce match</button>
+        <button onclick="playCarriereFullSeason()" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font-head);margin-top:5px">⏩ Simuler la saison entière</button>
+      </div>`;
+  } else {
+    html += `
+      <div style="background:color-mix(in srgb, var(--gold) 8%, transparent);border:1.5px solid var(--gold);border-radius:12px;padding:14px;margin-bottom:8px;text-align:center">
+        <div style="font-size:24px;margin-bottom:6px">${myPos===1?'🏆':myPos<=3?'🥈':'📋'}</div>
+        <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:4px">Saison terminée !</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Vous avez terminé ${myPos}${myPos===1?'er':'ème'} de ${car.clubLeague}</div>
+        <button onclick="finishCarriereSaison()" style="width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--gold);background:color-mix(in srgb, var(--gold) 12%, transparent);color:var(--gold);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font-head)">→ Passer à la Saison ${car.saison+1}</button>
+      </div>`;
+  }
+
+  // Classement
+  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px">
+    <div class="section-title">Classement</div>
+    <table class="standings-table" style="width:100%">
+      <tr><th>#</th><th>Équipe</th><th>Pts</th><th>V</th><th>N</th><th>D</th></tr>
+      ${sortedTable.map((t,i)=>`<tr ${t.isPlayer?'class="my-team"':''}>
+        <td>${i+1}</td><td style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis">${t.name}</td>
+        <td style="font-weight:700">${t.pts}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+      </tr>`).join('')}
+    </table>
+  </div>`;
+
+  panel.innerHTML = html;
+}
+
+function startCarriereSaison() {
+  const car = G.club.carriere;
+  if(car.transferCooldown > 0) car.transferCooldown--;
+  generateSeasonMatches(car);
+  car.seasonFinished = false;
+  car.seasonGoals = 0; car.seasonAssists = 0; car.seasonApps = 0;
+  car.seasonRating = 0; car.seasonRatingCount = 0;
+  car.seasonWins = 0; car.seasonDraws = 0; car.seasonLosses = 0;
+  renderCarriereSaison();
+  // Generate transfer offers for new season
+  generateTransferOffers(car);
+  showToast(`⚽ Saison ${car.saison} démarrée !`);
+  saveGame();
+}
+
+function playCarriereMatch() {
+  const car = G.club.carriere;
+  const next = car.seasonMatches.find(m=>!m.played);
+  if (!next) return;
+
+  const myOvr = car.clubOvr; // Use actual club OVR, not player rating
+  const diff = myOvr - next.oppOvr;
+  const winProb = 45 + diff * 1.5 + (next.home ? 5 : -5);
+  const rnd = Math.random() * 100;
+
+  let result, myG, oppG;
+  if (rnd < Math.max(10, Math.min(85, winProb))) {
+    result = 'win';
+    myG = 1 + Math.floor(Math.random()*3);
+    oppG = Math.floor(Math.random()*myG);
+    if(oppG===myG) oppG = Math.max(0,myG-1);
+    car.seasonWins++;
+    car.totalWins++;
+  } else if (rnd < Math.max(10, Math.min(85, winProb)) + 18) {
+    result = 'draw';
+    myG = Math.floor(Math.random()*3);
+    oppG = myG;
+    car.seasonDraws++;
+  } else {
+    result = 'lose';
+    oppG = 1 + Math.floor(Math.random()*3);
+    myG = Math.floor(Math.random()*oppG);
+    if(myG===oppG) myG = Math.max(0,oppG-1);
+    car.seasonLosses++;
+  }
+
+  // Player personal stats
+  const isStriker = ['AT','AG','AD'].includes(car.pos);
+  const isMidfield = ['MC','MD','MOC','MOC'].includes(car.pos);
+  const goals = result==='win' ? (isStriker?Math.floor(Math.random()*3):isMidfield?Math.floor(Math.random()*2):0) :
+                result==='draw' ? (isStriker?Math.floor(Math.random()*2):0) : 0;
+  const assists = Math.floor(Math.random()*(result==='win'?2:1));
+  const playerRating = (result==='win'?6+Math.random()*3:result==='draw'?5+Math.random()*2:4+Math.random()*2).toFixed(1);
+
+  car.seasonGoals += goals;
+  car.seasonAssists += assists;
+  car.seasonApps++;
+  car.seasonRating += parseFloat(playerRating);
+  car.seasonRatingCount++;
+  car.totalGoals += goals;
+  car.totalAssists += assists;
+  car.totalApps++;
+
+  next.played = true;
+  next.result = result;
+  next.score = `${myG} - ${oppG}`;
+  next.goals = goals;
+  next.assists = assists;
+  next.playerRating = playerRating;
+
+  // Update league table
+  const myRow = car.leagueTable.find(t=>t.isPlayer);
+  const oppRow = car.leagueTable.find(t=>t.name===next.opp);
+  if(myRow) { myRow.gf+=myG; myRow.ga+=oppG; if(result==='win'){myRow.w++;myRow.pts+=3;}else if(result==='draw'){myRow.d++;myRow.pts++;}else{myRow.l++;} }
+  if(oppRow) { oppRow.gf+=oppG; oppRow.ga+=myG; if(result==='lose'){oppRow.w++;oppRow.pts+=3;}else if(result==='draw'){oppRow.d++;oppRow.pts++;}else{oppRow.l++;} }
+
+  // Simulate other matches as proper pairs (each team plays exactly 1 match per round)
+  const othersActive = car.leagueTable.filter(t=>!t.isPlayer && t.name!==next.opp);
+  for(let i=othersActive.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[othersActive[i],othersActive[j]]=[othersActive[j],othersActive[i]];}
+  for(let i=0;i+1<othersActive.length;i+=2){
+    const a=othersActive[i],b=othersActive[i+1];
+    const diff=(a.ovr||75)-(b.ovr||75);
+    const pA=Math.max(15,Math.min(75,45+diff*1.2));
+    const r=Math.random()*100;
+    if(r<pA){a.w++;a.pts+=3;a.gf+=1+Math.floor(Math.random()*3);a.ga+=Math.floor(Math.random()*2);b.l++;b.ga+=1+Math.floor(Math.random()*2);b.gf+=Math.floor(Math.random()*2);}
+    else if(r<pA+18){const g=Math.floor(Math.random()*3);a.d++;a.pts++;a.gf+=g;a.ga+=g;b.d++;b.pts++;b.gf+=g;b.ga+=g;}
+    else{b.w++;b.pts+=3;b.gf+=1+Math.floor(Math.random()*3);b.ga+=Math.floor(Math.random()*2);a.l++;a.ga+=1+Math.floor(Math.random()*2);a.gf+=Math.floor(Math.random()*2);}
+  }
+
+  // Revenue from match
+  const matchEarnings = Math.floor(car.wage * (result==='win'?0.5:result==='draw'?0.1:0));
+  if(matchEarnings>0) { G.money += matchEarnings; G.totalEarned += matchEarnings; }
+
+  const goalsText = goals > 0 ? ` (${goals} but${goals>1?'s':''})` : '';
+  const assistText = assists > 0 ? ` (${assists} passe${assists>1?'s':''} D.)` : '';
+  const resultLabel = result==='win'?'Victoire':result==='draw'?'Nul':'Défaite';
+  showToast(`${resultLabel} ${myG}-${oppG} vs ${next.opp}${goalsText}${assistText} · Note ${playerRating}`);
+
+  if(car.seasonMatches.filter(m=>!m.played).length===0) car.seasonFinished = true;
+
+  renderCarriereAll(); updateUI(); saveGame();
+}
+
+function playCarriereFullSeason() {
+  const car = G.club.carriere;
+  const remaining = car.seasonMatches.filter(m=>!m.played);
+  remaining.forEach(() => playCarriereMatchSilent());
+  car.seasonFinished = true;
+  renderCarriereAll(); updateUI(); saveGame();
+  showToast('⏩ Saison simulée !');
+}
+
+function playCarriereMatchSilent() {
+  const car = G.club.carriere;
+  const next = car.seasonMatches.find(m=>!m.played);
+  if (!next) return;
+  const myOvr = car.clubOvr; // Use actual club OVR
+  const diff = myOvr - next.oppOvr;
+  const winProb = 45 + diff * 1.5 + (next.home?5:-5);
+  const rnd = Math.random()*100;
+  let result, myG, oppG;
+  if(rnd < Math.max(10,Math.min(85,winProb))){result='win';myG=1+Math.floor(Math.random()*3);oppG=Math.max(0,myG-1-Math.floor(Math.random()*myG));car.seasonWins++;car.totalWins++;}
+  else if(rnd < Math.max(10,Math.min(85,winProb))+18){result='draw';myG=Math.floor(Math.random()*3);oppG=myG;car.seasonDraws++;}
+  else{result='lose';oppG=1+Math.floor(Math.random()*3);myG=Math.max(0,oppG-1-Math.floor(Math.random()*oppG));car.seasonLosses++;}
+  const isStriker=['AT','AG','AD'].includes(car.pos);
+  const isMidfield=['MC','MD','MOC'].includes(car.pos);
+  const isDef=['DD','DC','DG'].includes(car.pos);
+  const goals=result==='win'?(isStriker?Math.floor(Math.random()*3):isMidfield?Math.floor(Math.random()*2):isDef?(Math.random()<0.12?1:0):0):result==='draw'?(isStriker?Math.floor(Math.random()*2):isMidfield?(Math.random()<0.3?1:0):0):0;
+  const assists=Math.floor(Math.random()*(result==='win'?2:result==='draw'?1:0));
+  const playerRating=(result==='win'?6+Math.random()*3:result==='draw'?5+Math.random()*2:4+Math.random()*2).toFixed(1);
+  car.seasonGoals+=goals; car.seasonAssists+=assists; car.seasonApps++;
+  car.seasonRating+=parseFloat(playerRating); car.seasonRatingCount++;
+  car.totalGoals+=goals; car.totalAssists+=assists; car.totalApps++;
+  next.played=true; next.result=result; next.score=`${myG}-${oppG}`; next.playerRating=playerRating;
+  const myRow=car.leagueTable.find(t=>t.isPlayer);
+  const oppRow=car.leagueTable.find(t=>t.name===next.opp);
+  if(myRow){myRow.gf+=myG;myRow.ga+=oppG;if(result==='win'){myRow.w++;myRow.pts+=3;}else if(result==='draw'){myRow.d++;myRow.pts++;}else{myRow.l++;}}
+  if(oppRow){oppRow.gf+=oppG;oppRow.ga+=myG;if(result==='lose'){oppRow.w++;oppRow.pts+=3;}else if(result==='draw'){oppRow.d++;oppRow.pts++;}else{oppRow.l++;}}
+  // Simulate other teams in pairs
+  const silentOthers=car.leagueTable.filter(t=>!t.isPlayer&&t.name!==next.opp);
+  for(let i=silentOthers.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[silentOthers[i],silentOthers[j]]=[silentOthers[j],silentOthers[i]];}
+  for(let i=0;i+1<silentOthers.length;i+=2){
+    const a=silentOthers[i],b=silentOthers[i+1];
+    const diff=(a.ovr||75)-(b.ovr||75);
+    const pA=Math.max(15,Math.min(75,45+diff*1.2));
+    const r=Math.random()*100;
+    if(r<pA){a.w++;a.pts+=3;a.gf+=1+Math.floor(Math.random()*3);a.ga+=Math.floor(Math.random()*2);b.l++;b.ga+=1+Math.floor(Math.random()*2);b.gf+=Math.floor(Math.random()*2);}
+    else if(r<pA+18){const g=Math.floor(Math.random()*3);a.d++;a.pts++;a.gf+=g;a.ga+=g;b.d++;b.pts++;b.gf+=g;b.ga+=g;}
+    else{b.w++;b.pts+=3;b.gf+=1+Math.floor(Math.random()*3);b.ga+=Math.floor(Math.random()*2);a.l++;a.ga+=1+Math.floor(Math.random()*2);a.gf+=Math.floor(Math.random()*2);}
+  }
+}
+
+function finishCarriereSaison() {
+  const car = G.club.carriere;
+  const sortedTable = (car.leagueTable||[]).slice().sort((a,b)=>b.pts-a.pts);
+  const myPos = sortedTable.findIndex(t=>t.isPlayer)+1;
+  const avgRat = car.seasonRatingCount>0 ? (car.seasonRating/car.seasonRatingCount).toFixed(1) : '6.0';
+
+  // Trophées collectifs
+  const newTrophies = [];
+  if(myPos===1) newTrophies.push({id:'tr_champ_s'+car.saison, name:`Champion ${car.clubLeague}`, icon:'🥇', saison:car.saison});
+  else if(myPos===2) newTrophies.push({id:'tr_2nd_s'+car.saison, name:`Vice-Champion ${car.clubLeague}`, icon:'🥈', saison:car.saison});
+  // Aléatoire coupe nationale (20% de chance)
+  if(Math.random()<0.2) newTrophies.push({id:'tr_cup_s'+car.saison, name:`Coupe Nationale`, icon:'🏅', saison:car.saison});
+  // Coupe d'Europe : UCL et UEL sont mutuellement exclusives
+  const club = CAREER_CLUBS.find(c=>c.id===car.clubId);
+  // Qualification UCL : champion ou top2 d'un club tier5, ou champion tier4
+  const qualifieUCL = club && ((myPos<=2 && club.tier===5) || (myPos===1 && club.tier===4));
+  // Qualification UEL : top3-4 tier5 ou top2 tier4 (si pas UCL)
+  const qualifieUEL = club && !qualifieUCL && ((myPos<=4 && club.tier>=4) || (myPos<=2 && club.tier===3));
+  if(qualifieUCL && Math.random()<0.3) {
+    newTrophies.push({id:'tr_ucl_s'+car.saison, name:'Ligue des Champions', icon:'🏆', saison:car.saison});
+  } else if(qualifieUEL && Math.random()<0.25) {
+    newTrophies.push({id:'tr_uel_s'+car.saison, name:'Ligue Europa', icon:'🥉', saison:car.saison});
+  }
+  car.trophies.push(...newTrophies);
+
+  // Récompenses individuelles
+  const newAwards = [];
+  const ratingNum = parseFloat(avgRat);
+  if(ratingNum >= 8.2 && club && club.tier===5) newAwards.push({id:'balonor_s'+car.saison, name:"Ballon d'Or", icon:'🌟', saison:car.saison});
+  if(car.seasonGoals >= 20) newAwards.push({id:'goldboot_s'+car.saison, name:'Soulier d\'Or ('+car.seasonGoals+' buts)', icon:'👟', saison:car.saison});
+  if(ratingNum >= 7.5) newAwards.push({id:'mvp_s'+car.saison, name:'MVP de la saison', icon:'🏅', saison:car.saison});
+  if(ratingNum >= 7.0) newAwards.push({id:'tots_s'+car.saison, name:'Team of the Season', icon:'⭐', saison:car.saison});
+  if(car.age<=21 && ratingNum>=6.8) newAwards.push({id:'yp_s'+car.saison, name:'Meilleur Jeune', icon:'🌱', saison:car.saison});
+  car.awards.push(...newAwards);
+
+  // Progression de la note selon performances
+  let ratingGain = 0;
+  // Base selon note moyenne de saison
+  if(ratingNum >= 8.5)      ratingGain = 5;
+  else if(ratingNum >= 8.0) ratingGain = 4;
+  else if(ratingNum >= 7.5) ratingGain = 3;
+  else if(ratingNum >= 7.0) ratingGain = 2;
+  else if(ratingNum >= 6.5) ratingGain = 1;
+  else if(ratingNum >= 6.0) ratingGain = 0.5;
+  else ratingGain = -1;
+
+  // Bonus jeunesse : plus fort quand le joueur est jeune
+  if(car.age <= 18)      ratingGain += 2;
+  else if(car.age <= 21) ratingGain += 1.5;
+  else if(car.age <= 25) ratingGain += 1;
+  else if(car.age <= 28) ratingGain += 0.5;
+
+  // Déclin après le pic
+  if(car.age >= 35)      ratingGain -= 3;
+  else if(car.age >= 33) ratingGain -= 2;
+  else if(car.age >= 31) ratingGain -= 1;
+
+  // Bonus de classement en ligue
+  if(myPos === 1)       ratingGain += 1.5;
+  else if(myPos <= 3)   ratingGain += 0.5;
+
+  // Bonus trophées majeurs
+  const hasUCL  = newTrophies.some(t=>t.name==='Ligue des Champions');
+  const hasUEL  = newTrophies.some(t=>t.name==='Ligue Europa');
+  const hasCup  = newTrophies.some(t=>t.name==='Coupe Nationale');
+  const hasChamp = newTrophies.some(t=>t.name.startsWith('Champion '));
+  if(hasUCL)   ratingGain += 3;   // Gagner la C1 = bond majeur
+  if(hasUEL)   ratingGain += 1.5;
+  if(hasCup)   ratingGain += 1;
+  if(hasChamp) ratingGain += 1;
+
+  // Bonus récompenses individuelles
+  const hasBalonor = newAwards.some(a=>a.name.includes("Ballon d'Or"));
+  const hasMVP     = newAwards.some(a=>a.name==='MVP de la saison');
+  const hasGoldBoot = newAwards.some(a=>a.name.includes('Soulier'));
+  if(hasBalonor)  ratingGain += 2;
+  if(hasMVP)      ratingGain += 1;
+  if(hasGoldBoot) ratingGain += 1;
+
+  // Plafond progressif : plus dur de progresser quand on est déjà très bon
+  if(car.rating >= 90) ratingGain = Math.min(ratingGain, 1);
+  else if(car.rating >= 85) ratingGain = Math.min(ratingGain, 2);
+  else if(car.rating >= 80) ratingGain = Math.min(ratingGain, 3);
+
+  ratingGain = parseFloat(ratingGain.toFixed(1));
+  car.rating = Math.max(40, Math.min(99, parseFloat((car.rating + ratingGain).toFixed(1))));
+
+  // Revenus saison
+  const seasonBonus = Math.floor(car.wage * 12 * 0.3 * (myPos===1?1.5:myPos<=3?1.1:0.7));
+  G.money += seasonBonus; G.totalEarned += seasonBonus;
+
+  // Save history
+  car.history.push({
+    saison: car.saison,
+    club: car.clubName,
+    league: car.clubLeague,
+    goals: car.seasonGoals,
+    assists: car.seasonAssists,
+    apps: car.seasonApps,
+    rating: avgRat,
+    pos: myPos,
+    trophies: newTrophies.map(t=>t.name),
+    awards: newAwards.map(a=>a.name),
+    bonus: seasonBonus,
+  });
+
+  // === RECAP FIN DE SAISON ===
+  const recapHtml = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:40px;margin-bottom:6px">${myPos===1?'🏆':myPos===2?'🥈':myPos<=4?'🥉':'📋'}</div>
+      <div style="font-size:17px;font-weight:800;color:var(--gold)">Saison ${car.saison} terminée !</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px">${car.clubName} · ${car.clubLeague}</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);font-weight:700;margin-bottom:8px">Performances personnelles</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--gold)">${car.seasonGoals}</div>
+          <div style="font-size:9px;color:var(--text3)">Buts</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--mint)">${car.seasonAssists}</div>
+          <div style="font-size:9px;color:var(--text3)">Passes D.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--text1)">${car.seasonApps}</div>
+          <div style="font-size:9px;color:var(--text3)">Matchs</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:${getRatingColor(parseFloat(avgRat)*10)}">${avgRat}/10</div>
+          <div style="font-size:9px;color:var(--text3)">Note moy.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--success)">${car.seasonWins}</div>
+          <div style="font-size:9px;color:var(--text3)">Victoires</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--danger)">${car.seasonLosses}</div>
+          <div style="font-size:9px;color:var(--text3)">Défaites</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:10px;margin-bottom:10px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);font-weight:700;margin-bottom:6px">Classement final</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--gold)">${myPos}${myPos===1?'er':'ème'}</div>
+        <div style="font-size:11px;color:var(--text2)">${car.clubLeague}</div>
+      </div>
+    </div>
+    ${newTrophies.length>0?`<div style="background:linear-gradient(135deg,color-mix(in srgb, var(--gold) 12%, transparent),transparent);border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);border-radius:9px;padding:10px;margin-bottom:8px">
+      <div style="font-size:10px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">🏆 Trophées</div>
+      ${newTrophies.map(t=>`<div style="font-size:11px;color:var(--text1);margin-bottom:2px">${t.icon} ${t.name}</div>`).join('')}
+    </div>`:''}
+    ${newAwards.length>0?`<div style="background:linear-gradient(135deg,color-mix(in srgb, var(--mint) 12%, transparent),transparent);border:1px solid color-mix(in srgb, var(--mint) 35%, transparent);border-radius:9px;padding:10px;margin-bottom:8px">
+      <div style="font-size:10px;color:var(--mint);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">⭐ Récompenses</div>
+      ${newAwards.map(a=>`<div style="font-size:11px;color:var(--text1);margin-bottom:2px">${a.icon} ${a.name}</div>`).join('')}
+    </div>`:''}
+    <div style="background:var(--bg3);border-radius:9px;padding:10px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:11px;color:var(--text2)">Progression globale</div>
+      <div>
+        <span style="font-family:var(--font-mono);font-size:14px;color:var(--text3)">${Math.round(car.rating - ratingGain)}</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)"> → </span>
+        <span style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:${ratingGain>=0?'var(--success)':'var(--danger)'}">${car.rating} (${ratingGain>=0?'+':''}${ratingGain.toFixed(1)})</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <button onclick="const m=document.getElementById('carriere-recap-modal');if(m)m.remove();renderCarriereAll();" style="width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--gold);background:color-mix(in srgb, var(--gold) 12%, transparent);color:var(--gold);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-head)">→ Saison ${car.saison + 1}</button>
+    </div>
+  `;
+  const existingRecap = document.getElementById('carriere-recap-modal');
+  if (existingRecap) existingRecap.remove();
+  const recapModal = document.createElement('div');
+  recapModal.id = 'carriere-recap-modal';
+  recapModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:700;display:flex;align-items:flex-end;justify-content:center;padding:0;overflow:hidden';
+  recapModal.innerHTML = `<div style="background:var(--bg1);border:1px solid var(--border);border-top-left-radius:16px;border-top-right-radius:16px;padding:20px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto">
+    <div style="font-size:13px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;text-align:center">Bilan de Saison</div>
+    ${recapHtml}
+  </div>`;
+  document.body.appendChild(recapModal);
+
+  // Vieillir, passer à saison suivante
+  car.saison++;
+  car.age++;
+  car.seasonMatches = [];
+  car.seasonFinished = false;
+  car.seasonMatchday = 0;
+  car.leagueTable = [];
+  // Renouveler contrat si besoin
+  if(car.contractEnd < car.saison) {
+    car.contractEnd = car.saison + 3;
+    car.wage = Math.floor(car.wage * (1 + ratingGain*0.05 + Math.random()*0.1));
+    showToast(`📝 Contrat renouvelé jusqu'à la saison ${car.contractEnd} !`);
+  }
+
+  if(newTrophies.length>0) showToast(`🏆 ${newTrophies.map(t=>t.name).join(', ')} remporté${newTrophies.length>1?'s':''} !`);
+  if(newAwards.length>0) showToast(`⭐ Récompense : ${newAwards[0].name} !`);
+  showToast(`+${fmt(seasonBonus)} de prime de saison !`);
+  flashMilestone();
+
+  generateTransferOffers(car);
+  renderCarriereAll(); updateUI(); saveGame();
+}
+
+function generateTransferOffers(car) {
+  car.transferOffers = [];
+  const myClub = CAREER_CLUBS.find(c=>c.id===car.clubId);
+  const myTier = myClub ? myClub.tier : 1;
+  // Higher chance if good rating or ending contract
+  const chanceBonus = (car.rating > 75 ? 0.3 : 0) + (car.contractEnd - car.saison <= 1 ? 0.2 : 0);
+  const nbOffers = Math.random() < (0.4 + chanceBonus) ? Math.floor(1 + Math.random()*3) : 0;
+  for(let i=0;i<nbOffers;i++) {
+    const eligible = CAREER_CLUBS.filter(c=>c.id!==car.clubId && Math.abs(c.tier-myTier)<=1 && c.ovr <= car.rating+10);
+    if(eligible.length===0) break;
+    const offer = eligible[Math.floor(Math.random()*eligible.length)];
+    const wageOffer = Math.floor(offer.wage * (0.9 + Math.random()*0.4));
+    car.transferOffers.push({clubId:offer.id, clubName:offer.name, league:offer.league, country:offer.country, wage:wageOffer, expires:car.saison+1});
+  }
+}
+
+function acceptTransfer(clubId) {
+  const car = G.club.carriere;
+  const offer = car.transferOffers.find(o=>o.clubId===clubId);
+  if(!offer) return;
+  const newClub = CAREER_CLUBS.find(c=>c.id===clubId);
+  if(!newClub) return;
+  car.clubId = newClub.id;
+  car.clubName = newClub.name;
+  car.clubLeague = newClub.league;
+  car.clubOvr = newClub.ovr;
+  car.wage = offer.wage;
+  car.contractEnd = car.saison + 3;
+  car.transferOffers = [];
+  showToast(`✅ Transfert accepté — Bienvenue à ${newClub.name} !`);
+  flashMilestone();
+  renderCarriereAll(); saveGame();
+}
+
+function requestTransfer() {
+  const car = G.club.carriere;
+  if(car.transferCooldown > 0) { showToast(`⏳ Demande disponible dans ${car.transferCooldown} saison(s)`); return; }
+  // Force-generate offers based on player rating
+  const eligible = CAREER_CLUBS.filter(c => c.id !== car.clubId);
+  const ratingBased = eligible.filter(c => Math.abs(c.ovr - car.rating) <= 15);
+  const pool = ratingBased.length > 0 ? ratingBased : eligible;
+  const nbOffers = Math.max(1, Math.floor(1 + Math.random() * 3));
+  car.transferOffers = [];
+  for(let i=0; i<nbOffers && i<pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    const offer = pool.splice(idx, 1)[0];
+    const wageOffer = Math.floor(offer.wage * (0.85 + Math.random() * 0.5));
+    car.transferOffers.push({clubId:offer.id, clubName:offer.name, league:offer.league, country:offer.country, wage:wageOffer, expires:car.saison+1});
+  }
+  if(car.transferOffers.length===0) {
+    showToast('Aucune offre reçue pour le moment…');
+    car.transferCooldown = 1;
+  } else {
+    showToast(`📨 ${car.transferOffers.length} offre(s) reçue(s) !`);
+    car.transferCooldown = 2;
+  }
+  renderCarriereMercato();
+  saveGame();
+}
+
+function renderCarriereStats() {
+  const panel = document.getElementById('car-stats');
+  if(!panel) return;
+  const car = G.club.carriere;
+  if(!car) return;
+  const avgRat = car.seasonRatingCount>0?(car.seasonRating/car.seasonRatingCount).toFixed(1):'–';
+
+  panel.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:12px;padding:14px;margin-bottom:9px">
+      <div class="section-title">Statistiques de la saison ${car.saison}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <div class="fin-card neutral"><div class="f-label">Buts</div><div class="f-amount" style="color:var(--gold)">${car.seasonGoals}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Passes D.</div><div class="f-amount" style="color:var(--mint)">${car.seasonAssists}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Matchs joués</div><div class="f-amount">${car.seasonApps}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Note moy.</div><div class="f-amount" style="color:${getRatingColor(parseFloat(avgRat)*10)}">${avgRat}/10</div></div>
+        <div class="fin-card neutral"><div class="f-label">Victoires</div><div class="f-amount" style="color:var(--success)">${car.seasonWins}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Défaites</div><div class="f-amount" style="color:var(--danger)">${car.seasonLosses}</div></div>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:9px">
+      <div class="section-title">Totaux de carrière</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <div class="fin-card neutral"><div class="f-label">Buts totaux</div><div class="f-amount" style="color:var(--gold)">${car.totalGoals}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Passes D. totales</div><div class="f-amount" style="color:var(--mint)">${car.totalAssists}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Matchs</div><div class="f-amount">${car.totalApps}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Victoires</div><div class="f-amount" style="color:var(--success)">${car.totalWins}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Note globale</div><div class="f-amount" style="color:${getRatingColor(car.rating)}">${car.rating}</div></div>
+        <div class="fin-card neutral"><div class="f-label">Âge</div><div class="f-amount">${car.age} ans</div></div>
+      </div>
+    </div>
+    ${car.history.length>0 ? `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px">
+      <div class="section-title">Historique des saisons</div>
+      ${car.history.slice().reverse().map(h=>`
+        <div style="border-bottom:1px solid var(--border);padding:8px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--text1)">Saison ${h.saison} — ${h.club}</div>
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${h.league} · ${h.pos}${h.pos===1?'er':'ème'}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">${h.goals} ⚽ ${h.assists} 🅰️</div>
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">Moy. ${h.rating}/10 · ${h.apps} matchs</div>
+            </div>
+          </div>
+          ${h.trophies.length>0?`<div style="font-size:9px;color:var(--gold);margin-top:3px">🏆 ${h.trophies.join(' · ')}</div>`:''}
+          ${h.awards.length>0?`<div style="font-size:9px;color:var(--mint);margin-top:2px">⭐ ${h.awards.join(' · ')}</div>`:''}
+        </div>
+      `).join('')}
+    </div>` : ''}
+  `;
+}
+
+function renderCarriereTrophees() {
+  const panel = document.getElementById('car-trophees');
+  if(!panel) return;
+  const car = G.club.carriere;
+  if(!car) return;
+
+  const totalTrophies = car.trophies.length;
+  const totalAwards = car.awards.length;
+
+  panel.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:12px;padding:14px;margin-bottom:9px">
+      <div class="section-title">Palmarès</div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1;background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--gold)">${totalTrophies}</div>
+          <div style="font-size:9px;color:var(--text3)">Trophées</div>
+        </div>
+        <div style="flex:1;background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--mint)">${totalAwards}</div>
+          <div style="font-size:9px;color:var(--text3)">Récompenses</div>
+        </div>
+        <div style="flex:1;background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--text2)">${car.saison-1}</div>
+          <div style="font-size:9px;color:var(--text3)">Saisons</div>
+        </div>
+      </div>
+      ${car.trophies.length===0 ? `<div style="text-align:center;padding:16px;font-size:11px;color:var(--text3)">Aucun trophée pour le moment.<br>Continuez à jouer !</div>` : ''}
+      ${car.trophies.map(t=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:22px;width:30px;text-align:center">${t.icon}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--gold)">${t.name}</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">Saison ${t.saison}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    ${car.awards.length>0 ? `
+    <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--mint) 30%, transparent);border-radius:12px;padding:14px">
+      <div class="section-title">Récompenses individuelles</div>
+      ${car.awards.map(a=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:22px;width:30px;text-align:center">${a.icon}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--mint)">${a.name}</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">Saison ${a.saison}</div>
+          </div>
+        </div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+function renderCarriereMercato() {
+  const panel = document.getElementById('car-mercato');
+  if(!panel) return;
+  const car = G.club.carriere;
+  if(!car) return;
+
+  const activeOffers = (car.transferOffers||[]).filter(o=>o.expires>=car.saison);
+
+  panel.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 30%, transparent);border-radius:12px;padding:14px;margin-bottom:9px">
+      <div class="section-title">Mercato — Saison ${car.saison}</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6">Faites une demande de transfert ou attendez qu'un club vous contacte.</div>
+      <button onclick="requestTransfer()" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--gold);background:color-mix(in srgb, var(--gold) 8%, transparent);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">
+        ${car.transferCooldown>0?`⏳ Demande disponible dans ${car.transferCooldown} saison(s)`:'📨 Demander un transfert'}
+      </button>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:9px">
+      <div class="section-title">Offres reçues (${activeOffers.length})</div>
+      ${activeOffers.length===0 ? `<div style="text-align:center;padding:16px;font-size:11px;color:var(--text3)">Aucune offre actuellement.<br>Continuez à briller et les clubs viendront !</div>` :
+        activeOffers.map(o=>{
+          const club = CAREER_CLUBS.find(c=>c.id===o.clubId)||{};
+          return `<div style="background:var(--bg3);border-radius:9px;padding:11px;margin-bottom:7px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <div style="font-size:18px">${o.country||'⚽'}</div>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:700;color:var(--text1)">${o.clubName}</div>
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${o.league}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--gold)">${fmt(o.wage)}/mois</div>
+                <div style="font-size:9px;color:var(--text3)">expire S.${o.expires}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button onclick="acceptTransfer('${o.clubId}')" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--mint);background:rgba(107,124,147,0.08);color:var(--mint);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">✓ Accepter</button>
+              <button onclick="declineTransfer('${o.clubId}')" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head)">✗ Refuser</button>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px">
+      <div class="section-title">Contrat actuel</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text1)">${car.clubName}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">Salaire : ${fmt(car.wage)}/mois</div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:${car.contractEnd-car.saison<=1?'var(--danger)':'var(--text2)'}">Fin : S.${car.contractEnd}</div>
+      </div>
+      ${car.contractEnd-car.saison<=1?`<button onclick="renewCareerContract()" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--gold);background:color-mix(in srgb, var(--gold) 8%, transparent);color:var(--gold);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font-head);margin-bottom:8px">📝 Négocier une prolongation</button>`:''}
+    </div>
+    <div style="background:var(--bg2);border:1px solid rgba(224,92,92,0.3);border-radius:12px;padding:14px;margin-top:9px">
+      <div class="section-title" style="color:var(--danger)">Fin de carrière</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.6">${car.age >= 35 ? '🎖️ Vous avez accompli une belle carrière. Le moment est peut-être venu de raccrocher les crampons.' : 'Vous pouvez prendre votre retraite à tout moment. Cette action est irréversible.'}</div>
+      <button onclick="showRetirementConfirm()" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--danger);background:rgba(224,92,92,0.06);color:var(--danger);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head)">🎖️ Prendre ma retraite</button>
+    </div>
+  `;
+}
+
+function declineTransfer(clubId) {
+  const car = G.club.carriere;
+  car.transferOffers = (car.transferOffers||[]).filter(o=>o.clubId!==clubId);
+  showToast('Offre refusée.');
+  renderCarriereMercato();
+}
+
+function showRetirementConfirm() {
+  const car = G.club.carriere;
+  const totalSeasons = car.saison - 1;
+  const html = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:44px;margin-bottom:8px">🎖️</div>
+      <div style="font-size:16px;font-weight:800;color:var(--gold)">Prendre sa retraite</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;text-align:center;font-weight:600">${car.name} — Bilan de carrière</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div style="text-align:center"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--gold)">${car.totalGoals}</div><div style="font-size:9px;color:var(--text3)">Buts</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--mint)">${car.totalAssists}</div><div style="font-size:9px;color:var(--text3)">Passes D.</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text1)">${car.totalApps}</div><div style="font-size:9px;color:var(--text3)">Matchs</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text2)">${totalSeasons}</div><div style="font-size:9px;color:var(--text3)">Saisons</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--gold)">${car.trophies.length}</div><div style="font-size:9px;color:var(--text3)">Trophées</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--mint)">${car.awards.length}</div><div style="font-size:9px;color:var(--text3)">Récompenses</div></div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:14px">Que souhaitez-vous faire ensuite ?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="retireAndRestartCareer()" style="width:100%;padding:11px;border-radius:9px;border:1.5px solid var(--mint);background:color-mix(in srgb, var(--mint) 10%, transparent);color:var(--mint);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-head)">⭐ Recommencer une nouvelle carrière</button>
+      <button onclick="retireAndManageClub()" style="width:100%;padding:11px;border-radius:9px;border:1.5px solid var(--gold);background:color-mix(in srgb, var(--gold) 10%, transparent);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-head)">🏢 Devenir Manager de Club</button>
+      <button onclick="const m=document.getElementById('carriere-retire-modal');if(m)m.remove();" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-head)">← Annuler</button>
+    </div>
+  `;
+  const existingRet = document.getElementById('carriere-retire-modal');
+  if (existingRet) existingRet.remove();
+  const retModal = document.createElement('div');
+  retModal.id = 'carriere-retire-modal';
+  retModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:700;display:flex;align-items:flex-end;justify-content:center;padding:0;overflow:hidden';
+  retModal.innerHTML = `<div style="background:var(--bg1);border:1px solid var(--border);border-top-left-radius:16px;border-top-right-radius:16px;padding:20px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto">
+    <div style="font-size:13px;font-weight:800;color:var(--danger);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;text-align:center">Retraite</div>
+    ${html}
+  </div>`;
+  document.body.appendChild(retModal);
+}
+
+function retireAndRestartCareer() {
+  const rm=document.getElementById('carriere-retire-modal');if(rm)rm.remove();
+  // Reset career, keep main game progress
+  G.club.carriere = null;
+  G.club.footballMode = null;
+  G.club.showOnboarding = true;
+  // Pre-select carriere mode
+  window._selectedFootballMode = 'carriere';
+  showToast('🎖️ Belle carrière ! Prêt pour une nouvelle aventure…');
+  flashMilestone();
+  updateFootballTab();
+  // Switch to football tab
+  switchTab('football');
+  // Auto-open carriere step
+  setTimeout(() => {
+    const modeStep = document.getElementById('ob-step-mode');
+    const carriereStep = document.getElementById('ob-step-carriere');
+    if(modeStep && carriereStep) {
+      modeStep.style.display = 'none';
+      carriereStep.style.display = 'block';
+      renderCareerClubList();
+      selectCareerPos('AT');
+      selectFootballMode('carriere');
+    }
+  }, 200);
+  saveGame();
+}
+
+function retireAndManageClub() {
+  const rm=document.getElementById('carriere-retire-modal');if(rm)rm.remove();
+  G.club.carriere = null;
+  G.club.footballMode = null;
+  G.club.showOnboarding = true;
+  window._selectedFootballMode = 'club';
+  showToast('🏢 Vous devenez Manager ! Configurez votre club.');
+  flashMilestone();
+  updateFootballTab();
+  switchTab('football');
+  setTimeout(() => {
+    const modeStep = document.getElementById('ob-step-mode');
+    const clubStep = document.getElementById('ob-step-club');
+    if(modeStep && clubStep) {
+      modeStep.style.display = 'none';
+      clubStep.style.display = 'block';
+      initOnboardingBadges();
+      selectFootballMode('club');
+    }
+  }, 200);
+  saveGame();
+}
+
+function renewCareerContract() {
+  const car = G.club.carriere;
+  const raise = Math.floor(car.wage * (0.05 + Math.random()*0.15));
+  car.wage += raise;
+  car.contractEnd = car.saison + 3;
+  showToast(`📝 Contrat prolongé ! +${fmt(raise)}/mois`);
+  renderCarriereMercato(); renderCarriereProfil();
+  saveGame();
+}
+
+// ── Patch updateFootballTab to handle carriere mode ──
+const _origUpdateFootballTab = updateFootballTab;
+function updateFootballTab() {
+  const locked=document.getElementById('football-locked');
+  const panel=document.getElementById('club-panel');
+  const carrierePanel=document.getElementById('carriere-panel');
+  const onboarding=document.getElementById('football-onboarding');
+
+  if (G.clubUnlocked && G.club.showOnboarding) {
+    locked.style.display='none';
+    panel.style.display='none';
+    if(carrierePanel) carrierePanel.style.display='none';
+    if (onboarding) { onboarding.style.display='block'; initOnboardingBadges(); }
+    return;
+  }
+  if (onboarding) onboarding.style.display='none';
+
+  const pct=Math.min(100,(G.money/CLUB_UNLOCK_THRESHOLD*100));
+  if (G.clubUnlocked) {
+    locked.style.display='none';
+    if(G.club.footballMode === 'carriere') {
+      panel.style.display='none';
+      if(carrierePanel) carrierePanel.style.display='flex';
+    } else {
+      panel.style.display='flex';
+      if(carrierePanel) carrierePanel.style.display='none';
+    }
+  } else {
+    locked.style.display='block';
+    panel.style.display='none';
+    if(carrierePanel) carrierePanel.style.display='none';
+    const fill=document.getElementById('fb-prog-fill');
+    if (fill) fill.style.width=pct.toFixed(1)+'%';
+    document.getElementById('football-progress-text').textContent=`Progression : ${pct.toFixed(1)}% — ${fmt(G.money)} / ${fmt(CLUB_UNLOCK_THRESHOLD)}`;
+    const buyBtn=document.getElementById('fb-unlock-btn');
+    if (buyBtn) {
+      if (G.money >= CLUB_UNLOCK_THRESHOLD) { buyFootballMode(); return; }
+      buyBtn.disabled = true;
+      buyBtn.className = 'buy-btn cant-buy';
+    }
+  }
+}
+
+
 setInterval(tick, 100);
 
 // ══════════════════════════════════════════════
