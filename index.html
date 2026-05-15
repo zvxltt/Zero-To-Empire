@@ -138,19 +138,19 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 #fortune-display .amount{font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--gold-light);}
 #fortune-display .pps{font-family:var(--font-mono);font-size:10px;color:var(--text2);margin-top:1px;}
 #content{flex:1;overflow:hidden;position:relative;min-height:0;}
-.tab-panel{display:none;height:100%;overflow-y:auto;padding:14px;scroll-behavior:smooth;}
+.tab-panel{display:none;height:100%;overflow-y:auto;padding:10px;scroll-behavior:smooth;}
 .tab-panel.active{display:block;}
 .tab-panel::-webkit-scrollbar{width:4px;}
 .tab-panel::-webkit-scrollbar-track{background:transparent;}
 .tab-panel::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 #bottomnav{background:rgba(14,24,32,0.97);border-top:1px solid var(--border);display:flex;flex-shrink:0;position:relative;}
 #bottomnav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);}
-.nav-btn{flex:1;padding:10px 2px 7px;background:none;border:none;color:#6a7f95 !important;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:7.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-head);transition:color .2s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-.nav-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;transition:transform .2s;}
+.nav-btn{flex:1;padding:8px 2px 6px;background:none;border:none;color:#6a7f95 !important;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:7.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-head);transition:color .2s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.nav-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;transition:transform .2s;}
 .nav-btn.active{color:var(--gold) !important;}
 .nav-btn.active svg{transform:translateY(-1px);}
 .nav-btn.active::after{content:'';position:absolute;bottom:0;left:15%;right:15%;height:2px;background:var(--gold);border-radius:2px 2px 0 0;}
-.section-title{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:3px;margin:0 0 10px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.section-title{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin:0 0 7px;font-weight:600;display:flex;align-items:center;gap:6px;}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* DASHBOARD */
@@ -257,31 +257,31 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 /* Club tabs — scrollable on mobile */
 .club-tabs{display:flex;gap:0;border:1px solid color-mix(in srgb, var(--gold) 30%, transparent);border-radius:8px;overflow-x:auto;overflow-y:hidden;margin-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .club-tabs::-webkit-scrollbar{display:none;}
-.club-tab{flex:1 0 auto;padding:8px 6px;background:#161d25;border:none;color:#6a8090 !important;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:var(--font-head);transition:all .2s;white-space:nowrap;}
+.club-tab{flex:1 0 auto;padding:6px 5px;background:#161d25;border:none;color:#6a8090 !important;font-size:8px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer;font-family:var(--font-head);transition:all .2s;white-space:nowrap;}
 .club-tab.active{background:#1c252f;color:var(--gold) !important;}
 .club-subpanel{display:none;}
-.club-subpanel.active{display:flex;flex-direction:column;gap:9px;}
+.club-subpanel.active{display:flex;flex-direction:column;gap:7px;}
 
-.club-header{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px;}
-.club-badge-display{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid rgba(100,140,200,0.3);flex-shrink:0;position:relative;overflow:hidden;}
-.club-name{font-size:17px;font-weight:800;}
+.club-header{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:9px;padding:9px 10px;display:flex;align-items:center;gap:9px;}
+.club-badge-display{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(100,140,200,0.3);flex-shrink:0;position:relative;overflow:hidden;}
+.club-name{font-size:14px;font-weight:800;}
 .club-meta{font-family:var(--font-mono);font-size:10px;color:var(--text2);margin-top:2px;}
-.club-overall{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--gold);margin-left:auto;text-align:center;}
+.club-overall{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--gold);margin-left:auto;text-align:center;}
 .club-overall-lbl{font-size:8px;color:var(--text3);text-align:center;text-transform:uppercase;letter-spacing:1px;}
 
 .finance-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.fin-card{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:8px;padding:9px 11px;}
-.fin-card .f-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;font-weight:600;}
+.fin-card{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:7px;padding:7px 9px;}
+.fin-card .f-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;font-weight:600;}
 .fin-card.income .f-label{color:var(--success);}
 .fin-card.expense .f-label{color:var(--danger);}
-.fin-card .f-amount{font-family:var(--font-mono);font-size:13px;font-weight:500;}
+.fin-card .f-amount{font-family:var(--font-mono);font-size:11px;font-weight:500;}
 .fin-card.income .f-amount{color:var(--success);}
 .fin-card.expense .f-amount{color:var(--danger);}
 .fin-card.neutral .f-label{color:var(--text3);}
 .fin-card.full{grid-column:span 2;}
 
-.players-section{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:10px;padding:11px;}
-.player-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
+.players-section{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:9px;padding:9px;}
+.player-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);}
 .player-row:last-child{border-bottom:none;}
 /* Tactical pitch */
 .tactic-slot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;z-index:10;user-select:none;}
@@ -296,10 +296,10 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 .tactic-slot.empty .tactic-pos-label{font-size:8px;font-weight:700;color:rgba(255,255,255,0.45);}
 .bench-player{display:inline-flex;align-items:center;gap:3px;background:var(--bg2);border:1px solid rgba(107,124,147,0.25);border-radius:6px;padding:4px 7px;cursor:pointer;transition:border-color .15s,background .15s;}
 .bench-player:hover,.bench-player:active{border-color:color-mix(in srgb, var(--gold) 40%, transparent);background:color-mix(in srgb, var(--gold) 5%, transparent);}
-.p-name{font-size:12px;font-weight:600;}
+.p-name{font-size:11px;font-weight:600;}
 .p-meta{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px;}
 .p-flag{font-size:10px;}
-.p-rating{border-radius:4px;padding:2px 6px;font-family:var(--font-mono);font-size:11px;font-weight:500;}
+.p-rating{border-radius:4px;padding:2px 5px;font-family:var(--font-mono);font-size:10px;font-weight:500;}
 .p-rating.elite{background:color-mix(in srgb, var(--gold) 15%, transparent);color:var(--gold);}
 .p-rating.good{background:rgba(107,124,147,0.12);color:var(--mint);}
 .p-rating.avg{background:var(--bg3);color:var(--text2);}
@@ -537,6 +537,26 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 }
 .biz-icon span:not(.svg-icon),.upg-icon span:not(.svg-icon),.coll-card-icon{
 font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,‘Twemoji Mozilla’,sans-serif;
+}
+
+/* Mobile compact overrides */
+@media (max-width: 430px) {
+  .tab-panel { padding: 8px; }
+  .club-header { padding: 8px; gap: 8px; }
+  .club-badge-display { width: 36px; height: 36px; font-size: 19px; }
+  .club-name { font-size: 13px; }
+  .club-overall { font-size: 20px; }
+  .fin-card { padding: 6px 8px; }
+  .fin-card .f-label { font-size: 7.5px; }
+  .fin-card .f-amount { font-size: 11px; }
+  .finance-grid { gap: 5px; }
+  .players-section { padding: 8px; }
+  .player-row { padding: 3px 0; }
+  .p-name { font-size: 10px; }
+  .p-rating { font-size: 9px; padding: 1px 4px; }
+  .standings-table { font-size: 10px; }
+  .section-title { font-size: 7.5px; margin: 0 0 6px; }
+  .modal-box { padding: 14px; margin: 10px; }
 }
 </style>
 
@@ -5121,7 +5141,8 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
+  else { const nb=document.querySelector(`.nav-btn[onclick*="'${name}'"]`); if(nb) nb.classList.add('active'); }
   currentTab=name;
   if (name==='biz') {
     if (currentBizTab==='entreprises') renderBizList();
@@ -6167,11 +6188,37 @@ function playCarriereMatch() {
 
   // Player personal stats
   const isStriker = ['AT','AG','AD'].includes(car.pos);
-  const isMidfield = ['MC','MD','MOC','MOC'].includes(car.pos);
-  const goals = result==='win' ? (isStriker?Math.floor(Math.random()*3):isMidfield?Math.floor(Math.random()*2):0) :
-                result==='draw' ? (isStriker?Math.floor(Math.random()*2):0) : 0;
-  const assists = Math.floor(Math.random()*(result==='win'?2:1));
-  const playerRating = (result==='win'?6+Math.random()*3:result==='draw'?5+Math.random()*2:4+Math.random()*2).toFixed(1);
+  const isMidfield = ['MC','MD','MOC'].includes(car.pos);
+  const isDef = ['DD','DC','DG'].includes(car.pos);
+  // Buts : plus fréquents, min 1 but sur victoire pour attaquants/milieux
+  let goals = 0;
+  if (result === 'win') {
+    if (isStriker)      goals = 1 + Math.floor(Math.random()*3);   // 1-3 buts
+    else if (isMidfield) goals = Math.random()<0.7 ? 1+Math.floor(Math.random()*2) : 0; // 70% chance 1-2
+    else if (isDef)      goals = Math.random()<0.25 ? 1 : 0;        // 25% chance 1 but
+    else                 goals = Math.random()<0.15 ? 1 : 0;
+  } else if (result === 'draw') {
+    if (isStriker)       goals = Math.random()<0.65 ? 1+Math.floor(Math.random()*2) : 0;
+    else if (isMidfield) goals = Math.random()<0.4 ? 1 : 0;
+    else                 goals = Math.random()<0.1 ? 1 : 0;
+  } else { // lose
+    if (isStriker)       goals = Math.random()<0.35 ? 1 : 0;
+    else if (isMidfield) goals = Math.random()<0.15 ? 1 : 0;
+    else                 goals = 0;
+  }
+  // Passes D : plus fréquentes
+  let assists = 0;
+  if (result === 'win') {
+    if (isStriker)       assists = Math.random()<0.5 ? 1 : 0;
+    else if (isMidfield) assists = Math.random()<0.75 ? 1+Math.floor(Math.random()*2) : 0;
+    else                 assists = Math.random()<0.4 ? 1 : 0;
+  } else if (result === 'draw') {
+    assists = Math.random()<0.4 ? 1 : 0;
+  } else {
+    assists = Math.random()<0.2 ? 1 : 0;
+  }
+  // Notes : tirées vers le haut (min 6.0 en victoire, 5.5 en nul)
+  const playerRating = (result==='win' ? 7+Math.random()*2.5 : result==='draw' ? 6+Math.random()*2 : 5+Math.random()*2).toFixed(1);
 
   car.seasonGoals += goals;
   car.seasonAssists += assists;
@@ -6246,9 +6293,32 @@ function playCarriereMatchSilent() {
   const isStriker=['AT','AG','AD'].includes(car.pos);
   const isMidfield=['MC','MD','MOC'].includes(car.pos);
   const isDef=['DD','DC','DG'].includes(car.pos);
-  const goals=result==='win'?(isStriker?Math.floor(Math.random()*3):isMidfield?Math.floor(Math.random()*2):isDef?(Math.random()<0.12?1:0):0):result==='draw'?(isStriker?Math.floor(Math.random()*2):isMidfield?(Math.random()<0.3?1:0):0):0;
-  const assists=Math.floor(Math.random()*(result==='win'?2:result==='draw'?1:0));
-  const playerRating=(result==='win'?6+Math.random()*3:result==='draw'?5+Math.random()*2:4+Math.random()*2).toFixed(1);
+  let goals=0;
+  if(result==='win'){
+    if(isStriker) goals=1+Math.floor(Math.random()*3);
+    else if(isMidfield) goals=Math.random()<0.7?1+Math.floor(Math.random()*2):0;
+    else if(isDef) goals=Math.random()<0.25?1:0;
+    else goals=Math.random()<0.15?1:0;
+  } else if(result==='draw'){
+    if(isStriker) goals=Math.random()<0.65?1+Math.floor(Math.random()*2):0;
+    else if(isMidfield) goals=Math.random()<0.4?1:0;
+    else goals=Math.random()<0.1?1:0;
+  } else {
+    if(isStriker) goals=Math.random()<0.35?1:0;
+    else if(isMidfield) goals=Math.random()<0.15?1:0;
+    else goals=0;
+  }
+  let assists=0;
+  if(result==='win'){
+    if(isStriker) assists=Math.random()<0.5?1:0;
+    else if(isMidfield) assists=Math.random()<0.75?1+Math.floor(Math.random()*2):0;
+    else assists=Math.random()<0.4?1:0;
+  } else if(result==='draw'){
+    assists=Math.random()<0.4?1:0;
+  } else {
+    assists=Math.random()<0.2?1:0;
+  }
+  const playerRating=(result==='win'?7+Math.random()*2.5:result==='draw'?6+Math.random()*2:5+Math.random()*2).toFixed(1);
   car.seasonGoals+=goals; car.seasonAssists+=assists; car.seasonApps++;
   car.seasonRating+=parseFloat(playerRating); car.seasonRatingCount++;
   car.totalGoals+=goals; car.totalAssists+=assists; car.totalApps++;
