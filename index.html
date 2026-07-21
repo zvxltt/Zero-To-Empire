@@ -25,8 +25,9 @@
   --epic: #a24fe0;
   --legendary: #e0a83f;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;height:100%;}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
+html{ background:var(--bg); height:100%; }
+html,body{margin:0;padding:0;height:100%; overscroll-behavior:none; }
 body{
   background:
     radial-gradient(circle at 18% 15%, rgba(217,119,87,0.16) 0%, transparent 30%),
@@ -35,7 +36,7 @@ body{
     repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px),
     radial-gradient(ellipse at top, #1b1428 0%, var(--bg) 60%);
   color:var(--cream);
-  font-family:'VT323', monospace;
+  font-family:'VT323', 'Courier New', monospace;
   font-size:20px;
   min-height:100%;
   display:flex;
@@ -49,7 +50,7 @@ body{
   50%{ filter:brightness(0.975); }
   78%{ filter:brightness(1.02); }
 }
-.pixel-font{ font-family:'Press Start 2P', monospace; }
+.pixel-font{ font-family:'Press Start 2P', 'Courier New', monospace; }
 
 #app{
   width:100%;
@@ -88,7 +89,7 @@ body{
 .panel::before{ top:-4px; left:-4px; }
 .panel::after{ bottom:-4px; right:-4px; }
 
-h1,h2,h3{ font-family:'Press Start 2P', monospace; margin:0; line-height:1.5; }
+h1,h2,h3{ font-family:'Press Start 2P', 'Courier New', monospace; margin:0; line-height:1.5; }
 h1{ font-size:16px; color:var(--cream); text-align:center; text-shadow:0 0 10px rgba(217,119,87,0.4), 2px 2px 0 var(--border-dark); }
 h2{ font-size:12px; color:var(--ember); margin-bottom:10px; text-shadow:2px 2px 0 var(--border-dark); }
 h3{ font-size:10px; color:var(--lilac); }
@@ -96,13 +97,13 @@ h3{ font-size:10px; color:var(--lilac); }
 .topbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
 .topbar .hero-btn{
   background:none; border:none; box-shadow:none; padding:0; cursor:pointer;
-  text-align:left; font-family:'VT323', monospace;
+  text-align:left; font-family:'VT323', 'Courier New', monospace;
 }
 .topbar .hero-btn .hero-tag{ font-size:16px; color:var(--cream); text-decoration:underline dotted var(--lilac); }
 .topbar .hero-btn .hero-hint{ font-size:11px; color:var(--muted); }
 .topbar .level-block{ text-align:right; min-width:120px; }
 .topbar .level-badge{
-  font-family:'Press Start 2P'; font-size:10px; color:var(--bg);
+  font-family:'Press Start 2P', 'Courier New', monospace; font-size:10px; color:var(--bg);
   background:var(--ember); padding:6px 8px; border:2px solid var(--border-dark);
   display:inline-block; margin-bottom:6px;
 }
@@ -110,7 +111,7 @@ h3{ font-size:10px; color:var(--lilac); }
 .topbar .xp-text{ font-size:11px; color:var(--muted); margin-top:3px; }
 
 button{
-  font-family:'Press Start 2P', monospace;
+  font-family:'Press Start 2P', 'Courier New', monospace;
   font-size:11px;
   background:linear-gradient(180deg, #e08a63 0%, var(--ember) 55%, var(--ember-dark) 100%);
   color:var(--border-dark);
@@ -135,7 +136,7 @@ button.secondary{ background:linear-gradient(180deg, #362a4d 0%, var(--panel-2) 
 button.block{ width:100%; }
 
 input[type=text], input[type=number]{
-  font-family:'VT323', monospace;
+  font-family:'VT323', 'Courier New', monospace;
   font-size:20px;
   background:var(--border-dark);
   color:var(--cream);
@@ -169,7 +170,7 @@ input[type=text], input[type=number]{
 .category-card .row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .dots-btn{
   background:var(--panel-2); border:2px solid var(--border-light); color:var(--lilac);
-  font-family:'Press Start 2P'; font-size:12px; padding:6px 10px; cursor:pointer; line-height:1;
+  font-family:'Press Start 2P', 'Courier New', monospace; font-size:12px; padding:6px 10px; cursor:pointer; line-height:1;
 }
 .dungeon-btn{ width:100%; text-align:left; background:var(--panel-2); border:2px solid var(--border-light); padding:10px; cursor:pointer; }
 .dungeon-btn:hover{ border-color:var(--ember); }
@@ -192,24 +193,24 @@ input[type=text], input[type=number]{
 .monster-frame canvas{ margin-bottom:12px; position:relative; z-index:1; animation: monsterBob 1s ease-in-out infinite; }
 .monster-frame.hit-active canvas{ animation:none; filter:brightness(2.4) saturate(0) drop-shadow(0 0 14px #fff); }
 @keyframes monsterBob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
-.monster-name{ font-family:'Press Start 2P'; font-size:13px; color:var(--cream); margin-bottom:10px; text-shadow:2px 2px 0 var(--border-dark); }
+.monster-name{ font-family:'Press Start 2P', 'Courier New', monospace; font-size:13px; color:var(--cream); margin-bottom:10px; text-shadow:2px 2px 0 var(--border-dark); }
 .hp-label{ font-size:14px; color:var(--lilac); margin-top:6px; }
 .dmg-popup{
   position:absolute; top:36%; left:50%; transform:translateX(-50%);
-  font-family:'Press Start 2P'; font-size:14px; color:#fff; z-index:2;
+  font-family:'Press Start 2P', 'Courier New', monospace; font-size:14px; color:#fff; z-index:2;
   text-shadow: 0 0 8px var(--ember), 2px 2px 0 var(--border-dark);
   animation: dmgFloat 0.65s ease-out forwards;
 }
 @keyframes dmgFloat{ 0%{ opacity:0; transform:translate(-50%,10px) scale(0.7); } 25%{ opacity:1; transform:translate(-50%,-6px) scale(1.15); } 100%{ opacity:0; transform:translate(-50%,-38px) scale(1); } }
 
-.timer{ font-family:'Press Start 2P'; font-size:20px; color:var(--cream); text-align:center; text-shadow:2px 2px 0 var(--border-dark); }
+.timer{ font-family:'Press Start 2P', 'Courier New', monospace; font-size:20px; color:var(--cream); text-align:center; text-shadow:2px 2px 0 var(--border-dark); }
 .timer.low{ color:var(--hp); animation: timerPulse 0.6s ease-in-out infinite; }
 @keyframes timerPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
 
 .item-row{ display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--panel-2); border:2px solid; margin-bottom:8px; }
 .item-icon{ width:32px; height:32px; flex:0 0 auto; }
 .chip .item-icon{ width:24px; height:24px; }
-.rarity-tag{ font-family:'Press Start 2P'; font-size:9px; padding:4px 6px; }
+.rarity-tag{ font-family:'Press Start 2P', 'Courier New', monospace; font-size:9px; padding:4px 6px; }
 
 .modal-overlay{
   position:fixed; inset:0; background:rgba(10,8,15,0.85); display:flex;
@@ -221,7 +222,7 @@ input[type=text], input[type=number]{
   padding:16px;
 }
 .list-row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-light); font-size:15px; }
-.status-dot{ font-size:12px; font-family:'Press Start 2P'; }
+.status-dot{ font-size:12px; font-family:'Press Start 2P', 'Courier New', monospace; }
 .status-done{ color:var(--ok); } .status-open{ color:var(--ember); } .status-locked{ color:var(--muted); }
 
 .muted{ color:var(--muted); font-size:14px; }
@@ -237,7 +238,7 @@ input[type=text], input[type=number]{
 }
 .daily-bar.claimed{ border-color:var(--ok); box-shadow:0 0 14px rgba(95,174,79,0.35); }
 .daily-bar .daily-icon{ font-size:26px; width:32px; height:28px; flex:0 0 auto; }
-.daily-bar .daily-title{ font-family:'Press Start 2P'; font-size:10px; color:var(--cream); margin-bottom:4px; }
+.daily-bar .daily-title{ font-family:'Press Start 2P', 'Courier New', monospace; font-size:10px; color:var(--cream); margin-bottom:4px; }
 .daily-bar .daily-sub{ font-size:13px; color:var(--muted); }
 .daily-bar .daily-sub.claimed{ color:var(--ok); border:none; }
 canvas.pixel-canvas{
@@ -251,6 +252,7 @@ canvas.pixel-canvas{
   border:3px solid var(--border-light); padding:10px; text-align:center;
   box-shadow:0 0 20px rgba(217,119,87,0.12), inset 0 0 18px rgba(0,0,0,0.4);
 }
+.creation-preview canvas{ animation: monsterBob 1.6s ease-in-out infinite; }
 .creation-options{ flex:1; min-width:0; }
 .topbar .hero-avatar{
   width:38px; height:48px; background:var(--panel-2); border:2px solid var(--border-light);
@@ -441,7 +443,8 @@ function accessoryLayer(colorHex){
 
 const SKIN_TONE_HEX = { 'Clair':'#f4d0a8', 'Médium':'#d9a066', 'Hâlé':'#b97a4b', 'Foncé':'#8a5a36' };
 const HAIR_COLOR_HEX = { 'Brun':'#5b3a24', 'Noir':'#2a2320', 'Blond':'#d9b45c', 'Roux':'#a34a28' };
-const SHIRT_DEFAULT = '#7a6a52', PANTS_DEFAULT = '#4a3f33', BOOTS_DEFAULT = '#2e2620';
+const TUNIC_COLOR_HEX = { 'Cuir':'#7a6a52', 'Bleu royal':'#3f5f8a', 'Vert forêt':'#3f6b45', 'Rouge écarlate':'#8a3f3f', 'Gris acier':'#5a5f66' };
+const PANTS_DEFAULT = '#4a3f33', BOOTS_DEFAULT = '#2e2620';
 
 // teintes visuelles par objet (archetype pour les casques uniquement)
 const ITEM_VISUALS = {
@@ -463,9 +466,10 @@ const ITEM_VISUALS = {
 };
 
 /** Dessine le héros sur un <canvas> selon apparence + équipement (peut être appelé en direct pendant la création pour un aperçu qui change en temps réel). */
-function renderHero(canvas, {skinLabel, hairStyle, hairColorLabel, equipped}, cell=8){
+function renderHero(canvas, {skinLabel, hairStyle, hairColorLabel, tunicLabel, equipped}, cell=8){
   const skinHex = SKIN_TONE_HEX[skinLabel] || SKIN_TONE_HEX['Médium'];
   const hairHex = HAIR_COLOR_HEX[hairColorLabel] || HAIR_COLOR_HEX['Brun'];
+  const tunicHex = TUNIC_COLOR_HEX[tunicLabel] || TUNIC_COLOR_HEX['Cuir'];
   const eq = equipped || {};
   const armorVis = eq.armor ? ITEM_VISUALS[eq.armor] : null;
   const helmetVis = eq.helmet ? ITEM_VISUALS[eq.helmet] : null;
@@ -474,7 +478,7 @@ function renderHero(canvas, {skinLabel, hairStyle, hairColorLabel, equipped}, ce
 
   const layers = [];
   if(capeVis) layers.push(capeLayer(capeVis.color));
-  layers.push(heroBaseRects(skinHex, SHIRT_DEFAULT, PANTS_DEFAULT, BOOTS_DEFAULT));
+  layers.push(heroBaseRects(skinHex, tunicHex, PANTS_DEFAULT, BOOTS_DEFAULT));
   if(armorVis) layers.push(armorLayer(armorVis.color, armorVis.accent));
   if(helmetVis) layers.push(helmetLayer(helmetVis.archetype, helmetVis.color, helmetVis.accent));
   else layers.push(hairLayer(hairStyle, hairHex));
@@ -527,6 +531,26 @@ const MONSTER_VISUALS = {
   kraken:{archetype:'blob', body:'#1e3a4a', eye:'#e0a83f', accent:'#123040'},
   phoenix:{archetype:'flyer', body:'#d97757', eye:'#fff3c4', accent:'#ffb347'},
 };
+const MONSTER_EXTRA_RECTS = {
+  goblin:   [ [3,4,1,1,'accent'],[12,4,1,1,'accent'] ],                    // oreilles pointues
+  slime:    [ [9,11,1,1,'highlight'] ],                                    // bulle
+  rat:      [ [14,6,2,1,'accent'],[12,4,1,1,'accent'] ],                   // moustaches + oreille
+  bat:      [ [6,3,1,1,'body'],[9,3,1,1,'body'] ],                        // oreilles pointues
+  spider:   [ [3,9,1,2,'shade'],[13,9,1,2,'shade'] ],                     // pattes supplémentaires
+  wolf:     [ [11,4,1,1,'accent'],[1,5,2,2,'body'] ],                      // oreille + fourrure de queue
+  orc:      [ [6,4,1,1,'highlight'],[9,4,1,1,'highlight'] ],               // défenses
+  troll:    [ [4,9,2,2,'shade'],[10,9,2,2,'shade'] ],                      // peau tachetée
+  ogre:     [ [6,9,4,2,'highlight'] ],                                     // ventre proéminent
+  skeleton: [ [5,8,6,1,'shade'],[5,10,6,1,'shade'] ],                      // cage thoracique
+  corrupted:[ [5,3,6,1,'accent'] ],                                        // visière
+  sorcerer: [ [5,0,6,2,'accent'] ],                                        // chapeau pointu
+  dragon:   [ [15,7,1,1,'shade'] ],                                        // narine
+  demon:    [ [5,1,1,2,'accent'],[10,1,1,2,'accent'] ],                    // cornes
+  golem:    [ [6,8,1,3,'shade'],[9,8,1,3,'shade'] ],                       // fissures de pierre
+  titan:    [ [6,1,1,1,'accent'],[9,1,1,1,'accent'] ],                     // pics de couronne
+  kraken:   [ [2,12,2,2,'accent'],[12,12,2,2,'accent'],[5,13,2,1,'accent'],[9,13,2,1,'accent'] ], // tentacules
+  phoenix:  [ [6,3,1,1,'accent'],[9,3,1,1,'accent'],[7,13,2,2,'accent'] ], // flammes
+};
 function renderMonster(canvas, monsterId, cell=8){
   const vis = MONSTER_VISUALS[monsterId] || MONSTER_VISUALS.goblin;
   const rects = MONSTER_ARCHETYPE_RECTS[vis.archetype] || MONSTER_ARCHETYPE_RECTS.imp;
@@ -535,7 +559,10 @@ function renderMonster(canvas, monsterId, cell=8){
     accent:vis.accent||darken(vis.body,0.8),
     highlight: lighten(vis.body,1.45), mouth:'#1a1410',
   };
-  drawSprite(canvas, [{palette, rects}], MONSTER_GRID.w, MONSTER_GRID.h, cell);
+  const layers = [{palette, rects}];
+  const extra = MONSTER_EXTRA_RECTS[monsterId];
+  if(extra) layers.push({palette, rects:extra});
+  drawSprite(canvas, layers, MONSTER_GRID.w, MONSTER_GRID.h, cell);
 }
 
 // ---- Coffres : grille logique 16x14, fermé / ouvert, 4 paliers de rareté ----
@@ -683,7 +710,7 @@ function render(){
 
 function heroVisualOptions(){
   const a = state.hero.appearance || {};
-  return { skinLabel:a.skin, hairStyle:a.hair, hairColorLabel:a.hairColor, equipped: state.hero.equipped };
+  return { skinLabel:a.skin, hairStyle:a.hair, hairColorLabel:a.hairColor, tunicLabel:a.tunic, equipped: state.hero.equipped };
 }
 
 // ---- Écran : création du personnage ----
@@ -691,8 +718,9 @@ const APPEARANCE_OPTIONS = {
   skin:['Clair','Médium','Hâlé','Foncé'],
   hair:['Court','Long','Chauve','Queue de cheval'],
   hairColor:['Brun','Noir','Blond','Roux'],
+  tunic:['Cuir','Bleu royal','Vert forêt','Rouge écarlate','Gris acier'],
 };
-const creationChoice = { skin:'Médium', hair:'Court', hairColor:'Brun', name:'' };
+const creationChoice = { skin:'Médium', hair:'Court', hairColor:'Brun', tunic:'Cuir', name:'' };
 
 function screenCreation(){
   const app=document.getElementById('app');
@@ -707,6 +735,7 @@ function screenCreation(){
     ${optionBlock('Peau', 'skin', APPEARANCE_OPTIONS.skin)}
     ${optionBlock('Coiffure', 'hair', APPEARANCE_OPTIONS.hair)}
     ${optionBlock('Couleur cheveux', 'hairColor', APPEARANCE_OPTIONS.hairColor)}
+    ${optionBlock('Tenue de départ', 'tunic', APPEARANCE_OPTIONS.tunic)}
     <div style="height:6px"></div>
     <button class="block" id="startBtn">Commencer l'aventure</button>
   `);
@@ -719,7 +748,7 @@ function screenCreation(){
     state.screen='map'; render();
   };
   renderHero(document.getElementById('heroPreviewCanvas'),
-    { skinLabel:creationChoice.skin, hairStyle:creationChoice.hair, hairColorLabel:creationChoice.hairColor, equipped:{} }, 8);
+    { skinLabel:creationChoice.skin, hairStyle:creationChoice.hair, hairColorLabel:creationChoice.hairColor, tunicLabel:creationChoice.tunic, equipped:{} }, 9);
 }
 function optionBlock(label, key, options){
   return `<div style="margin-bottom:14px">
@@ -883,7 +912,7 @@ function screenCombat(){
     ${run.hitActive ? `<div class="dmg-popup">VAINCU !</div>` : ''}
   `;
   app.appendChild(frame);
-  renderMonster(document.getElementById('monsterCanvas'), monster.id, phaseData.isBoss ? 9 : 7);
+  renderMonster(document.getElementById('monsterCanvas'), monster.id, phaseData.isBoss ? 11 : 8);
 
   if(!run.outcome && !run.hitActive){
     const row = el('div','gap','');
@@ -1121,7 +1150,7 @@ function screenProfile(){
   app.appendChild(heroRow);
   const renameInput = document.getElementById('renameInput');
   renameInput.oninput = e=>{ state.hero.name = e.target.value; };
-  renderHero(document.getElementById('profileHeroCanvas'), heroVisualOptions(), 7);
+  renderHero(document.getElementById('profileHeroCanvas'), heroVisualOptions(), 8);
 
   const levelCard = el('div','panel','');
   const xp = xpProgress(state.hero);
