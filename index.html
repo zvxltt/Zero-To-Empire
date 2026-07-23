@@ -166,6 +166,9 @@ body{display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100d
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) translateX(-50%);}100%{opacity:0;transform:translateY(-65px) translateX(-50%);}}
 @keyframes prestigePulse{0%,100%{box-shadow:0 0 6px color-mix(in srgb, var(--gold) 40%, transparent);}50%{box-shadow:0 0 18px color-mix(in srgb, var(--gold) 90%, transparent);}}
 #btn-label{font-size:8px;color:var(--text3);margin-top:8px;text-align:center;letter-spacing:0.5px;text-transform:uppercase;max-width:170px;overflow:hidden;word-break:break-word;padding:0 6px;line-height:1.3;}
+#btn-stage-progress-wrap{width:130px;height:3px;background:var(--bg3);border-radius:2px;margin:7px auto 0;overflow:hidden;}
+#btn-stage-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width .5s cubic-bezier(.22,.61,.36,1);}
+#btn-stage-progress-text{font-size:8px;color:var(--text3);text-align:center;margin-top:5px;letter-spacing:0.4px;font-family:var(--font-mono);}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .stat-card{background:var(--bg2);border:1px solid color-mix(in srgb, var(--gold) 45%, transparent);border-radius:10px;padding:10px 12px;position:relative;overflow:hidden;}
 .stat-card::before{content:’’;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--gold) 45%, transparent),transparent);}
@@ -559,13 +562,13 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
 }
 .stat-card{animation:cardPopIn .35s cubic-bezier(.22,.61,.36,1) both;}
 
-/* Effet ciblé UNIQUEMENT sur la carte qu'on vient d'acheter (pas les autres) */
+/* Effet ciblé UNIQUEMENT sur la carte qu'on vient d'acheter (pas les autres) — discret */
 @keyframes cardBoughtPulse{
-  0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--gold) 60%, transparent);transform:scale(1);}
-  35%{box-shadow:0 0 0 7px color-mix(in srgb, var(--gold) 22%, transparent);transform:scale(1.02);}
-  100%{box-shadow:0 0 0 0 rgba(0,0,0,0);transform:scale(1);}
+  0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--gold) 40%, transparent);}
+  50%{box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 14%, transparent);}
+  100%{box-shadow:0 0 0 0 rgba(0,0,0,0);}
 }
-.biz-card.just-bought{animation:cardBoughtPulse .5s ease-out;position:relative;z-index:1;}
+.biz-card.just-bought{animation:cardBoughtPulse .32s ease-out;position:relative;z-index:1;}
 
 /* Petits appuis satisfaisants sur les boutons */
 .buy-btn.can-buy{transition:transform .12s ease, box-shadow .15s ease, background .15s ease;}
@@ -610,6 +613,7 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
 #toast{transition:opacity .3s cubic-bezier(.34,1.56,.64,1), transform .35s cubic-bezier(.34,1.56,.64,1) !important;}
 
 /* Toast "fonds insuffisants" — version soignée, adaptée au thème actif */
+/* Barre d'avancement vers le prochain stade */
 .big-error-toast{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.85);
   background:rgba(14,24,32,0.97);border:1.5px solid var(--danger);border-radius:12px;
@@ -713,6 +717,10 @@ font-family:‘Segoe UI Emoji’,‘Apple Color Emoji’,‘Noto Color Emoji’,
           </div>
         </div>
         <div id="btn-label">Stade 1 — Pièce de monnaie</div>
+        <div id="btn-stage-progress-wrap">
+          <div id="btn-stage-progress-fill"></div>
+        </div>
+        <div id="btn-stage-progress-text"></div>
       </div>
       <!-- Améliorations always visible in Home -->
       <div id="home-amelios-section">
@@ -2399,7 +2407,7 @@ function flashBoughtCard(id) {
   card.classList.remove('just-bought');
   void card.offsetWidth; // force reflow pour pouvoir rejouer l'animation
   card.classList.add('just-bought');
-  setTimeout(() => card.classList.remove('just-bought'), 550);
+  setTimeout(() => card.classList.remove('just-bought'), 350);
 }
 
 // ══════════════════════════════════════════════
@@ -4549,11 +4557,12 @@ function updateCryptoPortfolio() {
 // BTN STAGES (enhanced visuals)
 // ══════════════════════════════════════════════
 const BTN_STAGES = {
-  /* ─── STADE 1 : PIÈCE ─── simple cercle + symbole € ─── */
+  /* ─── STADE 1 : PIÈCE ─── pile de pièces vue de côté ─── */
   1: {
     label:'Stade 1 — Pièce de monnaie',
-    svg:`<circle cx="32" cy="32" r="21" fill="none" stroke="var(--gold)" stroke-width="2"/>
-    <text x="32" y="39" text-anchor="middle" font-size="18" font-family="var(--font-head)" fill="var(--gold)" font-weight="600">€</text>`
+    svg:`<ellipse cx="32" cy="38" rx="18" ry="6" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <path d="M14 38 L14 28 A18 6 0 0 0 50 28 L50 38" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <ellipse cx="32" cy="28" rx="18" ry="6" fill="none" stroke="var(--gold)" stroke-width="2"/>`
   },
 
   /* ─── STADE 2 : BILLET ─── simple rectangle + médaillon ─── */
@@ -4580,28 +4589,91 @@ const BTN_STAGES = {
     <line x1="22.5" y1="34.5" x2="41.5" y2="45.5" stroke="var(--gold)" stroke-width="2"/>`
   },
 
-  /* ─── STADE 5 : EMPIRE ─── globe simple ─── */
+  /* ─── STADE 5 : TOUR D'AFFAIRES ─── immeuble simple ─── */
   5: {
-    label:'Stade 5 — Empire Mondial',
+    label:'Stade 5 — Tour d\'Affaires',
+    svg:`<rect x="20" y="10" width="24" height="44" rx="2" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <line x1="20" y1="20" x2="44" y2="20" stroke="var(--gold)" stroke-width="1.6"/>
+    <line x1="20" y1="30" x2="44" y2="30" stroke="var(--gold)" stroke-width="1.6"/>
+    <line x1="20" y1="40" x2="44" y2="40" stroke="var(--gold)" stroke-width="1.6"/>`
+  },
+
+  /* ─── STADE 6 : CONGLOMÉRAT ─── skyline à trois tours ─── */
+  6: {
+    label:'Stade 6 — Conglomérat',
+    svg:`<rect x="9" y="34" width="11" height="20" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <rect x="26" y="18" width="11" height="36" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <rect x="43" y="27" width="11" height="27" fill="none" stroke="var(--gold)" stroke-width="2"/>`
+  },
+
+  /* ─── STADE 7 : EXPANSION CONTINENTALE ─── drapeau ─── */
+  7: {
+    label:'Stade 7 — Expansion Continentale',
+    svg:`<line x1="20" y1="12" x2="20" y2="52" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M20 14 L46 20 L20 26 Z" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/>`
+  },
+
+  /* ─── STADE 8 : DOMINATION MONDIALE ─── globe simple ─── */
+  8: {
+    label:'Stade 8 — Domination Mondiale',
     svg:`<circle cx="32" cy="32" r="21" fill="none" stroke="var(--gold)" stroke-width="2"/>
     <ellipse cx="32" cy="32" rx="9" ry="21" fill="none" stroke="var(--gold)" stroke-width="1.6"/>
     <line x1="11" y1="32" x2="53" y2="32" stroke="var(--gold)" stroke-width="1.6"/>`
+  },
+
+  /* ─── STADE 9 : PUISSANCE GALACTIQUE ─── étoile simple ─── */
+  9: {
+    label:'Stade 9 — Puissance Galactique',
+    svg:`<path d="M32 9 L38 24 L54 25 L41 35 L46 51 L32 41 L18 51 L23 35 L10 25 L26 24 Z" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
+  },
+
+  /* ─── STADE 10 : SOUVERAINETÉ ABSOLUE ─── couronne simple ─── */
+  10: {
+    label:'Stade 10 — Souveraineté Absolue',
+    svg:`<path d="M14 44 L14 26 L24 36 L32 20 L40 36 L50 26 L50 44 Z" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="14" y1="44" x2="50" y2="44" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>`
   }
 };
 
+// Seuil (argent+total gagné) marquant l'entrée dans chaque stade — index i = seuil du stade i+1
+const STAGE_THRESHOLDS = [0, 1e3, 1e5, 1e7, 1e9, 1e12, 1e15, 1e18, 1e21, 1e24];
+
 function getStage() {
-  const m=G.money+G.totalEarned;
-  if (m>=1e9) return 5;
-  if (m>=1e7) return 4;
-  if (m>=1e5) return 3;
-  if (m>=1e3) return 2;
+  const m = G.money + G.totalEarned;
+  for (let i = STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (m >= STAGE_THRESHOLDS[i]) return i + 1;
+  }
   return 1;
 }
+
+function getStageProgress() {
+  const m = G.money + G.totalEarned;
+  const stage = getStage();
+  const lower = STAGE_THRESHOLDS[stage - 1];
+  const upper = STAGE_THRESHOLDS[stage]; // undefined si stade maximum
+  if (upper === undefined) return 100;
+  const pct = ((m - lower) / (upper - lower)) * 100;
+  return Math.max(0, Math.min(100, pct));
+}
+
+let _lastVisualStage = 0;
 function updateButtonVisual() {
-  const stage=getStage();
-  const s=BTN_STAGES[stage];
-  document.getElementById('btn-svg').innerHTML=s.svg;
-  document.getElementById('btn-label').textContent=s.label;
+  const stage = getStage();
+  if (stage !== _lastVisualStage) {
+    const s = BTN_STAGES[stage];
+    document.getElementById('btn-svg').innerHTML = s.svg;
+    document.getElementById('btn-label').textContent = s.label;
+    _lastVisualStage = stage;
+  }
+  const pct = getStageProgress();
+  const fill = document.getElementById('btn-stage-progress-fill');
+  if (fill) fill.style.width = pct + '%';
+  const txt = document.getElementById('btn-stage-progress-text');
+  if (txt) {
+    txt.textContent = stage >= STAGE_THRESHOLDS.length
+      ? 'Stade maximum atteint'
+      : Math.floor(pct) + '% vers le Stade ' + (stage + 1);
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -5404,6 +5476,13 @@ function buyFormationUpgrade(playerIdx, upgId) {
   updateUI();
 }
 setInterval(saveGame, 15000);
+// Sauvegarde immédiate dès que l'app passe en arrière-plan ou se ferme,
+// pour ne plus jamais perdre de progression entre deux sauvegardes automatiques.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveGame();
+});
+window.addEventListener('pagehide', saveGame);
+window.addEventListener('beforeunload', saveGame);
 setInterval(tick, 100);
 
 // ══════════════════════════════════════════════
