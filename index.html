@@ -7,6 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>From Zero to Empire</title>
 <style>
 /* Load Google Fonts when online */
@@ -5495,9 +5498,18 @@ window.addEventListener('beforeunload', saveGame);
 // (clic, achat, etc.), au cas où les événements de fermeture ne se
 // déclencheraient pas correctement selon le navigateur/l'appareil.
 let _saveDebounceTimer = null;
+let _lastImmediateSave = 0;
 document.addEventListener('click', () => {
+  const now = Date.now();
+  // Sauvegarde immédiate dès le premier clic d'une série (pas d'attente),
+  // pour qu'un rafraîchissement juste après un clic ne perde jamais rien.
+  if (now - _lastImmediateSave > 250) {
+    saveGame();
+    _lastImmediateSave = now;
+  }
+  // Verrouille aussi le tout dernier état peu après la fin d'une série de clics.
   clearTimeout(_saveDebounceTimer);
-  _saveDebounceTimer = setTimeout(saveGame, 700);
+  _saveDebounceTimer = setTimeout(saveGame, 200);
 }, true);
 setInterval(tick, 100);
 
