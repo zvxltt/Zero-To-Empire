@@ -2084,9 +2084,17 @@ function loadGame() {
   return defaultState();
 }
 
+let _saveFailedNotified = false;
 function saveGame() {
   G.lastSave = Date.now();
-  try { localStorage.setItem('zte_v3', JSON.stringify(G)); } catch(e){}
+  try {
+    localStorage.setItem('zte_v3', JSON.stringify(G));
+  } catch(e) {
+    if (!_saveFailedNotified) {
+      _saveFailedNotified = true;
+      try { showBigErrorToast('Sauvegarde impossible', 'Stockage local indisponible sur cet appareil'); } catch(e2) {}
+    }
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -5475,7 +5483,7 @@ function buyFormationUpgrade(playerIdx, upgId) {
   renderClubAll();
   updateUI();
 }
-setInterval(saveGame, 15000);
+setInterval(saveGame, 4000);
 // Sauvegarde immédiate dès que l'app passe en arrière-plan ou se ferme,
 // pour ne plus jamais perdre de progression entre deux sauvegardes automatiques.
 document.addEventListener('visibilitychange', () => {
@@ -5483,6 +5491,14 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('pagehide', saveGame);
 window.addEventListener('beforeunload', saveGame);
+// Filet de sécurité supplémentaire : sauvegarde peu après chaque action
+// (clic, achat, etc.), au cas où les événements de fermeture ne se
+// déclencheraient pas correctement selon le navigateur/l'appareil.
+let _saveDebounceTimer = null;
+document.addEventListener('click', () => {
+  clearTimeout(_saveDebounceTimer);
+  _saveDebounceTimer = setTimeout(saveGame, 700);
+}, true);
 setInterval(tick, 100);
 
 // ══════════════════════════════════════════════
